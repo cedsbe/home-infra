@@ -1,0 +1,11 @@
+# DO NOT STORE CREDENTIALS IN PLAIN TEXT
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-repo
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  type: git
+  url: https://github.com/cedsbe/home-infra

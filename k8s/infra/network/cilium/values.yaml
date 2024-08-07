@@ -1,0 +1,66 @@
+kubeProxyReplacement: true
+
+# Talos specific
+k8sServiceHost: localhost
+k8sServicePort: 7445
+securityContext:
+  capabilities:
+    ciliumAgent:
+      [
+        CHOWN,
+        KILL,
+        NET_ADMIN,
+        NET_RAW,
+        IPC_LOCK,
+        SYS_ADMIN,
+        SYS_RESOURCE,
+        DAC_OVERRIDE,
+        FOWNER,
+        SETGID,
+        SETUID,
+      ]
+    cleanCiliumState: [NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
+
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
+
+# https://docs.cilium.io/en/stable/network/concepts/ipam/
+ipam:
+  mode: kubernetes
+
+operator:
+  rollOutPods: true
+
+# Roll out cilium agent pods automatically when ConfigMap is updated.
+rollOutCiliumPods: true
+
+gatewayAPI:
+  enabled: true
+  gatewayClass:
+    create: "true" # Create a GatewayClass for Cilium - With Helm it detects the CDR, but not with Kustomize/templates
+
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+    rollOutPods: true
+  ui:
+    enabled: true
+    rollOutPods: true
+
+# Increase rate limit when doing L2 announcements
+k8sClientRateLimit:
+  qps: 20
+  burst: 100
+
+l2announcements:
+  enabled: true
+
+externalIPs:
+  enabled: true
+
+loadBalancer:
+  # https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/#maglev-consistent-hashing
+  algorithm: maglev

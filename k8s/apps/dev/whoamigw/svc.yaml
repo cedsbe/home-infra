@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: whoamigw
+  namespace: whoamigw
+spec:
+  type: ClusterIP
+  selector:
+    app: whoamigw
+  ports:
+    - name: web
+      port: 80
+      targetPort: http

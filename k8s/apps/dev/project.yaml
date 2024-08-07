@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: dev
+  namespace: argocd
+spec:
+  description: Development
+  sourceRepos:
+    - "https://github.com/cedsbe/home-infra"
+  destinations:
+    - namespace: "argocd"
+      server: "*"
+    - namespace: "whoami"
+      server: "*"
+    - namespace: "whoamigw"
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

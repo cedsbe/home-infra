@@ -1,0 +1,86 @@
+# https://github.com/argoproj/argo-helm/blob/main/charts/argo-cd/values.yaml
+# CMP stands for "Config Management Plugins" - https://argo-cd.readthedocs.io/en/stable/operator-manual/config-management-plugins/
+
+global:
+  domain: argocd.k8s.ghiot.be
+
+
+configs:
+  cm:
+    create: true
+    admin.enabled: true
+    url: "https://argocd.k8s.ghiot.be"
+
+    # The configs.cm values allows you to define any arbitrary key that we don't have in chart.
+    # https://github.com/argoproj/argo-helm/issues/2462
+    kustomize.buildOptions: --enable-helm
+
+  params:
+    server.insecure: true
+  rbac:
+    policy.csv: |
+      g, argocd:admin, role:admin
+      g, argocd:read_all, role:readonly
+
+crds:
+  install: true
+  # -- Keep CRDs on chart uninstall
+  keep: false
+
+controller:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 700Mi
+    limits:
+      memory: 4Gi
+
+dex:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+
+redis:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      memory: 1Gi
+
+server:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 1Gi
+
+repoServer:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 2Gi
+
+applicationSet:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 1Gi
+
+notifications:
+  enabled: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 1000m
+      memory: 128Mi

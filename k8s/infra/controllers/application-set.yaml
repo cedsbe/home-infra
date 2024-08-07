@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: controllers
+  namespace: argocd
+  labels:
+    be.ghiot: controllers
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/cedsbe/home-infra
+        revision: HEAD
+        directories:
+          - path: k8s/infra/controllers/*
+  template:
+    metadata:
+      name: "{{ path.basename }}"
+      labels:
+        be.ghiot: controllers
+    spec:
+      project: controllers
+      source:
+        repoURL: https://github.com/cedsbe/home-infra
+        targetRevision: HEAD
+        path: "{{ path }}"
+      destination:
+        name: in-cluster
+        namespace: argocd
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true

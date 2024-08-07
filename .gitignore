@@ -1,0 +1,9 @@
+k8s/infra/*/*/charts/*
+.terraform
+terraform.tfstate
+terraform.tfstate.backup
+id_rsa
+*.secrets.auto.tfvars
+.task/**/*
+terraform/kubernetes/output/**/*
+sensitive/**/*

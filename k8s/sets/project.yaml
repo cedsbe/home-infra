@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: app-of-apps
+  namespace: argocd
+spec:
+  description: App of apps
+  sourceRepos:
+    - 'https://github.com/cedsbe/home-infra'
+  destinations:
+    - namespace: 'argocd'
+      server: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

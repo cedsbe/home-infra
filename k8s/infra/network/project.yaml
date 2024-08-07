@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: network
+  namespace: argocd
+spec:
+  description: Network infrastructure
+  sourceRepos:
+    - "https://github.com/cedsbe/home-infra"
+  destinations:
+    - namespace: "argocd"
+      server: "*"
+    - namespace: "cilium-secrets"
+      server: "*"
+    - namespace: "dns"
+      server: "*"
+    - namespace: "gateway"
+      server: "*"
+    - namespace: "kube-system"
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

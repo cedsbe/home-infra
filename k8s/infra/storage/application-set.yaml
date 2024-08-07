@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: storage
+  namespace: argocd
+  labels:
+    be.ghiot: storage
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/cedsbe/home-infra
+        revision: HEAD
+        directories:
+          - path: k8s/infra/storage/*
+  template:
+    metadata:
+      name: '{{ path.basename }}'
+      labels:
+        be.ghiot: storage
+    spec:
+      project: storage
+      source:
+        repoURL: https://github.com/cedsbe/home-infra
+        targetRevision: HEAD
+        path: '{{ path }}'
+      destination:
+        name: in-cluster
+        namespace: argocd
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true

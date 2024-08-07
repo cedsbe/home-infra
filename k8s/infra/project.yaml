@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: infrastructure
+  namespace: argocd
+spec:
+  description: Infrastructure
+  sourceRepos:
+    - "https://github.com/cedsbe/home-infra"
+  destinations:
+    - namespace: "kube-system"
+      server: "*"
+    - namespace: "argocd"
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

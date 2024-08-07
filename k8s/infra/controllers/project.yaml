@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: controllers
+  namespace: argocd
+spec:
+  description: Controllers infrastructure
+  sourceRepos:
+    - "https://github.com/cedsbe/home-infra"
+  destinations:
+    - namespace: "argocd"
+      server: "*"
+    - namespace: "cert-manager"
+      server: "*"
+    - namespace: "kube-system"
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"

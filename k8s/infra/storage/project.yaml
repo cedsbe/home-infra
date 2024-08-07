@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: storage
+  namespace: argocd
+spec:
+  description: Storage infrastructure
+  sourceRepos:
+    - 'https://github.com/cedsbe/home-infra'
+  destinations:
+    - namespace: 'argocd'
+      server: '*'
+    - namespace: 'csi-proxmox'
+      server: '*'
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
