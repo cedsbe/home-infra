@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <servicing></servicing>
+    <settings pass="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <SetupUILanguage>
+                <UILanguage>en-US</UILanguage>
+            </SetupUILanguage>
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-BE</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UILanguageFallback>en-US</UILanguageFallback>
+            <UserLocale>en-BE</UserLocale>
+        </component>
+
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <DiskConfiguration>
+                <Disk wcm:action="add">
+                    <DiskID>0</DiskID>
+                    <WillWipeDisk>true</WillWipeDisk>
+                    <CreatePartitions>
+                        <CreatePartition wcm:action="add">
+                            <Order>1</Order>
+                            <Type>Primary</Type>
+                            <Size>2048</Size>
+                        </CreatePartition>
+
+                        <CreatePartition wcm:action="add">
+                            <Order>2</Order>
+                            <Type>EFI</Type>
+                            <Size>100</Size>
+                        </CreatePartition>
+
+
+                        <CreatePartition wcm:action="add">
+                            <Order>3</Order>
+                            <Type>MSR</Type>
+                            <Size>128</Size>
+                        </CreatePartition>
+
+                        <CreatePartition wcm:action="add">
+                            <Order>4</Order>
+                            <Type>Primary</Type>
+                            <Extend>true</Extend>
+                        </CreatePartition>
+                    </CreatePartitions>
+
+                    <ModifyPartitions>
+                        <ModifyPartition wcm:action="add">
+                            <Order>1</Order>
+                            <PartitionID>1</PartitionID>
+                            <Label>WinRE</Label>
+                            <Format>NTFS</Format>
+                            <TypeID>DE94BBA4-06D1-4D40-A16A-BFD50179D6AC</TypeID>
+                        </ModifyPartition>
+
+                        <ModifyPartition wcm:action="add">
+                            <Order>2</Order>
+                            <PartitionID>2</PartitionID>
+                            <Label>EFI</Label>
+                            <Format>FAT32</Format>
+                        </ModifyPartition>
+
+                        <ModifyPartition wcm:action="add">
+                            <Order>3</Order>
+                            <PartitionID>3</PartitionID>
+                        </ModifyPartition>
+
+                        <ModifyPartition wcm:action="add">
+                            <Order>4</Order>
+                            <PartitionID>4</PartitionID>
+                            <Label>Windows</Label>
+                            <Format>NTFS</Format>
+                            <Letter>C</Letter>
+                        </ModifyPartition>
+                    </ModifyPartitions>
+                </Disk>
+                <WillShowUI>OnError</WillShowUI>
+            </DiskConfiguration>
+
+            <Display>
+                <ColorDepth>32</ColorDepth>
+                <HorizontalResolution>1440</HorizontalResolution>
+                <RefreshRate>60</RefreshRate>
+                <VerticalResolution>900</VerticalResolution>
+            </Display>
+
+            <ImageInstall>
+                <OSImage>
+                    <WillShowUI>OnError</WillShowUI>
+                    <InstallFrom>
+                        <MetaData wcm:action="add">
+                            <Key>/IMAGE/INDEX</Key>
+                            <Value>${index}</Value>
+                        </MetaData>
+                    </InstallFrom>
+                    <InstallTo>
+                        <DiskID>0</DiskID>
+                        <PartitionID>4</PartitionID>
+                    </InstallTo>
+                </OSImage>
+            </ImageInstall>
+
+            <UserData>
+                <ProductKey>
+                    <Key>D764K-2NDRG-47T6Q-P8T8W-YP6DF</Key>
+                    <WillShowUI>OnError</WillShowUI>
+                </ProductKey>
+                <AcceptEula>true</AcceptEula>
+                <FullName>Ghiot</FullName>
+                <Organization>Ghiot</Organization>
+            </UserData>
+        </component>
+
+        <component name="Microsoft-Windows-PnpCustomizationsWinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <DriverPaths>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="netkvm">
+                    <Path>${cdrom_drive_virtio_winre}\NetKVM\2k25\amd64</Path>
+                </PathAndCredentials>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="virtio">
+                    <Path>${cdrom_drive_virtio_winre}\amd64\2k25</Path>
+                </PathAndCredentials>
+            </DriverPaths>
+        </component>
+    </settings>
+
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <ComputerName>WIN2025-DC</ComputerName>
+            <TimeZone>Romance Standard Time</TimeZone>
+            <RegisteredOrganization>Ghiot</RegisteredOrganization>
+            <RegisteredOwner>Ghiot</RegisteredOwner>
+        </component>
+
+        <component name="Microsoft-Windows-ServerManager-SvrMgrNc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <DoNotOpenServerManagerAtLogon>true</DoNotOpenServerManagerAtLogon>
+        </component>
+
+        <component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <IEHardenAdmin>false</IEHardenAdmin>
+            <IEHardenUser>false</IEHardenUser>
+        </component>
+
+        <component name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <SkipAutoActivation>true</SkipAutoActivation>
+        </component>
+    </settings>
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <AutoLogon>
+                <Password>
+                    <Value>${password}</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+                <Enabled>true</Enabled>
+                <LogonCount>2</LogonCount>
+                <Username>Administrator</Username>
+            </AutoLogon>
+
+            <Display>
+                <ColorDepth>32</ColorDepth>
+                <DPI>96</DPI>
+                <HorizontalResolution>1440</HorizontalResolution>
+                <RefreshRate>60</RefreshRate>
+                <VerticalResolution>900</VerticalResolution>
+            </Display>
+
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <Description>Set Execution Policy 64-bit</Description>
+                    <CommandLine>cmd.exe /c powershell -Command &quot;Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force&quot;</CommandLine>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+
+                <SynchronousCommand wcm:action="add">
+                    <Order>2</Order>
+                    <Description>Set Execution Policy 32-bit</Description>
+                    <CommandLine>C:\Windows\SysWOW64\cmd.exe /c powershell -Command &quot;Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force&quot;</CommandLine>
+                    <RequiresUserInput>true</RequiresUserInput>
+                </SynchronousCommand>
+
+                <SynchronousCommand wcm:action="add">
+                    <Order>3</Order>
+                    <Description>Disable network discovery prompt for all users</Description>
+                    <CommandLine>reg ADD HKLM\SYSTEM\CurrentControlSet\Control\Network\NewNetworkWindowOff /f</CommandLine>
+                </SynchronousCommand>
+
+                <SynchronousCommand wcm:action="add">
+                    <Order>4</Order>
+                    <Description>Turn on network discovery for all network profiles</Description>
+                    <CommandLine>netsh advfirewall firewall set rule group=&quot;Network Discovery&quot; new enable=Yes</CommandLine>
+                </SynchronousCommand>
+
+                <SynchronousCommand wcm:action="add">
+                    <Order>5</Order>
+                    <Description>Install Proxmox Tools</Description>
+                    <CommandLine>msiexec /i ${cdrom_drive_virtio_windows}\virtio-win-gt-x64.msi /l*v C:\Windows\Temp\virtio-win-gt-x64.msi.txt /qn ADDLOCAL=ALL</CommandLine>
+                </SynchronousCommand>
+
+                <SynchronousCommand wcm:action="add">
+                    <Order>6</Order>
+                    <Description>Install Proxmox Tools Agent</Description>
+                    <CommandLine>${cdrom_drive_virtio_windows}\virtio-win-guest-tools.exe /install /passive /norestart</CommandLine>
+                </SynchronousCommand>
+
+                <SynchronousCommand wcm:action="add">
+                    <Order>7</Order>
+                    <Description>Setup PowerShell and WinRM</Description>
+                    <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File ${cdrom_drive_unattended_files_windows}\initial-setup.ps1</CommandLine>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <SkipUserOOBE>true</SkipUserOOBE>
+                <SkipMachineOOBE>true</SkipMachineOOBE>
+                <ProtectYourPC>1</ProtectYourPC>
+            </OOBE>
+
+            <UserAccounts>
+                <AdministratorPassword>
+                    <Value>${password}</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+            </UserAccounts>
+        </component>
+    </settings>
+    <cpi:offlineImage cpi:source="wim:d:/windowsimaging/windowsserver2025/install.wim#Windows Server 2025 SERVERDATACENTER" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
+</unattend>

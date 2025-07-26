@@ -1,0 +1,131 @@
+# Project-specific dictionary for home-infra repository
+# Add custom words, technical terms, and project-specific vocabulary here
+
+# Infrastructure components
+argocd
+cilium
+kubeseal
+kustomize
+metallb
+proxmox
+talos
+
+# Project-specific names
+cedsbe
+ghiot
+homelab
+hsp
+hsv
+kctrl
+kwork
+
+# Windows-specific terms
+autounattend
+datacenter
+dccore
+sysprep
+unattended
+winrm
+
+# Common abbreviations
+cli
+fmt
+pkr
+tflint
+
+# Terraform/Packer file extensions
+pkrtpl
+pkrvars
+tfstate
+tfvars
+
+# Network and virtualization
+ovmf
+scsi
+virtio
+vmbr
+vmid
+
+# Kubernetes terms
+clusterip
+controlplane
+gatewayclass
+grpcroute
+httproute
+loadbalancer
+nodepool
+nodeport
+referencegrant
+tlsroute
+
+# DevOps tools and concepts
+cicd
+cloudops
+devops
+finops
+gitops
+netops
+
+# Container and orchestration
+buildah
+containerd
+microk8s
+openshift
+skopeo
+
+# Cloud providers
+digitalocean
+hetzner
+scaleway
+
+# File formats and extensions
+qcow
+vhdx
+vmdk
+
+# Development tools
+commitizen
+editorconfig
+eslint
+prettier
+stylelint
+
+# Programming languages and frameworks
+astro
+chakra
+emotion
+esbuild
+golang
+mantine
+styled
+svelte
+sveltekit
+tailwind
+typescript
+
+# Database and messaging
+clickhouse
+jsonrpc
+meilisearch
+msgpack
+opensearch
+protobuf
+pulsar
+timescale
+typesense
+websocket
+
+# Security and cryptography
+chacha
+ecdsa
+eddsa
+kerberos
+ntlm
+oidc
+passphrase
+poly
+
+# Add more project-specific terms below as needed
+CNI
+csi
+img

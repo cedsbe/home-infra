@@ -4,6 +4,13 @@ terraform.tfstate
 terraform.tfstate.backup
 id_rsa
 *.secrets.auto.tfvars
+*.secrets.auto.pkrvars.hcl
+.env
 .task/**/*
 terraform/kubernetes/output/**/*
 sensitive/**/*
+
+# Node.js dependencies for spell checking
+node_modules/
+package-lock.json
+npm-debug.log*

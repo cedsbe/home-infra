@@ -1,0 +1,62 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-added-large-files
+      - id: check-yaml
+      - id: check-json
+      - id: pretty-format-json
+        args: ['--autofix']
+      - id: check-toml
+      - id: mixed-line-ending
+
+  - repo: https://github.com/streetsidesoftware/cspell-cli
+    rev: v9.2.0
+    hooks:
+      - id: cspell
+        name: Spell check with cspell
+        entry: cspell
+        language: node
+        files: \.(md|txt|yaml|yml|json|js|ts|tf|hcl|ps1|sh|py)$
+        exclude: |
+          (?x)^(
+            .*\.secrets\..*|
+            .*\.lock$|
+            .*\.log$|
+            node_modules/.*|
+            .terraform/.*|
+            terraform\.tfstate.*|
+            .task/.*|
+            sensitive/.*|
+            .env
+          )$
+
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: v0.20.0
+    hooks:
+      - id: terraform-docs-go
+        args: ["markdown", "table", "--output-file", "README.md"]
+        files: \.tf$
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.99.5
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+        exclude: ^terraform/windows/
+      - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+
+  - repo: local
+    hooks:
+      - id: packer-validate
+        name: Validate Packer templates
+        entry: packer validate
+        language: system
+        files: \.pkr\.hcl$
+        pass_filenames: false
+        args: [packer/windows_server_2025/]

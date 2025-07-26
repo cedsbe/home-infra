@@ -13,5 +13,5 @@ Relies on:
 - [Task](https://taskfile.dev/)
 - [Homebrew](https://brew.sh/)
 
-## Acknowledgments  
+## Acknowledgments
 Heavily inspired by Vegard S. Hagen's Home lab. [Blog](https://blog.stonegarden.dev/articles/2024/08/talos-proxmox-tofu/) - [Github](https://github.com/vehagn/homelab)

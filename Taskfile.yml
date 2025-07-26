@@ -9,6 +9,13 @@ env:
   KUBECONFIG: terraform/kubernetes/output/kube-config.yaml
   TALOSCONFIG: terraform/kubernetes/output/talos-config.yaml
 
+dotenv: ['packer/windows_server_2025/.env']
+
+includes:
+  packer:
+    taskfile: ./packer/windows_server_2025/Taskfile.yml
+    dir: ./packer/windows_server_2025
+
 tasks:
   bootstrap_cilium_config:
     cmds:
@@ -114,3 +121,82 @@ tasks:
       - kubectl label namespace cilium-test-1 pod-security.kubernetes.io/enforce=privileged # The test requires privileged pods
       - cilium hubble port-forward&
       - cilium connectivity test
+
+  ####################
+  # Packer Templates
+  ####################
+  # Packer tasks are defined in packer/windows_server_2025/Taskfile.yml
+  # Use them with: task packer:TASK_NAME
+  #
+  # Examples:
+  #   task packer:setup               # Setup environment and check prerequisites
+  #   task packer:validate            # Validate Packer configuration
+  #   task packer:build               # Build default template (DcDesktop)
+  #   task packer:build-dccore        # Build Datacenter Core template
+  #   task packer:build-all           # Build all templates
+  #   task packer:debug               # Build with debug breakpoints
+  #   task packer:help                # Show detailed help
+
+  ####################
+  # Code Quality
+  ####################
+
+  node_install:
+    desc: "Install Node.js via Homebrew"
+    cmds:
+      - brew install node
+
+  precommit_install:
+    desc: "Install pre-commit hooks system"
+    cmds:
+      - brew install pre-commit
+
+  precommit_setup:
+    desc: "Install and setup pre-commit hooks (includes spell checking)"
+    deps:
+      - precommit_install
+      - node_install
+    cmds:
+      - npm install -g cspell
+      - pre-commit install
+      - pre-commit install --hook-type commit-msg
+
+  precommit_run:
+    desc: "Run pre-commit hooks on all files"
+    cmds:
+      - pre-commit run --all-files
+
+  precommit_update:
+    desc: "Update pre-commit hooks to latest versions"
+    cmds:
+      - pre-commit autoupdate
+
+  spell_install:
+    desc: "Install Node.js and cspell for spell checking"
+    cmds:
+      - brew install node
+      - npm install -g cspell
+
+  spell_check:
+    desc: "Run spell check on all files"
+    cmds:
+      - cspell "**/*"
+
+  spell_check_fix:
+    desc: "Run spell check and show suggestions for fixes"
+    cmds:
+      - cspell "**/*" --show-suggestions
+
+  spell_check_local:
+    desc: "Run spell check using local npm dependencies"
+    cmds:
+      - npm install
+      - npm run spell
+
+  spell_add_word:
+    desc: "Add a word to the project dictionary"
+    cmds:
+      - echo "{{.WORD}}" >> cspell-dict.txt
+      - sort -u cspell-dict.txt -o cspell-dict.txt
+    requires:
+      vars: [WORD]
