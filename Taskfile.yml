@@ -3,7 +3,7 @@
 version: "3"
 
 vars:
-  CILIUM_VERSION: v1.16.5
+  CILIUM_VERSION: v1.17.4
 
 env:
   KUBECONFIG: terraform/kubernetes/output/kube-config.yaml
