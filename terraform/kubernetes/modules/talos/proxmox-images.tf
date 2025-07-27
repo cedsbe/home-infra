@@ -1,6 +1,6 @@
 # The module exposes the images url from Talos factory.
 module "talos_images" {
-  source = "./talos-images"
+  source = "./talos_images"
 
   talos_image_base = {
     version    = var.images.version_base

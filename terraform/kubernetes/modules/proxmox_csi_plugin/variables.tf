@@ -4,4 +4,5 @@ variable "proxmox" {
     endpoint     = string
     insecure     = bool
   })
+  description = "Proxmox cluster configuration"
 }

@@ -32,3 +32,8 @@ winrm_username = "Administrator"
 
 # Debug settings - disable for production builds
 disable_debug_breakpoints = true
+
+# For validation purposes only - overwrite with environment variables or secrets management in production
+proxmox_username = "for_validation_purposes_only"
+winrm_password   = "for_validation_purposes_only"
+proxmox_api_token = "for_validation_purposes_only"

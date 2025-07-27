@@ -1,14 +1,87 @@
 {
-  "version": "0.2",
-  "language": "en",
+  "allowCompoundWords": true,
+  "dictionaries": [
+    "project-words"
+  ],
   "dictionaryDefinitions": [
     {
+      "addWords": true,
       "name": "project-words",
-      "path": "./cspell-dict.txt",
-      "addWords": true
+      "path": "./cspell-dict.txt"
     }
   ],
-  "dictionaries": ["project-words"],
+  "flagWords": [],
+  "ignorePaths": [
+    "node_modules/**",
+    ".git/**",
+    "*.log",
+    "*.lock",
+    "*.tmp",
+    "*.temp",
+    "dist/**",
+    "build/**",
+    "out/**",
+    "target/**",
+    ".terraform/**",
+    "terraform.tfstate*",
+    ".terraform.lock.hcl",
+    "*.iso",
+    "*.img",
+    "*.qcow2",
+    "*.vmdk",
+    "*.vdi",
+    "*.vhd",
+    "*.vhdx",
+    "packer/windows_server_2025/.env",
+    "**/*.secrets.*",
+    "sensitive/**",
+    "terraform/kubernetes/modules/talos/talos_inline_manifests/sensitive_cilium_helm_template.yaml"
+  ],
+  "language": "en",
+  "maxDuplicateProblems": 3,
+  "maxNumberOfProblems": 100,
+  "minWordLength": 3,
+  "numSuggestions": 8,
+  "overrides": [
+    {
+      "filename": "**/*.{md,mdx}",
+      "ignoreRegExpList": [
+        "/```[\\s\\S]*?```/g",
+        "/`[^`]*`/g",
+        "/\\[.*?\\]\\(.*?\\)/g"
+      ]
+    },
+    {
+      "filename": "**/*.{yaml,yml}",
+      "ignoreRegExpList": [
+        "/---/g",
+        "/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi"
+      ]
+    },
+    {
+      "filename": "**/*.{tf,hcl}",
+      "ignoreRegExpList": [
+        "/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi",
+        "/[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}/g"
+      ]
+    },
+    {
+      "filename": "**/*.{ps1,psm1,psd1}",
+      "ignoreRegExpList": [
+        "/\\$[a-zA-Z_][a-zA-Z0-9_]*/g",
+        "/\\[.*?\\]/g"
+      ]
+    },
+    {
+      "filename": "**/*.{sh,bash,zsh,fish}",
+      "ignoreRegExpList": [
+        "/\\$[a-zA-Z_][a-zA-Z0-9_]*/g",
+        "/\\${[^}]*}/g"
+      ]
+    }
+  ],
+  "suggestionsTimeout": 5000,
+  "version": "0.2",
   "words": [
     "talos",
     "proxmox",
@@ -644,75 +717,5 @@
     "siv",
     "eax",
     "ocb"
-  ],
-  "flagWords": [],
-  "ignorePaths": [
-    "node_modules/**",
-    ".git/**",
-    "*.log",
-    "*.lock",
-    "*.tmp",
-    "*.temp",
-    "dist/**",
-    "build/**",
-    "out/**",
-    "target/**",
-    ".terraform/**",
-    "terraform.tfstate*",
-    ".terraform.lock.hcl",
-    "*.iso",
-    "*.img",
-    "*.qcow2",
-    "*.vmdk",
-    "*.vdi",
-    "*.vhd",
-    "*.vhdx",
-    "packer/windows_server_2025/.env",
-    "**/*.secrets.*",
-    "sensitive/**"
-  ],
-  "overrides": [
-    {
-      "filename": "**/*.{md,mdx}",
-      "ignoreRegExpList": [
-        "/```[\\s\\S]*?```/g",
-        "/`[^`]*`/g",
-        "/\\[.*?\\]\\(.*?\\)/g"
-      ]
-    },
-    {
-      "filename": "**/*.{yaml,yml}",
-      "ignoreRegExpList": [
-        "/---/g",
-        "/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi"
-      ]
-    },
-    {
-      "filename": "**/*.{tf,hcl}",
-      "ignoreRegExpList": [
-        "/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/gi",
-        "/[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}/g"
-      ]
-    },
-    {
-      "filename": "**/*.{ps1,psm1,psd1}",
-      "ignoreRegExpList": [
-        "/\\$[a-zA-Z_][a-zA-Z0-9_]*/g",
-        "/\\[.*?\\]/g"
-      ]
-    },
-    {
-      "filename": "**/*.{sh,bash,zsh,fish}",
-      "ignoreRegExpList": [
-        "/\\$[a-zA-Z_][a-zA-Z0-9_]*/g",
-        "/\\${[^}]*}/g"
-      ]
-    }
-  ],
-  "allowCompoundWords": true,
-  "minWordLength": 3,
-  "maxNumberOfProblems": 100,
-  "numSuggestions": 8,
-  "suggestionsTimeout": 5000,
-  "maxDuplicateProblems": 3
+  ]
 }

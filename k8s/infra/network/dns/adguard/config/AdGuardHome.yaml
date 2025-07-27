@@ -73,9 +73,9 @@ dns:
   aaaa_disabled: false
   enable_dnssec: false
   max_goroutines: 300
-  handle_ddr: true  
+  handle_ddr: true
   ipset: [ ]
-  ipset_file: ""  
+  ipset_file: ""
   upstream_timeout: 10s
   serve_http3: false
   serve_plain_dns: true

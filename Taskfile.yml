@@ -26,11 +26,11 @@ tasks:
           --version={{.CILIUM_VERSION}} \
           --namespace kube-system \
           --set kubeProxyReplacement=true \
-          --values k8s/infra/network/cilium/values_bootstrap.yaml > terraform/kubernetes/modules/talos/talos-inline-manifests/sensitive_cilium_helm_template.yaml
+          --values k8s/infra/network/cilium/values_bootstrap.yaml > terraform/kubernetes/modules/talos/talos_inline_manifests/sensitive_cilium_helm_template.yaml
     sources:
       - k8s/infra/network/cilium/values_bootstrap.yaml
     generates:
-      - terraform/kubernetes/modules/talos/talos-inline-manifests/sensitive_cilium_helm_template.yaml
+      - terraform/kubernetes/modules/talos/talos_inline_manifests/sensitive_cilium_helm_template.yaml
 
   ####################
   # Tools
@@ -44,6 +44,7 @@ tasks:
       - kubeseal_install
       - kustomize_install
       - talosctl_install
+      - tflint_install
 
   argocd_cli_install:
     desc: "Install ArgoCD CLI"
@@ -85,6 +86,11 @@ tasks:
     desc: "Install talosctl"
     cmds:
       - brew install siderolabs/tap/talosctl
+
+  tflint_install:
+    desc: "Install TFLint for Terraform linting"
+    cmds:
+      - brew install tflint
 
   ####################
   # Infrastructure
@@ -151,11 +157,17 @@ tasks:
     cmds:
       - brew install pre-commit
 
+  terraform_docs_install:
+    desc: "Install terraform-docs for generating documentation"
+    cmds:
+      - brew install terraform-docs
+
   precommit_setup:
     desc: "Install and setup pre-commit hooks (includes spell checking)"
     deps:
       - precommit_install
       - node_install
+      - tflint_install
     cmds:
       - npm install -g cspell
       - pre-commit install
@@ -180,12 +192,28 @@ tasks:
   spell_check:
     desc: "Run spell check on all files"
     cmds:
-      - cspell "**/*"
+      - cspell --config cspell.json --gitignore .
 
   spell_check_fix:
     desc: "Run spell check and show suggestions for fixes"
     cmds:
-      - cspell "**/*" --show-suggestions
+      - cspell --config cspell.json --gitignore . --show-suggestions
+
+  spell_debug:
+    desc: "Debug spell check configuration"
+    cmds:
+      - echo "Current directory:" && pwd
+      - echo "cspell.json exists:" && ls -la cspell.json
+      - echo "Dictionary file exists:" && ls -la cspell-dict.txt
+      - echo "Testing configuration:"
+      - cspell --config cspell.json --gitignore --show-context --no-progress README.md
+
+  spell_test_file:
+    desc: "Test spell check on a specific file"
+    cmds:
+      - cspell --config cspell.json --gitignore --show-context "{{.FILE}}"
+    requires:
+      vars: [FILE]
 
   spell_check_local:
     desc: "Run spell check using local npm dependencies"
@@ -200,3 +228,8 @@ tasks:
       - sort -u cspell-dict.txt -o cspell-dict.txt
     requires:
       vars: [WORD]
+
+  spell_extract_unknown:
+    desc: "Extract all unknown words to toReview.txt for review"
+    cmds:
+      - cspell --config cspell.json --gitignore . --words-only --unique --no-progress > toReview.txt

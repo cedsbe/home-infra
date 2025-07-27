@@ -1,17 +1,17 @@
 {
-  "name": "home-infra",
-  "version": "1.0.0",
   "description": "Home infrastructure automation with Terraform, Talos, and Packer",
-  "private": true,
-  "scripts": {
-    "spell": "cspell '**/*'",
-    "spell:fix": "cspell '**/*' --show-suggestions",
-    "spell:add": "echo \"Usage: npm run spell:add -- WORD_TO_ADD\""
-  },
   "devDependencies": {
     "cspell": "^8.15.6"
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "name": "home-infra",
+  "private": true,
+  "scripts": {
+    "spell": "cspell '**/*'",
+    "spell:add": "echo \"Usage: npm run spell:add -- WORD_TO_ADD\"",
+    "spell:fix": "cspell '**/*' --show-suggestions"
+  },
+  "version": "1.0.0"
 }

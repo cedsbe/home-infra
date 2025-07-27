@@ -2,7 +2,7 @@ resource "local_file" "machine_configs" {
   for_each = module.talos.machine_config
 
   content         = each.value.machine_configuration
-  filename        = "output/talos-machine-config-${each.key}.yaml"
+  filename        = "output/talos_machine_config-${each.key}.yaml"
   file_permission = "0600"
 }
 

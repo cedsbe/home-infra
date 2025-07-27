@@ -4,11 +4,11 @@
 #
 ###############################################################
 
-data "talos_image_factory_versions" "update" {
-  filters = {
-    version = var.talos_image_update.version
-  }
-}
+# data "talos_image_factory_versions" "update" {
+#   filters = {
+#     version = var.talos_image_update.version
+#   }
+# }
 
 locals {
   # Validate that the requested version is available
@@ -33,7 +33,7 @@ resource "talos_image_factory_schematic" "update" {
     {
       customization = {
         systemExtensions = {
-          officialExtensions = data.talos_image_factory_extensions_versions.update.extensions_info.*.name
+          officialExtensions = data.talos_image_factory_extensions_versions.update.extensions_info[*].name
         }
       }
     }
@@ -48,6 +48,7 @@ data "talos_image_factory_urls" "update" {
 }
 
 output "image_update" {
+  description = "Update Talos image configuration"
   value = {
     architecture = local.talos_image_update_built.architecture
     image_id     = "${talos_image_factory_schematic.update.id}_${local.talos_image_update_built.version}"

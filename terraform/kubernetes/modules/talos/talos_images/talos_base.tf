@@ -28,7 +28,7 @@ resource "talos_image_factory_schematic" "base" {
       customization = {
         extraKernelArgs = var.talos_image_base.extraKernelArgs
         systemExtensions = {
-          officialExtensions = data.talos_image_factory_extensions_versions.base.extensions_info.*.name
+          officialExtensions = data.talos_image_factory_extensions_versions.base.extensions_info[*].name
         }
       }
     }
@@ -43,6 +43,7 @@ data "talos_image_factory_urls" "base" {
 }
 
 output "image_base" {
+  description = "Base Talos image configuration"
   value = {
     architecture = var.talos_image_base.architecture
     image_id     = "${talos_image_factory_schematic.base.id}_${local.talos_image_base_version}"

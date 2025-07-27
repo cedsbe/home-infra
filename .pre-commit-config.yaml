@@ -7,6 +7,7 @@ repos:
       - id: check-merge-conflict
       - id: check-added-large-files
       - id: check-yaml
+        args: [--allow-multiple-documents]
       - id: check-json
       - id: pretty-format-json
         args: ['--autofix']
@@ -34,29 +35,29 @@ repos:
             .env
           )$
 
-  - repo: https://github.com/terraform-docs/terraform-docs
-    rev: v0.20.0
-    hooks:
-      - id: terraform-docs-go
-        args: ["markdown", "table", "--output-file", "README.md"]
-        files: \.tf$
+  # - repo: https://github.com/terraform-docs/terraform-docs
+  #   rev: v0.20.0
+  #   hooks:
+  #     - id: terraform-docs-go
+  #       args: ["markdown", "table", "--output-file", "README.md"]
+  #       files: \.tf$
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.99.5
     hooks:
       - id: terraform_fmt
       - id: terraform_validate
-        exclude: ^terraform/windows/
+        args:
+          - --hook-config=--retry-once-with-cleanup=true
       - id: terraform_tflint
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
 
   - repo: local
     hooks:
-      - id: packer-validate
-        name: Validate Packer templates
-        entry: packer validate
+      - id: packer-validate-windows-server-2025
+        name: Validate Windows Server 2025 Packer templates
+        entry: bash -c 'cd packer/windows_server_2025 && packer validate .'
         language: system
-        files: \.pkr\.hcl$
+        files: packer/windows_server_2025/.*\.pkr\.hcl$
         pass_filenames: false
-        args: [packer/windows_server_2025/]

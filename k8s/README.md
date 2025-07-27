@@ -20,7 +20,7 @@ kubectl kustomize --enable-helm infra/network/cilium | kubectl apply -f -
 kubectl kustomize apps/dev/whoami
 ```
 
-## Gateway 
+## Gateway
 
 ```shell
 kubectl kustomize infra/network/gateway | kubectl apply -f -

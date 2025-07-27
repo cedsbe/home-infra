@@ -1,5 +1,5 @@
 config {
-  module = true
+  call_module_type = "local"
   force = false
   disabled_by_default = false
 }
@@ -7,10 +7,6 @@ config {
 plugin "terraform" {
   enabled = true
   preset  = "recommended"
-}
-
-plugin "aws" {
-  enabled = false
 }
 
 rule "terraform_unused_declarations" {

@@ -21,6 +21,7 @@ variable "talos_cluster" {
     proxmox_cluster = string
     talos_version   = string
   })
+  description = "Talos cluster configuration, including the endpoint, gateway, name, proxmox cluster, and Talos version."
 }
 
 variable "talos_nodes" {
@@ -107,8 +108,8 @@ variable "talos_nodes" {
 }
 
 variable "cilium" {
-  description = "Cilium configuration"
   type = object({
     inline_manifest = string
   })
+  description = "Cilium configuration"
 }

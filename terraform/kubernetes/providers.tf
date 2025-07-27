@@ -1,28 +1,29 @@
 terraform {
+  required_version = ">= 1.5.0"
   required_providers {
     local = {
       source  = "hashicorp/local"
-      version = "2.5.2"
+      version = "2.5.3"
     }
 
     talos = {
       source  = "siderolabs/talos"
-      version = "0.7.0"
+      version = "0.8.1"
     }
 
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.69.0"
+      version = "0.80.0"
     }
 
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "2.35.1"
+      version = "2.38.0"
     }
 
     restapi = {
       source  = "Mastercard/restapi"
-      version = ">= 1.20.0"
+      version = "2.0.1"
     }
   }
 }

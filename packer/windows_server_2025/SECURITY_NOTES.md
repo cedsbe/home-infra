@@ -1,5 +1,5 @@
 # Security Example - Use environment variables instead of plain text files
-# 
+#
 # Instead of storing secrets in variables.secrets.auto.pkrvars.hcl, use:
 #
 # export PKR_VAR_proxmox_api_token="your-token-here"

@@ -10,7 +10,7 @@ function Stop-DisableService {
     param (
         [string]$ServiceName
     )
-    
+
     try {
         $service = Get-Service -Name $ServiceName -ErrorAction SilentlyContinue
         if ($service) {
@@ -30,7 +30,7 @@ function Remove-ScheduledTaskSafe {
         [string]$TaskName,
         [string]$TaskPath = "\"
     )
-    
+
     try {
         $task = Get-ScheduledTask -TaskName $TaskName -TaskPath $TaskPath -ErrorAction SilentlyContinue
         if ($task) {
@@ -63,13 +63,13 @@ try {
         "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Run",
         "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run"
     )
-    
+
     foreach ($regPath in $azureRegPaths) {
         if (Test-Path $regPath) {
             $entries = Get-ItemProperty -Path $regPath -ErrorAction SilentlyContinue
             if ($entries) {
-                $entries.PSObject.Properties | Where-Object { 
-                    $_.Name -like "*Azure*" -or $_.Name -like "*Arc*" -or $_.Value -like "*Azure*" 
+                $entries.PSObject.Properties | Where-Object {
+                    $_.Name -like "*Azure*" -or $_.Name -like "*Arc*" -or $_.Value -like "*Azure*"
                 } | ForEach-Object {
                     Write-Host "Removing registry entry: $($_.Name)"
                     Remove-ItemProperty -Path $regPath -Name $_.Name -ErrorAction SilentlyContinue
@@ -90,12 +90,12 @@ try {
         Write-Host "Uninstalling Azure Connected Machine Agent..."
         $arcAgent.Uninstall()
     }
-    
+
     # Also check for other Azure-related software
-    $azureSoftware = Get-WmiObject -Class Win32_Product | Where-Object { 
-        $_.Name -like "*Azure*" -and $_.Name -notlike "*Visual Studio*" 
+    $azureSoftware = Get-WmiObject -Class Win32_Product | Where-Object {
+        $_.Name -like "*Azure*" -and $_.Name -notlike "*Visual Studio*"
     }
-    
+
     foreach ($software in $azureSoftware) {
         Write-Host "Found Azure software: $($software.Name)"
         # Uncomment the next line if you want to remove all Azure software
@@ -134,7 +134,7 @@ try {
     if (-not (Test-Path $updateRegPath)) {
         New-Item -Path $updateRegPath -Force | Out-Null
     }
-    
+
     # Disable automatic Azure integration
     Set-ItemProperty -Path $updateRegPath -Name "DisableAzureADJoin" -Value 1 -Type DWord -ErrorAction SilentlyContinue
 }

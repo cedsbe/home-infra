@@ -18,7 +18,7 @@ module "talos" {
   }
 
   cilium = {
-    inline_manifest = file("${path.module}/modules/talos/talos-inline-manifests/sensitive_cilium_helm_template.yaml")
+    inline_manifest = file("${path.module}/modules/talos/talos_inline_manifests/sensitive_cilium_helm_template.yaml")
   }
 
   talos_nodes = {
@@ -87,7 +87,7 @@ module "talos" {
 }
 
 module "proxmox_csi_plugin" {
-  source     = "./modules/proxmox-csi-plugin"
+  source     = "./modules/proxmox_csi_plugin"
   depends_on = [module.talos]
 
   proxmox = var.proxmox

@@ -16,4 +16,3 @@ variable "proxmox_secrets" {
   sensitive   = true
   description = "Proxmox provider configuration. Sensitive data."
 }
-

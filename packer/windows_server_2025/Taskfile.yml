@@ -39,7 +39,7 @@ tasks:
     cmds:
       - |
         echo "🔍 Checking required environment variables..."
-        
+
         # Check if .env file exists
         if [ ! -f ".env" ]; then
           echo "⚠️  .env file not found"
@@ -50,21 +50,21 @@ tasks:
         else
           echo "✅ .env file found"
         fi
-        
+
         missing_vars=()
-        
+
         if [ -z "$PKR_VAR_proxmox_api_token" ]; then
           missing_vars+=("PKR_VAR_proxmox_api_token")
         fi
-        
+
         if [ -z "$PKR_VAR_proxmox_username" ]; then
           missing_vars+=("PKR_VAR_proxmox_username")
         fi
-        
+
         if [ -z "$PKR_VAR_winrm_password" ]; then
           missing_vars+=("PKR_VAR_winrm_password")
         fi
-        
+
         if [ ${#missing_vars[@]} -eq 0 ]; then
           echo "✅ All required environment variables are set"
         else
@@ -96,10 +96,10 @@ tasks:
           exit 1
         fi
         echo "✅ Packer is installed: $(packer version)"
-        
+
         echo ""
         echo "🔍 Checking required files..."
-        
+
         required_files=(
           "windows_server_2025.pkr.hcl"
           "variables.pkr.hcl"
@@ -109,14 +109,14 @@ tasks:
           "build_files/scripts/generalize.ps1"
           "build_files/templates/unattended.xml.pkrtpl"
         )
-        
+
         missing_files=()
         for file in "${required_files[@]}"; do
           if [ ! -f "$file" ]; then
             missing_files+=("$file")
           fi
         done
-        
+
         if [ ${#missing_files[@]} -eq 0 ]; then
           echo "✅ All required files are present"
         else
@@ -124,7 +124,7 @@ tasks:
           printf '  %s\n' "${missing_files[@]}"
           exit 1
         fi
-        
+
         echo ""
         echo "🚀 Environment is ready for building Windows Server 2025 templates!"
 
@@ -217,18 +217,18 @@ tasks:
           rm -rf packer_cache
           echo "✅ Removed packer_cache directory"
         fi
-        
+
         if [ -f "packer.log" ]; then
           rm packer.log
           echo "✅ Removed packer.log"
         fi
-        
+
         # Remove any .box files (if any)
         if ls *.box 1> /dev/null 2>&1; then
           rm *.box
           echo "✅ Removed .box files"
         fi
-        
+
         echo "✅ Cleanup completed"
 
   inspect:

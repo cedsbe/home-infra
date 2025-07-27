@@ -29,10 +29,10 @@ Get-EventLog -LogName * | ForEach-Object { Clear-EventLog -LogName $_.Log -Error
 
 # Remove any leftover user profiles except default ones
 Write-Host "Cleaning up user profiles..."
-Get-WmiObject -Class Win32_UserProfile | Where-Object { 
-    $_.Special -eq $false -and 
-    $_.LocalPath -notlike "*Administrator*" -and 
-    $_.LocalPath -notlike "*Default*" 
+Get-WmiObject -Class Win32_UserProfile | Where-Object {
+    $_.Special -eq $false -and
+    $_.LocalPath -notlike "*Administrator*" -and
+    $_.LocalPath -notlike "*Default*"
 } | Remove-WmiObject -ErrorAction SilentlyContinue
 
 # Defragment the disk (optional but recommended for template optimization)
