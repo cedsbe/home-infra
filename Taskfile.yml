@@ -133,15 +133,6 @@ tasks:
   ####################
   # Packer tasks are defined in packer/windows_server_2025/Taskfile.yml
   # Use them with: task packer:TASK_NAME
-  #
-  # Examples:
-  #   task packer:setup               # Setup environment and check prerequisites
-  #   task packer:validate            # Validate Packer configuration
-  #   task packer:build               # Build default template (DcDesktop)
-  #   task packer:build-dccore        # Build Datacenter Core template
-  #   task packer:build-all           # Build all templates
-  #   task packer:debug               # Build with debug breakpoints
-  #   task packer:help                # Show detailed help
 
   ####################
   # Code Quality

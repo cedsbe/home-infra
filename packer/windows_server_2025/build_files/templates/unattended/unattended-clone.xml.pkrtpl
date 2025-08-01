@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"
+            xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <InputLocale>0409:00000409</InputLocale>
+            <SystemLocale>en-BE</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UserLocale>en-BE</UserLocale>
+        </component>
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64"
+            publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS"
+            xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <AutoLogon>
+                <Password>
+                    <Value>${password}</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+                <Enabled>true</Enabled>
+                <LogonCount>2</LogonCount>
+                <Username>Administrator</Username>
+            </AutoLogon>
+
+            <Display>
+                <ColorDepth>32</ColorDepth>
+                <DPI>96</DPI>
+                <HorizontalResolution>1440</HorizontalResolution>
+                <RefreshRate>60</RefreshRate>
+                <VerticalResolution>900</VerticalResolution>
+            </Display>
+
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <Description>Setup PowerShell and WinRM</Description>
+                    <CommandLine>cmd.exe /c C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -File ${cdrom_drive_unattended_files_windows}\initial-setup.ps1 -SkipFirewallDisable</CommandLine>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+            <!--Setting
+            OEM information -->
+            <OEMInformation>
+                <Manufacturer>Cedsbe Cloud Platform</Manufacturer>
+                <Model>Cedsbe Packer Virtual Machine</Model>
+                <SupportURL>https://github.com/cedsbe/home-infra</SupportURL>
+            </OEMInformation>
+
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideLocalAccountScreen>true</HideLocalAccountScreen>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <ProtectYourPC>1</ProtectYourPC>
+            </OOBE>
+            <UserAccounts>
+                <AdministratorPassword>
+                    <Value>${password}</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+            </UserAccounts>
+        </component>
+    </settings>
+    <cpi:offlineImage
+        cpi:source="wim:d:/windowsimaging/windowsserver2025/install.wim#Windows Server 2025 SERVERDATACENTER"
+        xmlns:cpi="urn:schemas-microsoft-com:cpi" />
+</unattend>

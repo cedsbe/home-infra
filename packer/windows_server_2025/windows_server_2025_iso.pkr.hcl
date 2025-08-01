@@ -1,21 +1,9 @@
-packer {
-  required_plugins {
-    windows-update = {
-      version = "0.16.10"
-      source  = "github.com/rgl/windows-update"
-    }
-    proxmox = {
-      version = "1.2.1" # Issue with the CPU type in 1.2.2. See https://github.com/hashicorp/packer-plugin-proxmox/pull/308
-      source  = "github.com/hashicorp/proxmox"
-    }
-  }
-}
-
 locals {
-  powershell_scripts = [
+  powershell_scripts_iso = [
     "./build_files/scripts/disable-services.ps1",
     "./build_files/scripts/remove-features.ps1",
     "./build_files/scripts/remove-azure-arc.ps1",
+    "./build_files/scripts/install-sdelete.ps1",
     "./build_files/scripts/config-os.ps1",
   ]
 }
@@ -50,7 +38,7 @@ source "proxmox-iso" "windows2025" {
     cd_files = ["./build_files/scripts/initial-setup.ps1", "./build_files"]
     cd_content = {
       "autounattend.xml" = (
-        templatefile("./build_files/templates/unattended.xml.pkrtpl",
+        templatefile("./build_files/templates/unattended/unattended-iso.xml.pkrtpl",
           {
             password                             = var.winrm_password,
             cdrom_drive_virtio_windows           = var.cdrom_drive_virtio_windows,
@@ -58,6 +46,14 @@ source "proxmox-iso" "windows2025" {
             cdrom_drive_unattended_files_windows = var.cdrom_drive_unattended_files_windows,
             cdrom_drive_unattended_files_winre   = var.cdrom_drive_unattended_files_winre,
             index                                = lookup(var.image_index, var.template, "DcDesktop")
+          }
+        )
+      )
+      "unattend.xml" = (
+        templatefile("./build_files/templates/unattended/unattended-clone.xml.pkrtpl",
+          {
+            password                             = var.winrm_password,
+            cdrom_drive_unattended_files_windows = var.cdrom_drive_unattended_files_windows
           }
         )
       )
@@ -132,7 +128,7 @@ source "proxmox-iso" "windows2025" {
 }
 
 build {
-  name    = "Proxmox Build"
+  name    = "iso_build"
   sources = ["source.proxmox-iso.windows2025"]
 
   provisioner "windows-restart" {
@@ -147,7 +143,7 @@ build {
   provisioner "powershell" {
     elevated_user     = var.winrm_username
     elevated_password = var.winrm_password
-    scripts           = local.powershell_scripts
+    scripts           = local.powershell_scripts_iso
   }
 
   provisioner "breakpoint" {
@@ -176,6 +172,6 @@ build {
   provisioner "powershell" {
     elevated_user     = var.winrm_username
     elevated_password = var.winrm_password
-    scripts           = ["./build_files/scripts/generalize.ps1"]
+    scripts           = ["./build_files/scripts/generalize-iso.ps1"]
   }
 }

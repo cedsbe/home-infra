@@ -5,7 +5,7 @@ version: "3"
 
 vars:
   DEFAULT_TEMPLATE: DcDesktop
-  PACKER_LOG_LEVEL: 1
+  PACKER_LOG_LEVEL: ""
 
 env:
   PACKER_LOG: "{{.PACKER_LOG_LEVEL}}"
@@ -83,6 +83,66 @@ tasks:
           exit 1
         fi
 
+  env-check-clone:
+    desc: "Check if required environment variables are set for clone build"
+    silent: true
+    cmds:
+      - |
+        echo "🔍 Checking required environment variables for clone build..."
+
+        # Check if .env file exists
+        if [ ! -f ".env" ]; then
+          echo "⚠️  .env file not found"
+          echo "💡 Create one from template:"
+          echo "   cp .env.template .env"
+          echo "   # Then edit .env with your actual credentials"
+          echo ""
+        else
+          echo "✅ .env file found"
+        fi
+
+        missing_vars=()
+
+        if [ -z "$PKR_VAR_proxmox_api_token" ]; then
+          missing_vars+=("PKR_VAR_proxmox_api_token")
+        fi
+
+        if [ -z "$PKR_VAR_proxmox_username" ]; then
+          missing_vars+=("PKR_VAR_proxmox_username")
+        fi
+
+        if [ -z "$PKR_VAR_winrm_password" ]; then
+          missing_vars+=("PKR_VAR_winrm_password")
+        fi
+
+        if [ -z "$PKR_VAR_clone_vm_id" ]; then
+          missing_vars+=("PKR_VAR_clone_vm_id")
+        fi
+
+        if [ ${#missing_vars[@]} -eq 0 ]; then
+          echo "✅ All required environment variables are set for clone build"
+        else
+          echo "❌ Missing required environment variables for clone build:"
+          printf '  %s\n' "${missing_vars[@]}"
+          echo ""
+          echo "💡 Options to set them:"
+          echo "   1. Create/update .env file (recommended):"
+          echo "      cp .env.template .env"
+          echo "      # Edit .env with your credentials"
+          echo ""
+          echo "   2. Export manually:"
+          echo "      export PKR_VAR_proxmox_api_token=\"your-token\""
+          echo "      export PKR_VAR_proxmox_username=\"terraform@pve!terra\""
+          echo "      export PKR_VAR_winrm_password=\"your-password\""
+          echo "      export PKR_VAR_clone_vm_id=\"vm-id-to-clone\""
+          echo ""
+          echo "   3. Pass as task variable:"
+          echo "      task build-clone PKR_VAR_clone_vm_id=12345"
+          echo ""
+          echo "ℹ️  The PKR_VAR_clone_vm_id should be the ID of an existing VM template to clone from"
+          exit 1
+        fi
+
   setup:
     desc: "Setup environment and check prerequisites"
     silent: true
@@ -98,114 +158,87 @@ tasks:
         echo "✅ Packer is installed: $(packer version)"
 
         echo ""
-        echo "🔍 Checking required files..."
-
-        required_files=(
-          "windows_server_2025.pkr.hcl"
-          "variables.pkr.hcl"
-          "variables.auto.pkrvars.hcl"
-          ".env.template"
-          "build_files/scripts/initial-setup.ps1"
-          "build_files/scripts/generalize.ps1"
-          "build_files/templates/unattended.xml.pkrtpl"
-        )
-
-        missing_files=()
-        for file in "${required_files[@]}"; do
-          if [ ! -f "$file" ]; then
-            missing_files+=("$file")
-          fi
-        done
-
-        if [ ${#missing_files[@]} -eq 0 ]; then
-          echo "✅ All required files are present"
-        else
-          echo "❌ Missing required files:"
-          printf '  %s\n' "${missing_files[@]}"
-          exit 1
-        fi
-
-        echo ""
         echo "🚀 Environment is ready for building Windows Server 2025 templates!"
 
-  build:
-    desc: "Build Windows Server 2025 template (default: {{.DEFAULT_TEMPLATE}})"
+  setup-clone:
+    desc: "Setup environment and check prerequisites for clone build"
+    silent: true
+    deps: [env-check-clone]
+    cmds:
+      - |
+        echo "🔍 Checking Packer installation..."
+        if ! command -v packer &> /dev/null; then
+          echo "❌ Packer is not installed. Please install Packer first."
+          echo "   Visit: https://www.packer.io/downloads"
+          exit 1
+        fi
+        echo "✅ Packer is installed: $(packer version)"
+
+        echo ""
+        echo "🚀 Environment is ready for building Windows Server 2025 clone templates!"
+
+  build-iso:
+    desc: "Build Windows Server 2025 template (default: {{.DEFAULT_TEMPLATE}}) - Use DEBUG=true to enable breakpoints"
     silent: true
     deps: [setup, validate]
     cmds:
       - |
         echo "🏗️  Building Windows Server 2025 template: {{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
-        echo "⏰ This process typically takes 45-90 minutes..."
-        echo ""
-        packer build -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' .
-        echo ""
-        echo "✅ Template build completed successfully!"
-        echo "📦 Template available in Proxmox as: template-win2025-{{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
-
-  build-dcdesktop:
-    desc: "Build Datacenter Desktop Experience template"
-    silent: true
-    cmds:
-      - task: build
-        vars: {TEMPLATE: DcDesktop}
-
-  build-dccore:
-    desc: "Build Datacenter Core template"
-    silent: true
-    cmds:
-      - task: build
-        vars: {TEMPLATE: DcCore}
-
-  build-stddesktop:
-    desc: "Build Standard Desktop Experience template"
-    silent: true
-    cmds:
-      - task: build
-        vars: {TEMPLATE: StdDesktop}
-
-  build-stdcore:
-    desc: "Build Standard Core template"
-    silent: true
-    cmds:
-      - task: build
-        vars: {TEMPLATE: StdCore}
-
-  build-all:
-    desc: "Build all Windows Server 2025 templates"
-    silent: true
-    deps: [setup, validate]
-    cmds:
-      - |
-        echo "🏗️  Building ALL Windows Server 2025 templates..."
-        echo "⚠️  This will take several hours to complete!"
-        echo ""
-        read -p "Continue? (y/N): " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-          echo "❌ Build cancelled"
-          exit 1
-        fi
-      - task: build-dcdesktop
-      - task: build-dccore
-      - task: build-stddesktop
-      - task: build-stdcore
-      - echo "✅ All templates built successfully!"
-
-  debug:
-    desc: "Build template with debug breakpoints enabled"
-    deps: [setup, validate]
-    silent: true
-    cmds:
-      - |
-        echo "🐛 Building Windows Server 2025 template with debug breakpoints..."
-        echo "⚠️  Build will pause at breakpoints for manual inspection"
+        
+        {{if eq .DEBUG "true"}}
+        echo "🐛 Debug mode enabled - build will pause at breakpoints"
         echo "💡 Use VNC to connect to the VM during breakpoints"
+        {{else}}
+        echo "⏰ This process typically takes 45-90 minutes..."
+        {{end}}
+        
         echo ""
+        
+        {{if eq .DEBUG "true"}}
         packer build \
           -var 'disable_debug_breakpoints=false' \
           -var 'disable_pre_sysprep_breakpoints=false' \
           -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' \
+          -only="iso_build.proxmox-iso.windows2025" \
           .
+        {{else}}
+        packer build -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' -only="iso_build.proxmox-iso.windows2025" .
+        {{end}}
+        
+        echo ""
+        echo "✅ Template build completed successfully!"
+        echo "📦 Template available in Proxmox as: template-win2025-{{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
+
+  build-clone:
+    desc: "Build Windows Server 2025 clone template - Use DEBUG=true to enable breakpoints"
+    silent: true
+    deps: [setup-clone, validate]
+    cmds:
+      - |
+        echo "🏗️  Building Windows Server 2025 clone template"
+        
+        {{if eq .DEBUG "true"}}
+        echo "🐛 Debug mode enabled - build will pause at breakpoints"
+        echo "💡 Use VNC to connect to the VM during breakpoints"
+        {{else}}
+        echo "⏰ This process typically takes 45-90 minutes..."
+        {{end}}
+        
+        echo ""
+        
+        {{if eq .DEBUG "true"}}
+        packer build \
+          -var 'disable_debug_breakpoints=false' \
+          -var 'disable_pre_sysprep_breakpoints=false' \
+          -only="clone_build.proxmox-clone.windows2025" \
+          .
+        {{else}}
+        packer build -only="clone_build.proxmox-clone.windows2025" .
+        {{end}}
+        
+        echo ""
+        echo "✅ Template build completed successfully!"
+        echo "📦 Template available in Proxmox as: template-win2025-cloudbase-{{.TEMPLATE | default "custom"}}"
 
   clean:
     desc: "Clean up Packer cache and temporary files"
@@ -282,9 +315,8 @@ tasks:
         echo "📋 Common Tasks:"
         echo "  task setup              # Check prerequisites and environment"
         echo "  task validate           # Validate configuration"
-        echo "  task build              # Build default template (DcDesktop)"
-        echo "  task build-all          # Build all templates"
-        echo "  task debug              # Build with debug breakpoints"
+        echo "  task build-iso          # Build default template (DcDesktop)"
+        echo "  task build-clone        # Build clone template"
         echo "  task clean              # Clean up cache and logs"
         echo ""
         echo "🏗️  Specific Template Builds:"
@@ -294,19 +326,27 @@ tasks:
         echo "  task build-stdcore      # Standard Core"
         echo ""
         echo "🔧 Custom Template Build:"
-        echo "  task build TEMPLATE=DcCore"
+        echo "  task build-iso TEMPLATE=DcCore"
+        echo "  task build-clone TEMPLATE=custom"
+        echo ""
+        echo "🔗 Clone Build Requirements:"
+        echo "  task env-check-clone                # Check clone-specific environment variables"
+        echo "  task build-clone PKR_VAR_clone_vm_id=12345  # Specify source VM ID for cloning"
+        echo "  # Note: PKR_VAR_clone_vm_id must be set to an existing VM template ID"
         echo ""
         echo "🐛 Debug Options:"
-        echo "  task debug TEMPLATE=DcDesktop"
-        echo "  PACKER_LOG=1 task build  # Enable verbose logging"
+        echo "  task build-iso DEBUG=true          # Enable breakpoints for ISO build"
+        echo "  task build-clone DEBUG=true        # Enable breakpoints for clone build"
+        echo "  task build-iso DEBUG=true TEMPLATE=DcDesktop   # Debug specific template"
+        echo "  PACKER_LOG=1 task build-iso        # Enable verbose logging"
         echo ""
         echo "📚 More Information:"
         echo "  - See README.md for detailed documentation"
         echo "  - Check variables.auto.pkrvars.hcl for configuration options"
-        echo "  - Review SECURITY_NOTES.md for credential management"
         echo ""
         echo "⚠️  Important:"
         echo "  - Create .env file from template: cp .env.template .env"
         echo "  - Edit .env with your actual credentials"
+        echo "  - For clone builds, set PKR_VAR_clone_vm_id to an existing VM template ID"
         echo "  - Never commit .env to version control"
         echo "  - Test builds in non-production environment first"

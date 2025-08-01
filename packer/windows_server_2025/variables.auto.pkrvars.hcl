@@ -9,7 +9,7 @@ cdrom_drive_virtio_winre   = "F:"
 # Optimized resources for template creation
 cores                           = 2
 disable_pre_sysprep_breakpoints = true
-disk_size_gb                    = 40  # Increased for better performance
+disk_size_gb                    = 40 # Increased for better performance
 disk_storage                    = "local-lvm"
 efi_storage                     = "local-lvm"
 
@@ -32,8 +32,3 @@ winrm_username = "Administrator"
 
 # Debug settings - disable for production builds
 disable_debug_breakpoints = true
-
-# For validation purposes only - overwrite with environment variables or secrets management in production
-proxmox_username = "for_validation_purposes_only"
-winrm_password   = "for_validation_purposes_only"
-proxmox_api_token = "for_validation_purposes_only"

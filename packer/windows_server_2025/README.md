@@ -207,7 +207,7 @@ packer build -var 'disable_debug_breakpoints=false' .
 Add PowerShell scripts to the `build_files/scripts/` directory and include them in the `locals.powershell_scripts` list.
 
 ### Modifying Unattended Installation
-Edit `build_files/templates/unattended.xml.pkrtpl` to customize the Windows installation process.
+Edit `build_files/templates/unattended/unattended-iso.xml.pkrtpl` to customize the Windows installation process.
 
 ### Changing Resource Allocation
 Modify values in `variables.auto.pkrvars.hcl`:

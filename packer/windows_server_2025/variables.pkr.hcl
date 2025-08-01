@@ -23,6 +23,16 @@ variable "cdrom_drive_virtio_winre" {
   type        = string
 }
 
+variable "clone_vm_id" {
+  description = "The VM ID for the clone operation."
+  type        = number
+
+  validation {
+    condition     = can(regex("^[1-9][0-9]{2,8}$", tostring(var.clone_vm_id)))
+    error_message = "VM ID must be a number between 100 and 999999999 (3-9 digits, cannot start with 0)."
+  }
+}
+
 variable "cores" {
   description = "The number of cores."
   type        = number
@@ -53,6 +63,12 @@ variable "disk_storage" {
 variable "efi_storage" {
   description = "The EFI storage pool."
   type        = string
+}
+
+variable "full_clone" {
+  description = "Enable full clone."
+  type        = bool
+  default     = true
 }
 
 variable "image_index" {

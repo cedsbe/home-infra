@@ -127,6 +127,7 @@ poly
 
 # Add more project-specific terms below as needed
 Audiosrv
+behaviour
 bitnami
 bpg
 bthserv
@@ -166,17 +167,20 @@ lvm
 minimisation
 msiexec
 MSR
+mtools
 mvance
 Ncb
 NDRG
 netkvm
 netsh
 noatime
+nocloudservice
 nofile
 nsec
 NTFS
 num
 nxdomain
+OEM
 Pim
 pixabay
 Pnp
@@ -215,6 +219,7 @@ unattend
 upnphost
 usr
 utf
+vfat
 wcm
 whoamigw
 whois
