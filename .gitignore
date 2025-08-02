@@ -1,17 +1,59 @@
-k8s/infra/*/*/charts/*
+# Terraform
 .terraform
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfstate.*.backup
-id_rsa
 *.secrets.auto.tfvars
 *.secrets.auto.pkrvars.hcl
+.terraform.lock.hcl
+
+# Packer
 .env
+*.box
+packer_cache/
+
+# Task
 .task/**/*
+
+# Generated outputs
 terraform/kubernetes/output/**/*
+
+# Sensitive data
 sensitive/**/*
+id_rsa
+*.pem
+*.key
+*.crt
+
+# Kubernetes downloads
+k8s/infra/*/*/charts/*
 
 # Node.js dependencies for spell checking
 node_modules/
 package-lock.json
 npm-debug.log*
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.cache

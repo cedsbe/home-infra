@@ -29,3 +29,8 @@ output "talos_config" {
   value       = module.talos.client_configuration.talos_config
   sensitive   = true
 }
+
+output "cilium_version" {
+  description = "Cilium version being used"
+  value       = var.cilium_version
+}

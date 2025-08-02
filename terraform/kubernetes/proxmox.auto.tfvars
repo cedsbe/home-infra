@@ -4,3 +4,6 @@ proxmox = {
   insecure     = true
   ssh_username = "root"
 }
+
+# Cilium Configuration
+# cilium_version = "v1.17.4"  # Uncomment and modify to override default version

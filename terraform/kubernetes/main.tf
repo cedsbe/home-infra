@@ -2,6 +2,44 @@ locals {
   talos_version = "v1.9.0"
 }
 
+# Generate Cilium Helm template
+data "helm_template" "cilium_helm_template_bootstrap" {
+  name       = "cilium"
+  repository = "https://helm.cilium.io/"
+  chart      = "cilium"
+  version    = var.cilium_version
+  namespace  = "kube-system"
+
+  kube_version = var.kubernetes_version
+
+  values = [
+    file("${path.root}/../../k8s/infra/network/cilium/values_bootstrap.yaml")
+  ]
+
+  set = [
+    {
+      name  = "kubeProxyReplacement"
+      value = "true"
+    }
+  ]
+}
+
+resource "terraform_data" "trigger_cilium_manifest_on_version_change" {
+  input = var.cilium_version
+}
+
+resource "terraform_data" "cilium_helm_template_bootstrap" {
+  input = data.helm_template.cilium_helm_template_bootstrap.manifest
+
+  lifecycle {
+    ignore_changes = [input]
+    replace_triggered_by = [
+      terraform_data.trigger_cilium_manifest_on_version_change.input
+    ]
+  }
+}
+
+
 module "talos" {
   source = "./modules/talos"
 
@@ -18,7 +56,7 @@ module "talos" {
   }
 
   cilium = {
-    inline_manifest = file("${path.module}/modules/talos/talos_inline_manifests/sensitive_cilium_helm_template.yaml")
+    inline_manifest = terraform_data.cilium_helm_template_bootstrap.input
   }
 
   talos_nodes = {

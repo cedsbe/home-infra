@@ -34,8 +34,7 @@
     "*.vhdx",
     "packer/windows_server_2025/.env",
     "**/*.secrets.*",
-    "sensitive/**",
-    "terraform/kubernetes/modules/talos/talos_inline_manifests/sensitive_cilium_helm_template.yaml"
+    "sensitive/**"
   ],
   "language": "en",
   "maxDuplicateProblems": 3,

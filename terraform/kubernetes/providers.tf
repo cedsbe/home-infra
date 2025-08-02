@@ -25,6 +25,11 @@ terraform {
       source  = "Mastercard/restapi"
       version = "2.0.1"
     }
+
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -41,6 +46,11 @@ provider "proxmox" {
 }
 
 provider "talos" {}
+
+provider "helm" {
+  # Note: This provider is used only for template generation, not for actual chart deployment
+  # The Kubernetes configuration is not needed for template generation
+}
 
 provider "restapi" {
   uri                  = var.proxmox.endpoint
