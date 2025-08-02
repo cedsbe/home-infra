@@ -1,0 +1,129 @@
+version: '3'
+
+vars:
+  TERRAFORM_DIR: "{{.TASKFILE_DIR}}"
+
+tasks:
+  init:
+    desc: "Initialize Terraform for Azure infrastructure"
+    dir: "{{.TERRAFORM_DIR}}"
+    cmds:
+      - |
+        if [ -f "./backend.config" ]; then
+          echo "Found backend.config - initializing with remote backend..."
+          terraform init -backend-config=./backend.config
+        else
+          echo "❌ backend.config not found"
+          echo ""
+          echo "For EXISTING infrastructure:"
+          echo "  Create backend.config with your storage account details (see backend.config.template)"
+          echo ""
+          echo "For NEW infrastructure:"
+          echo "  1. Comment out the backend block in backend.tf"
+          echo "  2. Run: terraform init"
+          echo "  3. Run: terraform apply (creates storage account)"
+          echo "  4. Create backend.config with the storage account name"
+          echo "  5. Uncomment backend.tf and run: terraform init -backend-config=./backend.config -migrate-state"
+          exit 1
+        fi
+
+  validate:
+    desc: "Validate Terraform configuration"
+    dir: "{{.TERRAFORM_DIR}}"
+    deps: [init]
+    cmds:
+      - terraform validate
+      - terraform fmt -check
+
+  format:
+    desc: "Format Terraform configuration files"
+    dir: "{{.TERRAFORM_DIR}}"
+    cmds:
+      - terraform fmt -recursive
+
+  plan:
+    desc: "Create Terraform execution plan"
+    dir: "{{.TERRAFORM_DIR}}"
+    deps: [validate]
+    cmds:
+      - terraform plan
+
+  apply:
+    desc: "Apply Terraform configuration"
+    dir: "{{.TERRAFORM_DIR}}"
+    deps: [plan]
+    cmds:
+      - terraform apply
+
+  destroy:
+    desc: "Destroy Terraform-managed infrastructure"
+    dir: "{{.TERRAFORM_DIR}}"
+    cmds:
+      - terraform destroy
+
+  output:
+    desc: "Show Terraform outputs"
+    dir: "{{.TERRAFORM_DIR}}"
+    cmds:
+      - terraform output
+
+  clean:
+    desc: "Clean Terraform state and cache"
+    dir: "{{.TERRAFORM_DIR}}"
+    cmds:
+      - rm -rf .terraform
+      - rm -f .terraform.lock.hcl
+      - rm -f terraform.tfstate*
+
+  azure:login:
+    desc: "Login to Azure CLI"
+    cmds:
+      - az login
+
+  azure:account:
+    desc: "Show current Azure account information"
+    cmds:
+      - az account show
+
+  azure:locations:
+    desc: "List available Azure regions"
+    cmds:
+      - az account list-locations -o table
+
+  azure:resources:
+    desc: "List resources in the resource group"
+    dir: "{{.TERRAFORM_DIR}}"
+    cmds:
+      - |
+        RG_NAME=$(terraform output -raw resource_group_name 2>/dev/null)
+        if [ -z "$RG_NAME" ]; then
+          echo "❌ Cannot get resource group name from Terraform outputs"
+          echo "Make sure you have:"
+          echo "  1. Initialized Terraform (task azure:init)"
+          echo "  2. Applied the configuration (task azure:apply)"
+          echo "  3. The infrastructure is deployed"
+          exit 1
+        fi
+        echo "Listing resources in resource group: $RG_NAME"
+        az resource list --resource-group "$RG_NAME" -o table
+
+  setup:
+    desc: "Setup Azure configuration from template"
+    dir: "{{.TERRAFORM_DIR}}"
+    cmds:
+      - |
+        if [ ! -f "azure.secrets.auto.tfvars" ]; then
+          echo "Creating azure.secrets.auto.tfvars from template..."
+          cp azure.secrets.auto.tfvars.template azure.secrets.auto.tfvars
+          echo "Please edit azure.secrets.auto.tfvars with your Azure credentials"
+        else
+          echo "azure.secrets.auto.tfvars already exists"
+        fi
+
+  check:
+    desc: "Check Azure CLI authentication and Terraform setup"
+    cmds:
+      - echo "Checking Azure CLI authentication..."
+      - az account show --query "name" -o tsv
+      - echo "Checking Terraform configuration..."
+      - task: validate

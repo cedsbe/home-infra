@@ -1,8 +1,8 @@
 {
   "editor.formatOnSave": true,
   "files.associations": {
-    "*.yaml": "yaml",
-    "*.xml.pkrtpl": "xml"
+    "*.xml.pkrtpl": "xml",
+    "*.yaml": "yaml"
   },
   "xml.format.maxLineWidth": 250
 }
