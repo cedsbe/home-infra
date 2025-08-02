@@ -17,7 +17,7 @@ try {
     # Check if SDelete is already installed
     Write-Host "Checking for existing SDelete installation..." -ForegroundColor Yellow
     $existingSDelete = Get-Command "sdelete.exe" -ErrorAction SilentlyContinue
-    
+
     if ($existingSDelete) {
         $sdeleteInfo = Get-ItemProperty -Path $existingSDelete.Source
         Write-Host "SDelete is already installed:" -ForegroundColor Yellow
@@ -32,12 +32,12 @@ try {
     # Download SDelete
     Write-Host "Downloading SDelete from: $sdeleteUrl" -ForegroundColor Yellow
     Write-Host "Destination: $sdeleteZip" -ForegroundColor Cyan
-    
+
     $downloadStart = Get-Date
     Invoke-WebRequest -Uri $sdeleteUrl -OutFile $sdeleteZip -UseBasicParsing
     $downloadEnd = Get-Date
     $downloadDuration = $downloadEnd - $downloadStart
-    
+
     # Verify download
     if (Test-Path $sdeleteZip) {
         $fileSize = (Get-Item $sdeleteZip).Length
@@ -72,13 +72,13 @@ try {
     if (-not $sdeleteExe) {
         throw "SDelete executable not found in extracted files"
     }
-    
+
     $sdeleteSourcePath = Join-Path -Path $sdeleteExtractPath -ChildPath $sdeleteExe
     Write-Host "Found SDelete executable: $sdeleteSourcePath" -ForegroundColor Green
 
     # Install SDelete to System32
     Write-Host "Installing SDelete to System32..." -ForegroundColor Yellow
-    
+
     try {
         Copy-Item -Path $sdeleteSourcePath -Destination $sdeleteTargetPath -Force
         Write-Host "✅ SDelete installed successfully to: $sdeleteTargetPath" -ForegroundColor Green
@@ -124,17 +124,17 @@ catch {
 finally {
     # Cleanup
     Write-Host "Cleaning up temporary files..." -ForegroundColor Yellow
-    
+
     if (Test-Path $sdeleteZip) {
         Remove-Item $sdeleteZip -Force -ErrorAction SilentlyContinue
         Write-Host "Cleaned up: $sdeleteZip" -ForegroundColor Cyan
     }
-    
+
     if (Test-Path $sdeleteExtractPath) {
         Remove-Item $sdeleteExtractPath -Recurse -Force -ErrorAction SilentlyContinue
         Write-Host "Cleaned up: $sdeleteExtractPath" -ForegroundColor Cyan
     }
-    
+
     Write-Host "Script completed at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Cyan
     Write-Host "=======================================" -ForegroundColor Green
 }

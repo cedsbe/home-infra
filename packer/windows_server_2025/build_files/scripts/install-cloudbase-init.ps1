@@ -14,13 +14,13 @@ $logFile = "$env:TEMP\CloudbaseInit_Install.log"
 try {
     # Check if Cloudbase-Init is already installed
     Write-Host "Checking for existing Cloudbase-Init installation..." -ForegroundColor Yellow
-    
+
     # Use registry check for faster detection instead of slow WMI query
     $uninstallKeys = @(
         "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
         "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
     )
-    
+
     $existingInstall = $null
     foreach ($keyPath in $uninstallKeys) {
         $apps = Get-ItemProperty -Path $keyPath -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like "*Cloudbase-Init*" }
@@ -93,7 +93,7 @@ try {
 
         # Verify installation
         Write-Host "Verifying installation..." -ForegroundColor Yellow
-        
+
         # Use same fast registry method for verification
         $installedProduct = $null
         foreach ($keyPath in $uninstallKeys) {

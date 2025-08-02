@@ -6,6 +6,7 @@ terraform.tfstate.*.backup
 *.secrets.auto.tfvars
 *.secrets.auto.pkrvars.hcl
 .terraform.lock.hcl
+backend.config
 
 # Packer
 .env
@@ -43,7 +44,6 @@ ehthumbs.db
 Thumbs.db
 
 # Editor specific
-.vscode/
 .idea/
 *.swp
 *.swo
@@ -57,3 +57,4 @@ logs/
 *.tmp
 *.temp
 *.cache
+terraform/azure/backend.config

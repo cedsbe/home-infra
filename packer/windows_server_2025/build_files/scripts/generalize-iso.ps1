@@ -27,7 +27,7 @@ $mountedDrives = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Used -ne
 foreach ($drive in $mountedDrives) {
     $testPath = Join-Path -Path "$($drive.Name):\" -ChildPath "unattend.xml"
     Write-Host "Checking: $testPath"
-    
+
     if (Test-Path -Path $testPath) {
         $sourceUnattendPath = $testPath
         Write-Host "Found unattend.xml at: $sourceUnattendPath"
@@ -37,14 +37,14 @@ foreach ($drive in $mountedDrives) {
 
 if (-not $sourceUnattendPath) {
     Write-Host "unattend.xml not found at the root of any drive. Checking CD/DVD drives..."
-    
+
     # Also check removable drives and CD/DVD drives
     $allDrives = Get-WmiObject -Class Win32_LogicalDisk | Where-Object { $_.DriveType -in @(2, 5) } # 2=Removable, 5=CD-ROM
-    
+
     foreach ($drive in $allDrives) {
         $testPath = Join-Path -Path "$($drive.DeviceID)\" -ChildPath "unattend.xml"
         Write-Host "Checking removable/CD drive: $testPath"
-        
+
         if (Test-Path -Path $testPath) {
             $sourceUnattendPath = $testPath
             Write-Host "Found unattend.xml at: $sourceUnattendPath"
@@ -117,10 +117,10 @@ Write-Host "File size: $((Get-Item 'C:\Deploy\unattend.xml').Length) bytes" -For
 try {
     Write-Host "Executing sysprep command..." -ForegroundColor Yellow
     Write-Host "Command: sysprep.exe /oobe /generalize /mode:vm /quit /unattend:C:\Deploy\unattend.xml" -ForegroundColor Gray
-    
+
     $sysrepStartTime = Get-Date
     Write-Host "Sysprep started at: $($sysrepStartTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Cyan
-    
+
     # Construct sysprep argument list for clarity and maintainability
     $sysprepArgs = @(
         "/oobe"
@@ -130,35 +130,35 @@ try {
         "/unattend:C:\Deploy\unattend.xml"
     )
     $process = Start-Process -FilePath "$($ENV:SystemRoot)\System32\Sysprep\sysprep.exe" -ArgumentList $sysprepArgs -Wait -PassThru -NoNewWindow
-    
+
     $sysrepEndTime = Get-Date
     $duration = $sysrepEndTime - $sysrepStartTime
-    
+
     Write-Host "Sysprep process completed." -ForegroundColor Green
     Write-Host "Duration: $($duration.TotalMinutes.ToString('F2')) minutes" -ForegroundColor Cyan
     Write-Host "Exit Code: $($process.ExitCode)" -ForegroundColor Cyan
-    
+
     if ($process.ExitCode -eq 0) {
         Write-Host "✅ Sysprep completed successfully!" -ForegroundColor Green
-        
+
         # Post-sysprep actions can be added here if needed
         Write-Host "Performing final cleanup..." -ForegroundColor Yellow
-        
+
         # Final log cleanup (optional)
         Write-Host "Clearing PowerShell history..." -ForegroundColor Cyan
         Remove-Item -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
-        
+
         # Clear any remaining temp files
         Write-Host "Final temp file cleanup..." -ForegroundColor Cyan
         Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
-        
+
         Write-Host "=== Generalization Process Completed Successfully ===" -ForegroundColor Green
         Write-Host "Script finished at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Cyan
         Write-Host "Initiating system shutdown..." -ForegroundColor Yellow
-        
+
         # Give a brief pause to ensure all output is flushed
         Start-Sleep -Seconds 2
-        
+
         # Shutdown the system
         Stop-Computer -Force
     }
@@ -169,13 +169,13 @@ try {
 }
 catch {
     Write-Error "❌ Sysprep execution failed: $($_.Exception.Message)"
-    
+
     # Check if sysprep log exists for troubleshooting
     $sysrepLog = "C:\Windows\System32\Sysprep\Panther\setuperr.log"
     if (Test-Path $sysrepLog) {
         Write-Host "Sysprep error log found. Last 10 lines:" -ForegroundColor Yellow
         Get-Content $sysrepLog | Select-Object -Last 10 | ForEach-Object { Write-Host $_ -ForegroundColor Red }
     }
-    
+
     exit 1
 }

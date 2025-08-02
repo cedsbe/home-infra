@@ -15,23 +15,23 @@ resource "restapi_object" "proxmox_volume" {
     format   = var.volume.format
   })
 
-  // Proxmox returns a different object which we ignore. This is acceptable because
-  // the returned object does not contain any information that is critical for the
-  // operation of this Terraform module. Instead, we rely on the input parameters
-  // (e.g., size, format, and filename) to define the desired state of the volume.
-  //
-  // The size is also returned in bytes, not with a prefix (e.g., 1G, 512Mi), which
-  // would require additional parsing and conversion logic. By ignoring server changes,
-  // we avoid unnecessary complexity and ensure consistent behavior across runs.
-  //
-  // Setting `ignore_all_server_changes = true` ensures that Terraform does not
-  // detect changes based on the server's response, which could otherwise trigger
-  // unnecessary updates or recreations of the resource. This approach assumes that
-  // the server's state remains consistent with the input parameters provided.
+  # Proxmox returns a different object which we ignore. This is acceptable because
+  # the returned object does not contain any information that is critical for the
+  # operation of this Terraform module. Instead, we rely on the input parameters
+  # (e.g., size, format, and filename) to define the desired state of the volume.
+  #
+  # The size is also returned in bytes, not with a prefix (e.g., 1G, 512Mi), which
+  # would require additional parsing and conversion logic. By ignoring server changes,
+  # we avoid unnecessary complexity and ensure consistent behavior across runs.
+  #
+  # Setting `ignore_all_server_changes = true` ensures that Terraform does not
+  # detect changes based on the server's response, which could otherwise trigger
+  # unnecessary updates or recreations of the resource. This approach assumes that
+  # the server's state remains consistent with the input parameters provided.
   ignore_all_server_changes = true
 
-  // Providing a supported parameter that doesn't do anything.
-  // Supplying either `null` or an empty object makes this fall back to the `data` object.
+  # Providing a supported parameter that doesn't do anything.
+  # Supplying either `null` or an empty object makes this fall back to the `data` object.
   update_data = jsonencode({
     node = var.volume.node
   })

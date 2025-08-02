@@ -184,16 +184,16 @@ tasks:
     cmds:
       - |
         echo "🏗️  Building Windows Server 2025 template: {{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
-        
+
         {{if eq .DEBUG "true"}}
         echo "🐛 Debug mode enabled - build will pause at breakpoints"
         echo "💡 Use VNC to connect to the VM during breakpoints"
         {{else}}
         echo "⏰ This process typically takes 45-90 minutes..."
         {{end}}
-        
+
         echo ""
-        
+
         {{if eq .DEBUG "true"}}
         packer build \
           -var 'disable_debug_breakpoints=false' \
@@ -204,7 +204,7 @@ tasks:
         {{else}}
         packer build -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' -only="iso_build.proxmox-iso.windows2025" .
         {{end}}
-        
+
         echo ""
         echo "✅ Template build completed successfully!"
         echo "📦 Template available in Proxmox as: template-win2025-{{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
@@ -216,16 +216,16 @@ tasks:
     cmds:
       - |
         echo "🏗️  Building Windows Server 2025 clone template"
-        
+
         {{if eq .DEBUG "true"}}
         echo "🐛 Debug mode enabled - build will pause at breakpoints"
         echo "💡 Use VNC to connect to the VM during breakpoints"
         {{else}}
         echo "⏰ This process typically takes 45-90 minutes..."
         {{end}}
-        
+
         echo ""
-        
+
         {{if eq .DEBUG "true"}}
         packer build \
           -var 'disable_debug_breakpoints=false' \
@@ -235,7 +235,7 @@ tasks:
         {{else}}
         packer build -only="clone_build.proxmox-clone.windows2025" .
         {{end}}
-        
+
         echo ""
         echo "✅ Template build completed successfully!"
         echo "📦 Template available in Proxmox as: template-win2025-cloudbase-{{.TEMPLATE | default "custom"}}"

@@ -16,6 +16,10 @@ includes:
     taskfile: ./packer/windows_server_2025/Taskfile.yml
     dir: ./packer/windows_server_2025
 
+  azure:
+    taskfile: ./terraform/azure/Taskfile.yml
+    dir: ./terraform/azure
+
   ####################
   # Tools
   ####################
@@ -29,6 +33,7 @@ includes:
       - kustomize_install
       - talosctl_install
       - tflint_install
+      - az_cli_install
 
   argocd_cli_install:
     desc: "Install ArgoCD CLI"
@@ -75,6 +80,11 @@ includes:
     desc: "Install TFLint for Terraform linting"
     cmds:
       - brew install tflint
+
+  az_cli_install:
+    desc: "Install Azure CLI"
+    cmds:
+      - brew install azure-cli
 
   ####################
   # Infrastructure

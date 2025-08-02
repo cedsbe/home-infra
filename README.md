@@ -37,10 +37,10 @@ A comprehensive Infrastructure as Code solution for home lab automation using Ta
    # Terraform secrets
    cp terraform/kubernetes/proxmox.secrets.auto.tfvars.template terraform/kubernetes/proxmox.secrets.auto.tfvars
    cp terraform/windows/proxmox.secrets.auto.tfvars.template terraform/windows/proxmox.secrets.auto.tfvars
-   
+
    # Packer environment
    cp packer/windows_server_2025/.env.template packer/windows_server_2025/.env
-   
+
    # Edit files with your actual credentials
    ```
 
