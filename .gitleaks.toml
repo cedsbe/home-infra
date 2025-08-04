@@ -1,0 +1,17 @@
+# Gitleaks configuration for home-infra
+# https://github.com/gitleaks/gitleaks
+
+title = "gitleaks config for home-infra"
+
+[extend]
+# useDefault will extend the base configuration with the default gitleaks config
+# https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+[[rules.allowlists]]
+condition = "AND"
+# Allow Sealed Secrets or similar large base64-encoded blobs (e.g., Kubernetes SealedSecret encrypted data)
+regexes = ['''Ag[a-zA-Z0-9+/]{500,}={0,2}''']
+paths = ['''(?i).*\.ya?ml$''']

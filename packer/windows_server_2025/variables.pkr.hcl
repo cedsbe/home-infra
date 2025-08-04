@@ -28,8 +28,8 @@ variable "clone_vm_id" {
   type        = number
 
   validation {
-    condition     = can(regex("^[1-9][0-9]{2,8}$", tostring(var.clone_vm_id)))
-    error_message = "VM ID must be a number between 100 and 999999999 (3-9 digits, cannot start with 0)."
+    condition     = var.clone_vm_id >= 100 && var.clone_vm_id <= 999999999
+    error_message = "VM ID must be a number between 100 and 999999999."
   }
 }
 

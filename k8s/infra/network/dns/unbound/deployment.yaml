@@ -12,13 +12,13 @@ spec:
       labels:
         app: unbound
     spec:
-      #securityContext:
+      # securityContext:
       #  seccompProfile:
       #    type: RuntimeDefault
       containers:
         - name: unbound
           image: docker.io/mvance/unbound:1.22.0
-          #securityContext:
+          # securityContext:
           #  allowPrivilegeEscalation: false
           #  readOnlyRootFilesystem: false
           ports:

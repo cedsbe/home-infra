@@ -134,6 +134,7 @@ behaviour
 bitnami
 bpg
 bthserv
+CAF
 cainjector
 cdrom
 Cim
@@ -165,6 +166,8 @@ ICS
 img
 iothread
 IPC
+KICS
+kubeconform
 lfsvc
 lltdsvc
 LRS
@@ -199,6 +202,7 @@ rgl
 rlimit
 rrset
 rtt
+sarif
 sdelete
 Sensr
 sergelogvinov
@@ -239,5 +243,6 @@ Wmi
 Wpn
 wuauserv
 xsi
+xzf
 xzvf
 zst

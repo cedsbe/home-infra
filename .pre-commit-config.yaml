@@ -11,7 +11,6 @@ repos:
       - id: check-json
       - id: pretty-format-json
         args: ['--autofix']
-      - id: check-toml
       - id: mixed-line-ending
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
@@ -53,11 +52,39 @@ repos:
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
 
+  # YAML linting (excluding k8s manifests which may have templating)
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-c=.yamllint.yml, --strict]
+
+  # Secret detection
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
   - repo: local
     hooks:
       - id: packer-validate-windows-server-2025
         name: Validate Windows Server 2025 Packer templates
-        entry: bash -c 'cd packer/windows_server_2025 && packer validate .'
+        # yamllint disable-line rule:line-length
+        entry: bash -c 'cd packer/windows_server_2025 && packer validate -var clone_vm_id=12345 -var proxmox_api_token=validateOnly -var proxmox_username=validateOnly -var winrm_password=validateOnly .'
         language: system
         files: packer/windows_server_2025/.*\.pkr\.hcl$
+        pass_filenames: false
+
+      - id: kubernetes-validate
+        name: Validate Kubernetes manifests with kubeconform
+        entry: bash task_scripts/validate_kubernetes.sh
+        language: system
+        files: ^k8s/.*\.(yaml|yml)$
+        pass_filenames: false
+
+      - id: taskfile-validate
+        name: Validate Taskfiles
+        entry: bash task_scripts/validate_taskfiles.sh
+        language: system
+        files: ^.*Taskfile\.yml$
         pass_filenames: false

@@ -1,4 +1,3 @@
----
 apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret
 metadata:
@@ -7,6 +6,7 @@ metadata:
   namespace: cert-manager
 spec:
   encryptedData:
+    # yamllint disable-line rule:line-length
     api-token: AgCwgrQXxZxXGGZj2L40Q6+FJZh/1z000wdXI/6X3Of5sele5Ks8nxDUdblt1ap2RX+dDpQ7mXNwPHMZKEMjPknBcBhadOV9WrvzN/2quvKZO2t4Q9P5r3ekBuqCUWuRDClEa9COXF1Y1UMBLiNGafMN/9Y5L66m/Ws2QbXMr6KeQeR/cKK9R7IVwzJhmpa6FXwFcw6dVjYanqjnppyHB4cGrHZ2UHrgulVjbX6nCuHgGP/NnQj5i2hQXJ1Do8LCbGturjRR8sdlkMadHzmphQ/qM56lpWmnkGJikED54hdxVpXXS7jwaiEBygOWj4psUX+zTP3uN4ANTfpNdOPye5FKI9pgNOpTZ5BQMCvDKusgc1O5GMMc3gxn+hG3NRnqqZWVyrhqeROLYcEmrBQ2GJevtZlUtrJpjekYmCrpOCRrYjJr1JAl5iIN6pOWrYnIUqhdZolXJ0KOcFSBE379n3FV5XN9q0bstuZx7H4Q8KI8BxSJ1nzZQeJw5zGA7PLF52Ehix39IsCsk5lHdYPArY3agLtab63AD8OawrPxb0ymYJYD+Rg0B7zhgLtL6CEIlCLkom9NFhPKS7yJVoMIyVjgdR8fktyfAqpC8V7qwbBu7ZiyuwH34qDPfqqgLwvlXbLpZe4Z4C8qveBNuWUD1iw+0/FeRuwOZy3N5B+f2cNIPLyvJnM0G4pDBoRE9UJWWOhmevomGHIe3Ex8gGkc+DWtvic7aLI0alkypFTmWdi0g3oeEFHmuGwj
   template:
     metadata:

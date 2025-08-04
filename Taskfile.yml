@@ -20,6 +20,7 @@ includes:
     taskfile: ./terraform/azure/Taskfile.yml
     dir: ./terraform/azure
 
+tasks:
   ####################
   # Tools
   ####################
@@ -30,10 +31,12 @@ includes:
       - argocd_cli_install
       - cilium_install
       - kubeseal_install
+      - kubeconform_install
       - kustomize_install
       - talosctl_install
       - tflint_install
       - az_cli_install
+      - gitleaks_install
 
   argocd_cli_install:
     desc: "Install ArgoCD CLI"
@@ -66,6 +69,11 @@ includes:
     cmds:
       - brew install derailed/k9s/k9s
 
+  kubeconform_install:
+    desc: "Install kubeconform for Kubernetes manifest validation"
+    cmds:
+      - brew install kubeconform
+
   kustomize_install:
     desc: "Install Kustomize"
     cmds:
@@ -85,6 +93,11 @@ includes:
     desc: "Install Azure CLI"
     cmds:
       - brew install azure-cli
+
+  gitleaks_install:
+    desc: "Install gitleaks for secret detection"
+    cmds:
+      - brew install gitleaks
 
   ####################
   # Infrastructure
@@ -165,6 +178,34 @@ includes:
     desc: "Update pre-commit hooks to latest versions"
     cmds:
       - pre-commit autoupdate
+
+  ####################
+  # Security / Secret Detection
+  ####################
+
+  gitleaks_scan:
+    desc: "Run gitleaks to scan the git repository for secrets"
+    cmds:
+      - gitleaks git --config .gitleaks.toml --verbose .
+
+  gitleaks_precommit:
+    desc: "Run gitleaks pre-commit scan (not tracking staged changes)"
+    cmds:
+      - gitleaks git --pre-commit --config .gitleaks.toml --verbose .
+
+  gitleaks_precommit_staged:
+    desc: "Run gitleaks pre-commit scan on staged changes only"
+    cmds:
+      - gitleaks git --pre-commit --staged --config .gitleaks.toml --verbose .
+
+  gitleaks_directory:
+    desc: "Scan directory/files for secrets (non-git scan)"
+    cmds:
+      - gitleaks directory --config .gitleaks.toml --verbose .
+
+  ####################
+  # Spell Checking
+  ####################
 
   spell_install:
     desc: "Install Node.js and cspell for spell checking"
