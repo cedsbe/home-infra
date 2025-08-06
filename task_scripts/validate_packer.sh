@@ -26,7 +26,7 @@ fi
 
 echo "Validating Windows Server 2025 templates..."
 
-if ! (cd packer/windows_server_2025 && packer validate -var clone_vm_id=12345 -var proxmox_api_token=validateOnly -var proxmox_username=validateOnly -var winrm_password=validateOnly .); then
+if ! (packer validate -var clone_vm_id=12345 -var proxmox_api_token=validateOnly -var proxmox_username=validateOnly -var winrm_password=validateOnly .); then
     echo "❌ Validation failed for Windows Server 2025 templates"
     validation_failed=1
 fi

@@ -38,6 +38,11 @@ jobs:
           terraform: latest
           packer: latest
 
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Install additional tools
         run: |
           # Install yamllint for YAML validation
@@ -56,9 +61,7 @@ jobs:
           key: node-${{ runner.os }}-${{ hashFiles('package*.json') }}
 
       - name: Run pre-commit
-        uses: pre-commit/action@v3.0.1
-        with:
-          extra_args: --all-files
+        uses: cloudposse/github-action-pre-commit@v4.0.0
 
   security-scan:
     runs-on: ubuntu-latest
