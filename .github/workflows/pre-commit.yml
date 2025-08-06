@@ -45,7 +45,7 @@ jobs:
 
       - name: Install cspell
         run: |
-          npm install -g git+https://github.com/streetsidesoftware/cspell-cli
+          npm install -g cspell
           cspell --version
 
       - name: Install additional tools
