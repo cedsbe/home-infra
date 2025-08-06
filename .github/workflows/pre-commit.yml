@@ -43,6 +43,11 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Install cspell
+        run: |
+          npm install -g git+https://github.com/streetsidesoftware/cspell-cli
+          cspell --version
+
       - name: Install additional tools
         run: |
           # Install yamllint for YAML validation
