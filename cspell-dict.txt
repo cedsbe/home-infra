@@ -127,6 +127,7 @@ poly
 
 # Add more project-specific terms below as needed
 addrs
+arkade
 Audiosrv
 aztfmod
 azurecaf

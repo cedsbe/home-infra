@@ -25,52 +25,28 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
-      - name: Set up Node.js (for cspell)
+      - name: Install CLI tools
+        uses: alexellis/arkade-get@master
+        with:
+          kubectl: latest
+          kustomize: latest
+          kubeconform: latest
+          task: latest
+          tflint: latest
+          terraform: latest
+          packer: latest
+
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: latest
-
-      - name: Set up Packer
-        uses: hashicorp/setup-packer@main
-        with:
-          version: latest
-
-      - name: Install Task
-        uses: arduino/setup-task@v2
-        with:
-          version: 3.x
-
-      - name: Install kubectl and kustomize
+      - name: Install cspell
         run: |
-          # Install kubectl
-          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
-
-          # Install kustomize
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
-          sudo mv kustomize /usr/local/bin/
-
-      - name: Install kubeconform
-        run: |
-          wget https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
-          tar xf kubeconform-linux-amd64.tar.gz
-          sudo mv kubeconform /usr/local/bin
-
-      - name: Install tflint
-        run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-
-      - name: Install tflint plugins
-        run: |
-          tflint --init
+          npm install -g cspell
+          cspell --version
 
       - name: Install additional tools
         run: |
@@ -89,13 +65,8 @@ jobs:
           path: ~/.npm
           key: node-${{ runner.os }}-${{ hashFiles('package*.json') }}
 
-      - name: Install cspell dependencies
-        run: npm install
-
       - name: Run pre-commit
-        uses: pre-commit/action@v3.0.1
-        with:
-          extra_args: --all-files
+        uses: cloudposse/github-action-pre-commit@v4.0.0
 
   security-scan:
     runs-on: ubuntu-latest
