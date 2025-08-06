@@ -21,6 +21,6 @@ provider "proxmox" {
   ssh {
     username    = var.proxmox.ssh_username
     agent       = false
-    private_key = file("~/.ssh/id_rsa")
+    private_key = fileexists("~/.ssh/id_rsa") ? file("~/.ssh/id_rsa") : "For Validation Only"
   }
 }

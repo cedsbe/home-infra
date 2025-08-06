@@ -67,12 +67,11 @@ repos:
 
   - repo: local
     hooks:
-      - id: packer-validate-windows-server-2025
-        name: Validate Windows Server 2025 Packer templates
-        # yamllint disable-line rule:line-length
-        entry: bash -c 'cd packer/windows_server_2025 && packer validate -var clone_vm_id=12345 -var proxmox_api_token=validateOnly -var proxmox_username=validateOnly -var winrm_password=validateOnly .'
+      - id: packer-validate
+        name: Validate Packer templates
+        entry: bash task_scripts/validate_packer.sh
         language: system
-        files: packer/windows_server_2025/.*\.pkr\.hcl$
+        files: packer/.*\.pkr\.hcl$
         pass_filenames: false
 
       - id: kubernetes-validate
