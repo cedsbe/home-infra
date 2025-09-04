@@ -228,8 +228,8 @@ function Test-NetworkProfileConfiguration {
       $_.Virtual -eq $false
     }
 
-    # More robust matching - check both Name and InterfaceDescription
-    $ActiveAdapterNames = @($ActiveAdapters.Name) + @($ActiveAdapters.InterfaceDescription)
+    # More robust matching - check Name, InterfaceDescription, and InterfaceAlias
+    $ActiveAdapterNames = @($ActiveAdapters.Name) + @($ActiveAdapters.InterfaceDescription) + @($ActiveAdapters.InterfaceAlias)
     $ActivePrivateProfiles = $NetworkProfiles | Where-Object {
       $_.NetworkCategory -eq "Private" -and
       ($_.InterfaceAlias -in $ActiveAdapterNames -or $_.Name -in $ActiveAdapterNames)
@@ -239,10 +239,12 @@ function Test-NetworkProfileConfiguration {
     $ProfilesForActiveAdapters = @()
     foreach ($NetProfile in $NetworkProfiles) {
       foreach ($Adapter in $ActiveAdapters) {
+        # Use precise matching only - avoid wildcard patterns that could cause false positives
         if ($NetProfile.InterfaceAlias -eq $Adapter.Name -or
           $NetProfile.InterfaceAlias -eq $Adapter.InterfaceDescription -or
-          $NetProfile.InterfaceAlias -like "*$($Adapter.Name)*") {
+          $NetProfile.InterfaceAlias -eq $Adapter.InterfaceAlias) {
           $ProfilesForActiveAdapters += $NetProfile
+          Write-Log "Matched profile '$($NetProfile.Name)' to adapter '$($Adapter.Name)' via InterfaceAlias" -Level "DEBUG"
           break
         }
       }

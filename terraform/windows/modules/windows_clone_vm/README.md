@@ -129,15 +129,6 @@ module "windows_vm_advanced" {
 | tags | List of tags to assign to the VM | `list(string)` | `["windows", "server-2025"]` | no |
 | description | Description of the VM | `string` | `"Windows Server 2025 VM created with Terraform"` | no |
 
-### Default User Account
-
-```hcl
-user_account = {
-  username = "administrator"
-  password = "P@ssw0rd123!"
-}
-```
-
 ## Outputs
 
 | Name | Description |

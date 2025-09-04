@@ -1,26 +1,23 @@
 <#
-    install-powershell-core.ps1
+  install-powershell-core.ps1
 
-    <#
-    install-powershell-core.ps1
+  Idempotent installer for PowerShell (pwsh) on Windows Server 2025.
 
-    Idempotent installer for PowerShell (pwsh) on Windows Server 2025.
+  Strategy:
+    1. If pwsh is already installed and satisfies requested version, do nothing.
+    2. If winget is available, try to install via winget (non-interactive).
+    3. Otherwise download the MSI from the official PowerShell GitHub releases and install silently.
 
-    Strategy:
-      1. If pwsh is already installed and satisfies requested version, do nothing.
-      2. If winget is available, try to install via winget (non-interactive).
-      3. Otherwise download the MSI from the official PowerShell GitHub releases and install silently.
+  Usage examples:
+    .\install-powershell-core.ps1
+    .\install-powershell-core.ps1 -Version 7.4.6
+    .\install-powershell-core.ps1 -UseWinget
 
-    Usage examples:
-      .\install-powershell-core.ps1
-      .\install-powershell-core.ps1 -Version 7.4.6
-      .\install-powershell-core.ps1 -UseWinget
-
-    Notes:
-      - This script runs under Windows PowerShell (built-in) to bootstrap pwsh.
-      - It attempts to use TLS1.2 for web calls.
-      - It does not hardcode credentials and is safe for public repositories.
-    #>
+  Notes:
+    - This script runs under Windows PowerShell (built-in) to bootstrap pwsh.
+    - It attempts to use TLS1.2 for web calls.
+    - It does not hardcode credentials and is safe for public repositories.
+#>
 
 param(
   [Parameter(Position = 0)]

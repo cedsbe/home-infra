@@ -128,10 +128,6 @@ variable "user_account" {
     username = string
     password = string
   })
-  default = {
-    username = "administrator"
-    password = "P@ssw0rd123!"
-  }
   sensitive = true
 }
 
