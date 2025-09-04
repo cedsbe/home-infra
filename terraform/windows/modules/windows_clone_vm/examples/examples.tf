@@ -8,6 +8,12 @@ module "basic_windows_vm" {
   vm_id       = 201
   clone_vm_id = 9001         # Replace with your template VM ID
   node_name   = "proxmox-01" # Replace with your Proxmox node name
+
+  # Custom user account
+  user_account = {
+    username = "administrator"
+    password = "MySecurePassword123!"
+  }
 }
 
 # Windows VM with static IP
@@ -65,6 +71,12 @@ module "windows_vm_performance" {
   node_name   = "proxmox-02"
   datastore   = "nvme-storage" # Fast storage
 
+  # Custom user account
+  user_account = {
+    username = "administrator"
+    password = "MySecurePassword123!"
+  }
+
   # High-performance configuration
   cores     = 8
   sockets   = 2
@@ -96,6 +108,12 @@ module "windows_vm_dmz" {
   # DMZ network configuration
   network_bridge = "vmbr2" # DMZ bridge
   network_vlan   = 200     # DMZ VLAN
+
+  # Custom user account
+  user_account = {
+    username = "administrator"
+    password = "MySecurePassword123!"
+  }
 
   ip_config = {
     ipv4 = {
