@@ -1,0 +1,14 @@
+{
+  "inputs": [],
+  "servers": {
+    "mcp-docker": {
+      "args": [
+        "mcp",
+        "gateway",
+        "run"
+      ],
+      "command": "docker.exe",
+      "type": "stdio"
+    }
+  }
+}

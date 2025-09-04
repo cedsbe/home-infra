@@ -1,5 +1,6 @@
 locals {
   powershell_scripts_clone = [
+    "./build_files/scripts/install-powershell-core.ps1",
     "./build_files/scripts/install-cloudbase-init.ps1",
     "./build_files/scripts/configure-cloudbase-init.ps1"
   ]
@@ -49,8 +50,8 @@ source "proxmox-clone" "windows2025" {
     cd_files = [
       "./build_files/scripts/initial-setup.ps1",
       "./build_files",
-      "./build_files/templates/cloudbase-init/cloudbase-init-unattend.conf",
-      "./build_files/templates/cloudbase-init/cloudbase-init.conf"
+      "./build_files/configs/cloudbase-init/cloudbase-init-unattend.conf",
+      "./build_files/configs/cloudbase-init/cloudbase-init.conf"
     ]
     cd_label         = "Unattended"
     iso_storage_pool = var.iso_storage
@@ -104,14 +105,14 @@ build {
     note    = "Debug breakpoint 2. Wait before starting the updates."
   }
 
-  # provisioner "windows-update" {
-  #   search_criteria = "BrowseOnly=0 and IsInstalled=0"
-  #   filters = [
-  #     "exclude:$_.Title -like '*Preview*'",
-  #     "include:$true",
-  #   ]
-  #   update_limit = 25
-  # }
+  provisioner "windows-update" {
+    search_criteria = "BrowseOnly=0 and IsInstalled=0"
+    filters = [
+      "exclude:$_.Title -like '*Preview*'",
+      "include:$true",
+    ]
+    update_limit = 25
+  }
 
   provisioner "windows-restart" {
     restart_check_command = "powershell -command \"& {Write-Output 'Machine restarted.'}\""
@@ -120,6 +121,14 @@ build {
   provisioner "breakpoint" {
     disable = var.disable_pre_sysprep_breakpoints
     note    = "Sysprep breakpoint. Wait before starting the sysprep generalize process."
+  }
+
+  provisioner "file" {
+    sources      = [
+        "./build_files/scripts/enable-openssh.ps1",
+        "./build_files/scripts/set-network-private.ps1"
+      ]
+    destination = "C:/Program Files/Cloudbase Solutions/Cloudbase-Init/LocalScripts/"
   }
 
   provisioner "powershell" {

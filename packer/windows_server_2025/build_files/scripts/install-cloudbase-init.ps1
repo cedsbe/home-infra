@@ -165,3 +165,5 @@ finally {
     Write-Host "Script completed at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Green
     Write-Host "=======================================" -ForegroundColor Green
 }
+
+exit 0

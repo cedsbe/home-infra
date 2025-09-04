@@ -9,7 +9,7 @@ env:
   KUBECONFIG: terraform/kubernetes/output/kube-config.yaml
   TALOSCONFIG: terraform/kubernetes/output/talos-config.yaml
 
-dotenv: ['packer/windows_server_2025/.env']
+dotenv: ["packer/windows_server_2025/.env"]
 
 includes:
   packer:
@@ -19,6 +19,10 @@ includes:
   azure:
     taskfile: ./terraform/azure/Taskfile.yml
     dir: ./terraform/azure
+
+  windows:
+    taskfile: ./terraform/windows/Taskfile.yml
+    dir: ./terraform/windows
 
 tasks:
   ####################
@@ -37,6 +41,7 @@ tasks:
       - tflint_install
       - az_cli_install
       - gitleaks_install
+      - shfmt_install
 
   argocd_cli_install:
     desc: "Install ArgoCD CLI"
@@ -98,6 +103,11 @@ tasks:
     desc: "Install gitleaks for secret detection"
     cmds:
       - brew install gitleaks
+
+  shfmt_install:
+    desc: "Install shfmt for shell script formatting"
+    cmds:
+      - brew install shfmt
 
   ####################
   # Infrastructure
