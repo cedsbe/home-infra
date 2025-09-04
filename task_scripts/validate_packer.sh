@@ -9,14 +9,16 @@ fi
 
 echo "Packer version: $(packer version)"
 
-
 echo "Validating Packer templates..."
 
 validation_failed=0
 
 # Validate Windows Server 2025 Packer templates
 
-cd packer/windows_server_2025 || { echo "❌ Failed to change directory to packer/windows_server_2025"; exit 1; }
+cd packer/windows_server_2025 || {
+    echo "❌ Failed to change directory to packer/windows_server_2025"
+    exit 1
+}
 
 echo "Initializing Packer..."
 if ! packer init .; then

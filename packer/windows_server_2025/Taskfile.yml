@@ -178,7 +178,7 @@ tasks:
         echo "🚀 Environment is ready for building Windows Server 2025 clone templates!"
 
   build-iso:
-    desc: "Build Windows Server 2025 template (default: {{.DEFAULT_TEMPLATE}}) - Use DEBUG=true to enable breakpoints"
+    desc: "Build Windows Server 2025 template - Use DEBUG=true to enable breakpoints"
     silent: true
     deps: [setup, validate]
     cmds:
@@ -189,7 +189,7 @@ tasks:
         echo "🐛 Debug mode enabled - build will pause at breakpoints"
         echo "💡 Use VNC to connect to the VM during breakpoints"
         {{else}}
-        echo "⏰ This process typically takes 45-90 minutes..."
+        echo "⏰ This process typically takes 90 - 180 minutes, depending on Windows Updates..."
         {{end}}
 
         echo ""
@@ -221,7 +221,7 @@ tasks:
         echo "🐛 Debug mode enabled - build will pause at breakpoints"
         echo "💡 Use VNC to connect to the VM during breakpoints"
         {{else}}
-        echo "⏰ This process typically takes 45-90 minutes..."
+        echo "⏰ This process typically takes 25 - 90 minutes, depending on Windows Updates..."
         {{end}}
 
         echo ""

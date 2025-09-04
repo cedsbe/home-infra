@@ -61,7 +61,7 @@ try {
     Write-Host "Extracting SDelete archive..." -ForegroundColor Yellow
     try {
         Expand-Archive -Path $sdeleteZip -DestinationPath $sdeleteExtractPath -Force
-        Write-Host "✅ Archive extracted successfully" -ForegroundColor Green
+        Write-Host "Archive extracted successfully" -ForegroundColor Green
     }
     catch {
         throw "Failed to extract SDelete archive: $($_.Exception.Message)"
@@ -101,18 +101,6 @@ try {
         throw "Installation verification failed - SDelete not found at target location"
     }
 
-    # Test SDelete command
-    Write-Host "Testing SDelete command..." -ForegroundColor Yellow
-    $sdeleteVersion = & sdelete.exe -? 2>&1 | Select-Object -First 3
-    if ($LASTEXITCODE -eq 1) {
-        Write-Host "✅ SDelete command test successful" -ForegroundColor Green
-        Write-Host "SDelete version info:" -ForegroundColor Cyan
-        $sdeleteVersion | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
-    }
-    else {
-        Write-Warning "SDelete command test failed with exit code $LASTEXITCODE, but file was installed."
-    }
-
     Write-Host "=== SDelete Installation Completed Successfully ===" -ForegroundColor Green
 
 }
@@ -138,3 +126,5 @@ finally {
     Write-Host "Script completed at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Cyan
     Write-Host "=======================================" -ForegroundColor Green
 }
+
+exit 0

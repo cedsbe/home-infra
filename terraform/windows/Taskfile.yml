@@ -1,0 +1,56 @@
+version: "3"
+
+tasks:
+  init:
+    desc: "Initialize Terraform for Windows infrastructure"
+    cmds:
+      - |
+        if [ -f "./backend.config" ]; then
+          echo "Found backend.config - initializing with remote backend..."
+          terraform init -backend-config=./backend.config
+        else
+          echo "❌ backend.config not found"
+        fi
+    status:
+      - test -d .terraform
+
+  validate:
+    desc: "Validate Terraform configuration"
+    deps: [init]
+    cmds:
+      - terraform validate
+      - terraform fmt -check
+
+  format:
+    desc: "Format Terraform configuration files"
+    cmds:
+      - terraform fmt -recursive
+
+  plan:
+    desc: "Create Terraform execution plan"
+    deps: [validate]
+    cmds:
+      - terraform plan
+
+  apply:
+    desc: "Apply Terraform configuration"
+    deps: [validate]
+    cmds:
+      - terraform apply
+
+  destroy:
+    desc: "Destroy Terraform-managed infrastructure"
+    cmds:
+      - terraform destroy
+
+  output:
+    desc: "Show Terraform outputs"
+    cmds:
+      - terraform output
+
+  clean:
+    desc: "Clean Terraform state and cache"
+    cmds:
+      - rm -rf .terraform
+      - rm -f .terraform.lock.hcl
+      - rm -f terraform.tfstate*

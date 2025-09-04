@@ -35,6 +35,50 @@ Get-WmiObject -Class Win32_UserProfile | Where-Object {
     $_.LocalPath -notlike "*Default*"
 } | Remove-WmiObject -ErrorAction SilentlyContinue
 
+# Remove existing OpenSSH host keys so each cloned VM regenerates unique fingerprints
+Write-Host "Removing OpenSSH host keys..."
+$sshHostKeyPath = "C:\ProgramData\ssh"
+if (Test-Path $sshHostKeyPath) {
+    Get-ChildItem -Path $sshHostKeyPath -Filter 'ssh_host_*' -File -ErrorAction SilentlyContinue | ForEach-Object {
+        try {
+            Remove-Item -Path $_.FullName -Force -ErrorAction Stop
+        }
+        catch {
+            Write-Warning "Failed to remove host key file $($_.FullName): $($_.Exception.Message)"
+        }
+    }
+}
+else {
+    Write-Host "OpenSSH directory not found; skipping host key removal." -ForegroundColor DarkGray
+}
+
+# Scrub stray user private SSH keys (keep authorized_keys if present)
+Write-Host "Scrubbing user SSH private keys..."
+Get-ChildItem -Path 'C:\Users' -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+    $userSsh = Join-Path $_.FullName '.ssh'
+    if (Test-Path $userSsh) {
+        Get-ChildItem $userSsh -ErrorAction SilentlyContinue | Where-Object {
+            ($_.Name -like 'id_*' -or $_.Extension -in '.pem', '.ppk') -and $_.PSIsContainer -eq $false
+        } | ForEach-Object {
+            try {
+                Remove-Item -Path $_.FullName -Force -ErrorAction Stop
+            }
+            catch {
+                Write-Warning "Failed to remove private key $($_.FullName): $($_.Exception.Message)"
+            }
+        }
+    }
+}
+
+# Stop sshd so it will regenerate host keys on next boot if service exists
+if (Get-Service -Name sshd -ErrorAction SilentlyContinue) {
+    Write-Host "Stopping sshd service in preparation for regeneration..."
+    Stop-Service sshd -Force -ErrorAction SilentlyContinue
+}
+
+# Record that keys were removed for debugging
+Write-Host "OpenSSH key cleanup complete." -ForegroundColor Cyan
+
 # Defragment the disk (optional but recommended for template optimization)
 # Write-Host "Optimizing disk..."
 # Optimize-Volume -DriveLetter C -Defrag -Verbose

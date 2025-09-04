@@ -99,7 +99,7 @@ Optimize-Volume -DriveLetter C -Defrag -Verbose
 # Zero out free space (use with caution - this takes time but reduces template size)
 # Uncomment the following lines if you want maximum compression:
 # Write-Host "Zeroing free space (this may take a while)..."
-# sdelete.exe -z C: -accepteula
+sdelete.exe -z C: -accepteula
 
 Write-Host "Pre-sysprep cleanup completed successfully."
 Write-Host "Starting Sysprep generalization..." -ForegroundColor Yellow

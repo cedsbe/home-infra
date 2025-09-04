@@ -38,7 +38,7 @@ source "proxmox-iso" "windows2025" {
     cd_files = ["./build_files/scripts/initial-setup.ps1", "./build_files"]
     cd_content = {
       "autounattend.xml" = (
-        templatefile("./build_files/templates/unattended/unattended-iso.xml.pkrtpl",
+        templatefile("./build_files/configs/unattended/unattended-iso.xml.pkrtpl",
           {
             password                             = var.winrm_password,
             cdrom_drive_virtio_windows           = var.cdrom_drive_virtio_windows,
@@ -50,7 +50,7 @@ source "proxmox-iso" "windows2025" {
         )
       )
       "unattend.xml" = (
-        templatefile("./build_files/templates/unattended/unattended-clone.xml.pkrtpl",
+        templatefile("./build_files/configs/unattended/unattended-clone.xml.pkrtpl",
           {
             password                             = var.winrm_password,
             cdrom_drive_unattended_files_windows = var.cdrom_drive_unattended_files_windows

@@ -1,5 +1,14 @@
 {
+  "[properties]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": false
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "chat.mcp.autostart": "newAndOutdated",
   "editor.formatOnSave": true,
+  "editor.tabSize": 2,
   "files.associations": {
     "*.xml.pkrtpl": "xml",
     "*.yaml": "yaml"

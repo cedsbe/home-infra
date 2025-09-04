@@ -1,12 +1,8 @@
-version: '3'
-
-vars:
-  TERRAFORM_DIR: "{{.TASKFILE_DIR}}"
+version: "3"
 
 tasks:
   init:
     desc: "Initialize Terraform for Azure infrastructure"
-    dir: "{{.TERRAFORM_DIR}}"
     cmds:
       - |
         if [ -f "./backend.config" ]; then
@@ -29,7 +25,6 @@ tasks:
 
   validate:
     desc: "Validate Terraform configuration"
-    dir: "{{.TERRAFORM_DIR}}"
     deps: [init]
     cmds:
       - terraform validate
@@ -37,39 +32,33 @@ tasks:
 
   format:
     desc: "Format Terraform configuration files"
-    dir: "{{.TERRAFORM_DIR}}"
     cmds:
       - terraform fmt -recursive
 
   plan:
     desc: "Create Terraform execution plan"
-    dir: "{{.TERRAFORM_DIR}}"
     deps: [validate]
     cmds:
       - terraform plan
 
   apply:
     desc: "Apply Terraform configuration"
-    dir: "{{.TERRAFORM_DIR}}"
     deps: [plan]
     cmds:
       - terraform apply
 
   destroy:
     desc: "Destroy Terraform-managed infrastructure"
-    dir: "{{.TERRAFORM_DIR}}"
     cmds:
       - terraform destroy
 
   output:
     desc: "Show Terraform outputs"
-    dir: "{{.TERRAFORM_DIR}}"
     cmds:
       - terraform output
 
   clean:
     desc: "Clean Terraform state and cache"
-    dir: "{{.TERRAFORM_DIR}}"
     cmds:
       - rm -rf .terraform
       - rm -f .terraform.lock.hcl
@@ -92,7 +81,6 @@ tasks:
 
   azure:resources:
     desc: "List resources in the resource group"
-    dir: "{{.TERRAFORM_DIR}}"
     cmds:
       - |
         RG_NAME=$(terraform output -raw resource_group_name 2>/dev/null)
@@ -109,7 +97,6 @@ tasks:
 
   setup:
     desc: "Setup Azure configuration from template"
-    dir: "{{.TERRAFORM_DIR}}"
     cmds:
       - |
         if [ ! -f "azure.secrets.auto.tfvars" ]; then

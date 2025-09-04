@@ -16,3 +16,9 @@ variable "proxmox_secrets" {
   sensitive   = true
   description = "Proxmox provider configuration. Sensitive data."
 }
+
+variable "windows_admin_password" {
+  type        = string
+  sensitive   = true
+  description = "Windows administrator password for domain controllers and servers."
+}
