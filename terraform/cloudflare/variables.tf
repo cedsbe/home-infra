@@ -11,7 +11,7 @@ variable "zone_ids" {
   }
 }
 
-variable "records_public_ghiot_be" {
+variable "records_public" {
   type = map(object({
     zone_name = string
     name      = string
@@ -22,11 +22,11 @@ variable "records_public_ghiot_be" {
     proxied   = optional(bool, false)
     priority  = optional(number, null)
   }))
-  description = "A map of DNS records that can be committed to Git."
+  description = "A map of DNS records that can be committed to Git. Supports all zones configured in zone_ids."
   default     = {}
 }
 
-variable "records_private_ghiot_be" {
+variable "records_private" {
   type = map(object({
     zone_name = string
     name      = string
@@ -37,36 +37,6 @@ variable "records_private_ghiot_be" {
     proxied   = optional(bool, false)
     priority  = optional(number, null)
   }))
-  description = "A map of DNS records that must be kept private."
-  default     = {}
-}
-
-variable "records_public_ghiot_net" {
-  type = map(object({
-    zone_name = string
-    name      = string
-    ttl       = optional(number, 60)
-    type      = string
-    comment   = string
-    content   = string
-    proxied   = optional(bool, false)
-    priority  = optional(number, null)
-  }))
-  description = "A map of DNS records that can be committed to Git."
-  default     = {}
-}
-
-variable "records_private_ghiot_net" {
-  type = map(object({
-    zone_name = string
-    name      = string
-    ttl       = optional(number, 60)
-    type      = string
-    comment   = string
-    content   = string
-    proxied   = optional(bool, false)
-    priority  = optional(number, null)
-  }))
-  description = "A map of DNS records that must be kept private."
+  description = "A map of DNS records that must be kept private. Supports all zones configured in zone_ids."
   default     = {}
 }

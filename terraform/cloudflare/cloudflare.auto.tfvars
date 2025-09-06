@@ -1,4 +1,4 @@
-records_public_ghiot_be = {
+records_public = {
   "ghiot.be_a" = {
     zone_name = "ghiot.be"
     name      = "ghiot.be"
@@ -145,10 +145,8 @@ records_public_ghiot_be = {
     priority  = 10
     proxied   = false
   }
-}
 
-records_public_ghiot_net = {
-
+  # ghiot.net zone records
   "ghiot.net_txt_spf" = {
     zone_name = "ghiot.net"
     name      = "ghiot.net"
