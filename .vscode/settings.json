@@ -1,4 +1,12 @@
 {
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
+    "editor.formatOnSave": true
+  },
   "[properties]": {
     "editor.defaultFormatter": null,
     "editor.formatOnSave": false
