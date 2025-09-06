@@ -2,7 +2,7 @@ version: "3"
 
 tasks:
   init:
-    desc: "Initialize Terraform for Windows infrastructure"
+    desc: "Initialize Terraform for Cloudflare infrastructure"
     cmds:
       - |
         if [ -f "./backend.config" ]; then
