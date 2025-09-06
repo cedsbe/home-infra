@@ -220,6 +220,138 @@ tasks:
       - gitleaks directory --config .gitleaks.toml --verbose .
 
   ####################
+  # Secrets Management (Git-Crypt)
+  ####################
+
+  secrets:status:
+    desc: "Show git-crypt status and file availability"
+    cmds:
+      - echo "=== Git-crypt Status ==="
+      - git-crypt status
+      - echo ""
+      - echo "=== Secrets File Status ==="
+      - |
+        for template in $(find . -name "*.template" | grep -E "\.(env|tfvars)\.template$"); do
+          target="${template%.template}"
+          if [ -f "$target" ]; then
+            if git-crypt status "$target" 2>/dev/null | grep -q "encrypted"; then
+              echo "✅ $target (encrypted, available)"
+            else
+              echo "⚠️  $target (not encrypted - check .gitattributes)"
+            fi
+          else
+            echo "❌ $target (missing - run 'task secrets:create-from-templates')"
+          fi
+        done
+
+  secrets:init-new-environment:
+    desc: "Initialize secrets for a completely new environment (no existing secrets)"
+    cmds:
+      - |
+        echo "Setting up secrets for new environment..."
+        for template in $(find . -name "*.template" | grep -E "\.(env|tfvars)\.template$"); do
+          target="${template%.template}"
+          if [ ! -f "$target" ]; then
+            cp "$template" "$target"
+            echo "Created $target from template"
+          else
+            echo "Skipping $target (already exists)"
+          fi
+        done
+      - echo ""
+      - echo "Next steps:"
+      - echo "1. Edit the created files with your actual credentials"
+      - echo "2. Commit the files (they'll be encrypted automatically)"
+      - echo "3. Export your git-crypt key for backup - task secrets:export-key"
+
+  secrets:verify-templates:
+    desc: "Verify that templates match the structure of actual secrets"
+    cmds:
+      - |
+        echo "Checking template completeness..."
+        for template in $(find . -name "*.template" | grep -E "\.(env|tfvars)\.template$"); do
+          target="${template%.template}"
+          if [ -f "$target" ]; then
+            echo "📋 Checking $target vs $template"
+            # Extract variable names from both files
+            template_vars=$(grep -E "^[A-Za-z_][A-Za-z0-9_]*\s*=" "$template" | cut -d'=' -f1 | sort || true)
+            actual_vars=$(grep -E "^[A-Za-z_][A-Za-z0-9_]*\s*=" "$target" | cut -d'=' -f1 | sort || true)
+
+            if [ "$template_vars" = "$actual_vars" ]; then
+              echo "  ✅ Variables match"
+            else
+              echo "  ⚠️  Variable mismatch detected"
+              echo "     Template has: $(echo $template_vars | tr '\n' ' ')"
+              echo "     Actual has:   $(echo $actual_vars | tr '\n' ' ')"
+            fi
+          fi
+        done
+
+  secrets:create-from-templates:
+    desc: "Create missing secrets files from templates (for key recovery or new setup)"
+    cmds:
+      - |
+        missing_files=0
+        for template in $(find . -name "*.template" | grep -E "\.(env|tfvars)\.template$"); do
+          target="${template%.template}"
+          if [ ! -f "$target" ]; then
+            cp "$template" "$target"
+            echo "Created $target from template - please edit with real values"
+            missing_files=$((missing_files + 1))
+          fi
+        done
+
+        if [ $missing_files -eq 0 ]; then
+          echo "All secrets files already exist. Use 'task secrets:status' to check their status."
+        else
+          echo ""
+          echo "Created $missing_files secrets file(s) from templates."
+          echo "Please edit them with your actual credentials before committing."
+        fi
+
+  secrets:export-key:
+    desc: "Export git-crypt key for backup (store securely!)"
+    cmds:
+      - |
+        if [ ! -f .git-crypt/.git-crypt_key ]; then
+          echo "❌ Git-crypt not initialized or unlocked"
+          echo "Run 'git-crypt init' or 'git-crypt unlock /path/to/keyfile'"
+          exit 1
+        fi
+
+        default_keyfile="$HOME/.ssh/home-infra-git-crypt-$(date +%Y%m%d).key"
+        read -p "Enter backup location [$default_keyfile]: " keyfile
+        keyfile=${keyfile:-$default_keyfile}
+
+        git-crypt export-key "$keyfile"
+        echo "✅ Key exported to $keyfile"
+        echo ""
+        echo "🔒 IMPORTANT SECURITY REMINDERS:"
+        echo "  - Store this file in a secure location (password manager, encrypted storage)"
+        echo "  - Never commit this key file to any repository"
+        echo "  - Make multiple backups in different secure locations"
+        echo "  - This key can decrypt ALL your secrets in this repository"
+
+  secrets:lock:
+    desc: "Lock git-crypt (remove key from working directory)"
+    cmds:
+      - git-crypt lock
+      - echo "Repository locked. Use 'git-crypt unlock /path/to/keyfile' to unlock"
+
+  secrets:unlock:
+    desc: "Unlock git-crypt with key file"
+    cmds:
+      - |
+        if [ -z "{{.KEYFILE}}" ]; then
+          echo "Usage: task secrets:unlock KEYFILE=/path/to/keyfile"
+          exit 1
+        fi
+        git-crypt unlock "{{.KEYFILE}}"
+        echo "Repository unlocked successfully"
+    requires:
+      vars: [KEYFILE]
+
+  ####################
   # Spell Checking
   ####################
 
