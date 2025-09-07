@@ -14,18 +14,21 @@ The following files are automatically encrypted with git-crypt:
 ## 📋 Available Tasks
 
 ### Status and Information
+
 ```bash
 task secrets:status                 # Show encryption status of all secrets files
 task secrets:verify-templates       # Verify templates match actual secrets structure
 ```
 
 ### Setting Up Secrets
+
 ```bash
 task secrets:create-from-templates  # Create secrets files from templates (for new setup)
 task secrets:init-new-environment   # Complete setup for new environment
 ```
 
 ### Key Management
+
 ```bash
 task secrets:export-key            # Export git-crypt key for backup (CRITICAL!)
 task secrets:unlock KEYFILE=path   # Unlock repository with key file
@@ -39,17 +42,20 @@ task secrets:lock                  # Lock repository (remove encryption key)
 If you're cloning this repository for the first time:
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/yourusername/home-infra.git
    cd home-infra
    ```
 
 2. **Check if you need the encryption key**
+
    ```bash
    task secrets:status
    ```
 
 3. **Option A: You have the git-crypt key**
+
    ```bash
    task secrets:unlock KEYFILE=/path/to/your/backup/key
    task secrets:status  # Verify all files are decrypted
@@ -66,11 +72,13 @@ If you're cloning this repository for the first time:
 ### For Existing Repository (Add New Secrets)
 
 1. **Check current status**
+
    ```bash
    task secrets:status
    ```
 
 2. **Add new secrets files** (if you have templates)
+
    ```bash
    task secrets:create-from-templates
    # Edit the new files with actual values
@@ -109,18 +117,22 @@ If you're cloning this repository for the first time:
 ## 🔑 Key Management
 
 ### Export Your Key (CRITICAL!)
+
 ```bash
 task secrets:export-key
 ```
 
 **Store the exported key in multiple secure locations:**
+
 - Password manager (Bitwarden, 1Password, etc.)
 - Encrypted cloud storage (separate from git repository)
 - Encrypted USB drive (offline backup)
 - Secure network storage (encrypted)
 
 ### Key Recovery
+
 If you lose your git-crypt key but still have the repository:
+
 1. Use template files to recreate the structure
 2. Fill in your credentials from memory/other sources
 3. Create a new git-crypt setup
@@ -128,12 +140,14 @@ If you lose your git-crypt key but still have the repository:
 ## 🔒 Security Best Practices
 
 ### ✅ What's Safe
+
 - **Template files** - These contain no secrets and show structure
 - **Internal IP addresses** - Private networks (192.168.x.x, 10.x.x.x)
 - **Internal domain names** - Local domains (homelab.local, ad.ghiot.be)
 - **Configuration structure** - Non-sensitive infrastructure patterns
 
 ### ❌ What's Protected
+
 - **API tokens and keys** - External service credentials
 - **Passwords** - System and service passwords
 - **Zone IDs** - Cloudflare zone identifiers
@@ -141,6 +155,7 @@ If you lose your git-crypt key but still have the repository:
 - **VM credentials** - Proxmox and Windows credentials
 
 ### 🛡️ Additional Security
+
 - **Git-crypt uses AES-256** encryption
 - **Files are encrypted at rest** in git history
 - **Decryption requires the key file**
@@ -150,18 +165,21 @@ If you lose your git-crypt key but still have the repository:
 ## 🚨 Emergency Procedures
 
 ### Lost Git-Crypt Key
+
 1. **Check backup locations** for exported key files
 2. **Use template files** to understand what credentials you need
 3. **Recreate from memory/external sources** if possible
 4. **Re-initialize git-crypt** with new key if necessary
 
 ### Suspected Key Compromise
+
 1. **Rotate all credentials** in the secrets files
 2. **Export new git-crypt key** with different name
 3. **Update shared team keys** if applicable
 4. **Review access logs** for any unauthorized usage
 
 ### Repository Migration
+
 1. **Export git-crypt key** before any migration
 2. **Test unlock process** on new clone
 3. **Verify all secrets files** decrypt properly
@@ -176,6 +194,7 @@ If you lose your git-crypt key but still have the repository:
 ## 🤝 Team Collaboration
 
 For team environments, consider:
+
 - **GPG key integration** for individual team member access
 - **Shared key storage** in secure team password manager
 - **Key rotation procedures** for security compliance
