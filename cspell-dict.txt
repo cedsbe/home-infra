@@ -1,6 +1,10 @@
-
-# Add custom words, technical terms, and project-specific vocabulary here
-# Add more project-specific terms below as needed
+# CSpell Custom Dictionary
+# This file contains project-specific words that are not in the standard dictionary
+# Words are automatically sorted alphabetically when using the spell_add_word task
+#
+# To add a new word: task spell_add_word WORD=yourword
+# To sort manually: begin; head -7 cspell-dict.txt; tail -n +8 cspell-dict.txt | sort -u; end > temp; and mv temp cspell-dict.txt
+#
 addrs
 argocd
 arkade
@@ -26,27 +30,21 @@ Cim
 cli
 clickhouse
 cloudops
-# Cloud providers
 clusterip
 CMP
 CNI
 commitizen
-# Common abbreviations
-# Container and orchestration
 containerd
 controlplane
 creds
 cryptsvc
 csi
 DAC
-# Database and messaging
 datacenter
 dccore
 dcdesktop
 dchp
-# Development tools
 devops
-# DevOps tools and concepts
 dhcpv
 digitalocean
 dmwappushservice
@@ -63,7 +61,6 @@ EFI
 emotion
 esbuild
 eslint
-# File formats and extensions
 finalizer
 finops
 fmt
@@ -86,7 +83,6 @@ httproute
 iad
 ICS
 img
-# Infrastructure components
 iothread
 IPC
 jsonrpc
@@ -94,7 +90,6 @@ kctrl
 kerberos
 KICS
 kubeconform
-# Kubernetes terms
 kubeseal
 kustomize
 kwork
@@ -121,7 +116,6 @@ NDRG
 netkvm
 netops
 netsh
-# Network and virtualization
 noatime
 nocloudservice
 nodepool
@@ -151,9 +145,6 @@ poly
 ppk
 pprof
 prettier
-# Programming languages and frameworks
-# Project-specific dictionary for home-infra repository
-# Project-specific names
 protobuf
 proxmox
 ptr
@@ -173,7 +164,6 @@ sarif
 scaleway
 scsi
 sdelete
-# Security and cryptography
 Sensr
 sergelogvinov
 servfail
@@ -198,7 +188,6 @@ sysprep
 tailwind
 talos
 temu
-# Terraform/Packer file extensions
 tflint
 tfstate
 tfvars
@@ -231,7 +220,6 @@ whois
 Wia
 WIA
 wim
-# Windows-specific terms
 winre
 winrm
 winrmcertificateauth

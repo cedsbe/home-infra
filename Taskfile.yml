@@ -190,6 +190,23 @@ tasks:
     cmds:
       - pre-commit run --all-files
 
+  precommit_ci_test:
+    desc: "Test pre-commit in CI/CD mode (with git-crypt locked)"
+    cmds:
+      - |
+        echo "🔒 Testing pre-commit with git-crypt locked (simulating CI/CD environment)"
+        if git-crypt status >/dev/null 2>&1; then
+          echo "Git-crypt is unlocked, locking for test..."
+          git-crypt lock
+          echo "Running pre-commit..."
+          pre-commit run --all-files
+          echo "Unlocking git-crypt..."
+          git-crypt unlock || echo "⚠️  You'll need to unlock manually with: git-crypt unlock /path/to/keyfile"
+        else
+          echo "Git-crypt already locked, running pre-commit..."
+          pre-commit run --all-files
+        fi
+
   precommit_update:
     desc: "Update pre-commit hooks to latest versions"
     cmds:
