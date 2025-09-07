@@ -8,7 +8,7 @@
     "editor.formatOnSave": true
   },
   "[properties]": {
-    "editor.defaultFormatter": null,
+    "editor.defaultFormatter": "foxundermoon.shell-format",
     "editor.formatOnSave": false
   },
   "[shellscript]": {

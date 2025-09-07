@@ -22,10 +22,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Unlock secrets
-        uses: sliteteam/github-action-git-crypt-unlock@f99c0c6b60bb7ec30dcec033a8f0a3b3d48f21e1
-        env:
-          GIT_CRYPT_KEY: ${{ secrets.GIT_CRYPT_KEY }}
+      - name: Remove encrypted files for security
+        run: |
+          echo "🔒 Removing encrypted files for CI security..."
+          find . -name "*.secrets.*" -type f -delete
+          find . -name ".env" -type f -delete
+          find . -name "backend.config" -type f -delete
+          # Remove any git-crypt encrypted files (they have binary content)
+          git ls-files | xargs file | grep -i "data" | cut -d: -f1 | xargs rm -f || true
+          echo "✅ Encrypted files removed"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -83,6 +88,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Remove encrypted files for security
+        run: |
+          echo "🔒 Removing encrypted files for security scan..."
+          find . -name "*.secrets.*" -type f -delete
+          find . -name ".env" -type f -delete
+          find . -name "backend.config" -type f -delete
+          git ls-files | xargs file | grep -i "data" | cut -d: -f1 | xargs rm -f || true
+          echo "✅ Encrypted files removed"
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
