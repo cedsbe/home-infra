@@ -313,7 +313,7 @@ tasks:
     desc: "Export git-crypt key for backup (store securely!)"
     cmds:
       - |
-        if [ ! -f .git-crypt/.git-crypt_key ]; then
+        if [ ! -f .git/git-crypt/keys/default ]; then
           echo "❌ Git-crypt not initialized or unlocked"
           echo "Run 'git-crypt init' or 'git-crypt unlock /path/to/keyfile'"
           exit 1
