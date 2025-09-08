@@ -28,8 +28,8 @@ jobs:
           find . -name "*.secrets.*" -type f -delete
           find . -name ".env" -type f -delete
           find . -name "backend.config" -type f -delete
-          # Remove any git-crypt encrypted files (they have binary content)
-          git ls-files | xargs file | grep -i "data" | cut -d: -f1 | xargs rm -f || true
+          # Remove git-crypt encrypted files (they typically show as "data" without format info)
+          git ls-files | xargs file | grep -E ": data$" | cut -d: -f1 | xargs rm -f || true
           echo "✅ Encrypted files removed"
 
       - name: Set up Python
