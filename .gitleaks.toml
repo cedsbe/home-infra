@@ -15,3 +15,25 @@ condition = "AND"
 # Allow Sealed Secrets or similar large base64-encoded blobs (e.g., Kubernetes SealedSecret encrypted data)
 regexes = ['''Ag[a-zA-Z0-9+/]{500,}={0,2}''']
 paths = ['''(?i).*\.ya?ml$''']
+
+# Allow encrypted secrets files managed by git-crypt
+[[rules.allowlists]]
+condition = "AND"
+paths = [
+  '''.*\.secrets\.auto\.tfvars$''',
+  '''packer/.*/\.env$''',
+  '''terraform/.*/\.env$''',
+  '''backend\.config$'''
+]
+
+[[rules]]
+id = "cloudflare-api-key"
+[[rules.allowlists]]
+condition = "AND"
+# Allow encrypted secrets files managed by git-crypt
+paths = [
+  '''.*\.secrets\.auto\.tfvars$''',
+  '''packer/.*/\.env$''',
+  '''terraform/.*/\.env$''',
+  '''backend\.config$'''
+]

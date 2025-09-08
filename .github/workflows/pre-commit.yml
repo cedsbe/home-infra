@@ -22,6 +22,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Remove git-crypt encrypted files
+        run: |
+          echo "🔐 Removing git-crypt encrypted files (not unlocked in CI)..."
+          find . -name "*.secrets.*" -type f -delete
+          find . -name ".env" -type f -delete
+          find . -name "backend.config" -type f -delete
+          # Remove git-crypt encrypted files (they appear as binary data when locked)
+          git ls-files | xargs file | grep -E ": data$" | cut -d: -f1 | xargs rm -f || true
+          echo "✅ Encrypted files removed to avoid CI processing issues"
+          git status --porcelain
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
