@@ -31,6 +31,7 @@ jobs:
           # Remove git-crypt encrypted files (they typically show as "data" without format info)
           git ls-files | xargs file | grep -E ": data$" | cut -d: -f1 | xargs rm -f || true
           echo "✅ Encrypted files removed"
+          git status --porcelain
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -88,15 +89,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Remove encrypted files for security
-        run: |
-          echo "🔒 Removing encrypted files for security scan..."
-          find . -name "*.secrets.*" -type f -delete
-          find . -name ".env" -type f -delete
-          find . -name "backend.config" -type f -delete
-          git ls-files | xargs file | grep -i "data" | cut -d: -f1 | xargs rm -f || true
-          echo "✅ Encrypted files removed"
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
