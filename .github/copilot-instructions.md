@@ -17,9 +17,12 @@ This is a home infrastructure repository that automates the deployment of a Kube
 ## Directory Structure and Conventions
 
 ### `/terraform/azure/global/`
-- **Purpose**: Azure cloud global infrastructure management
+- **Purpose**: Azure cloud global infrastructure management.
+  This directory contains global resources shared across projects, such as:
+  - **Terraform backend storage account**: Used for remote state storage for all Terraform projects.
+  - **Azure Key Vault**: Stores shared secrets and credentials used by multiple projects.
 - **Key Files**:
-  - `main.tf` - Core Azure resources (Resource Group, Storage, Key Vault)
+  - `main.tf` - Core Azure resources (Resource Group, Storage Account for backend, Key Vault for secrets)
   - `variables.tf` - Input variables with validation
   - `providers.tf` - Azure provider configuration with required providers
   - `backend.tf` - Remote state backend configuration
