@@ -29,7 +29,7 @@ fi
 
 # Validate azure Taskfile
 echo "Validating azure Taskfile..."
-if (cd terraform/azure && task --list >/dev/null 2>&1); then
+if (cd terraform/azure/global && task --list >/dev/null 2>&1); then
     echo "✓ Azure Taskfile is valid"
 else
     echo "✗ Azure Taskfile validation failed"

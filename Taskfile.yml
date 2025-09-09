@@ -19,8 +19,8 @@ includes:
     dir: ./packer/windows_server_2025
 
   azure:
-    taskfile: ./terraform/azure/Taskfile.yml
-    dir: ./terraform/azure
+    taskfile: ./terraform/azure/global/Taskfile.yml
+    dir: ./terraform/azure/global
 
   cloudflare:
     taskfile: ./terraform/cloudflare/Taskfile.yml

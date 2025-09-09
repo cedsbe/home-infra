@@ -1,17 +1,17 @@
 # Azure Terraform Configuration
 
-This directory contains Terraform configuration for managing Azure resources as part of the home-infra project.
+This directory contains Terraform configuration for global Azure resources shared across projects in the home-infra environment.
 
 ## Overview
 
-This configuration sets up Azure infrastructure including:
+This configuration sets up global Azure infrastructure, including:
 
-- **Resource Group**: Container for all resources
-- **Storage Account**: For Terraform backend state storage
-- **Key Vault**: For secrets management with network restrictions
+- **Resource Group**: Container for all shared resources
+- **Storage Account**: Centralized backend state storage for all Terraform projects
+- **Key Vault**: Shared secrets management for use across multiple projects, with network restrictions
 - **Dynamic DNS Resolution**: Resolves home network FQDN for security rules
 
-The configuration uses Azure CAF (Cloud Adoption Framework) naming conventions and includes remote state management.
+These resources are intended to be reused by other infrastructure modules and projects. The configuration uses Azure CAF (Cloud Adoption Framework) naming conventions and includes remote state management.
 
 ## Key Features
 
@@ -115,6 +115,7 @@ task azure:resources
 This configuration uses a self-managed Azure Storage Account for Terraform state:
 
 #### For NEW Infrastructure:
+
 1. Ensure `backend.tf` has the backend block commented out initially
 2. Run `task azure:init` (initializes without backend)
 3. Run `task azure:apply` (creates storage account)
@@ -123,6 +124,7 @@ This configuration uses a self-managed Azure Storage Account for Terraform state
 6. Re-run `task azure:init` with `-migrate-state` to move state to remote backend
 
 #### For EXISTING Infrastructure:
+
 1. Ensure you have `backend.config` with correct storage account details
 2. Ensure backend block in `backend.tf` is uncommented
 3. Run `task azure:init` (automatically uses backend configuration)
@@ -152,7 +154,7 @@ All resources include the project name as prefix and follow Azure naming best pr
 ## File Structure
 
 ```
-terraform/azure/
+terraform/azure/global/
 ├── main.tf                           # Main infrastructure resources
 ├── variables.tf                      # Variable definitions with validation
 ├── providers.tf                      # Provider requirements and configuration
@@ -234,8 +236,8 @@ If you have backend state issues:
 This Azure configuration is designed to complement the existing Proxmox-based home infrastructure:
 
 - **Hybrid Cloud**: Azure for cloud services, Proxmox for local workloads
-- **State Management**: Centralized Terraform state storage in Azure
-- **Secrets Management**: Azure Key Vault for cross-environment secrets
+- **Global State Management**: Centralized Terraform state storage in Azure, shared by all Terraform projects
+- **Shared Secrets Management**: Azure Key Vault for secrets used across multiple environments and modules
 - **Network Integration**: Dynamic DNS resolution for home network access
 - **Task Integration**: Seamless integration with project's Task-based workflow
 
