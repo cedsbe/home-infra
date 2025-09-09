@@ -16,8 +16,8 @@ This is a home infrastructure repository that automates the deployment of a Kube
 
 ## Directory Structure and Conventions
 
-### `/terraform/azure/`
-- **Purpose**: Azure cloud infrastructure management
+### `/terraform/azure/global/`
+- **Purpose**: Azure cloud global infrastructure management
 - **Key Files**:
   - `main.tf` - Core Azure resources (Resource Group, Storage, Key Vault)
   - `variables.tf` - Input variables with validation

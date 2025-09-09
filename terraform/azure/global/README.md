@@ -115,6 +115,7 @@ task azure:resources
 This configuration uses a self-managed Azure Storage Account for Terraform state:
 
 #### For NEW Infrastructure:
+
 1. Ensure `backend.tf` has the backend block commented out initially
 2. Run `task azure:init` (initializes without backend)
 3. Run `task azure:apply` (creates storage account)
@@ -123,6 +124,7 @@ This configuration uses a self-managed Azure Storage Account for Terraform state
 6. Re-run `task azure:init` with `-migrate-state` to move state to remote backend
 
 #### For EXISTING Infrastructure:
+
 1. Ensure you have `backend.config` with correct storage account details
 2. Ensure backend block in `backend.tf` is uncommented
 3. Run `task azure:init` (automatically uses backend configuration)
@@ -152,7 +154,7 @@ All resources include the project name as prefix and follow Azure naming best pr
 ## File Structure
 
 ```
-terraform/azure/
+terraform/azure/global/
 ├── main.tf                           # Main infrastructure resources
 ├── variables.tf                      # Variable definitions with validation
 ├── providers.tf                      # Provider requirements and configuration

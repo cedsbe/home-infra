@@ -57,4 +57,3 @@ logs/
 *.tmp
 *.temp
 *.cache
-terraform/azure/backend.config
