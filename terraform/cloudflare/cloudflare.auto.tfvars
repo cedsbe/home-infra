@@ -130,10 +130,10 @@ records_public = {
     zone_name = "ghiot.be"
     name      = "www.ghiot.be"
     type      = "CNAME"
-    comment   = "WWW subdomain pointing to root domain"
-    content   = "ghiot.be"
+    comment   = "WWW subdomain pointing to Azure Static Web App"
+    content   = "red-wave-089a8e303.2.azurestaticapps.net"
     ttl       = 1 # automatic
-    proxied   = true
+    proxied   = false
   }
 
   "ghiot.be_mx" = {
