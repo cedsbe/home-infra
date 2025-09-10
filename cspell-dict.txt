@@ -185,6 +185,7 @@ stylelint
 svelte
 sveltekit
 Svr
+swa
 sysprep
 tailwind
 talos

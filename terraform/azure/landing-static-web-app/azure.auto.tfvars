@@ -7,5 +7,7 @@ tags = {
   Project    = "home-infra"
   ManagedBy  = "Terraform"
   Repository = "home-infra"
-  Scope      = "global"
+  Scope      = "landing"
 }
+
+custom_domain_name = "www.ghiot.be"

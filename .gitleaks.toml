@@ -37,3 +37,15 @@ paths = [
   '''terraform/.*/\.env$''',
   '''backend\.config$'''
 ]
+
+[[rules]]
+id = "github-pat"
+[[rules.allowlists]]
+condition = "AND"
+# Allow encrypted secrets files managed by git-crypt
+paths = [
+  '''.*\.secrets\.auto\.tfvars$''',
+  '''packer/.*/\.env$''',
+  '''terraform/.*/\.env$''',
+  '''backend\.config$'''
+]

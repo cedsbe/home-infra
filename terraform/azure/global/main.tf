@@ -71,7 +71,7 @@ resource "local_file" "backend_config" {
   content    = <<-EOF
     storage_account_name = "${azurerm_storage_account.backend.name}"
     container_name       = "${azurerm_storage_container.tf_backend.name}"
-    key                  = "azure.tfstate"
+    key                  = "global.tfstate"
     EOF
   filename   = "${path.module}/backend.config"
   depends_on = [azurerm_storage_container.tf_backend]
