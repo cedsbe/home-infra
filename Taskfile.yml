@@ -154,12 +154,6 @@ tasks:
       - cilium connectivity test
 
   ####################
-  # Packer Templates
-  ####################
-  # Packer tasks are defined in packer/windows_server_2025/Taskfile.yml
-  # Use them with: task packer:TASK_NAME
-
-  ####################
   # Code Quality
   ####################
 
