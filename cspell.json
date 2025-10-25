@@ -35,7 +35,8 @@
     "*.vhdx",
     "packer/windows_server_2025/.env",
     "**/*.secrets.*",
-    "sensitive/**"
+    "sensitive/**",
+    "backend.config"
   ],
   "language": "en",
   "maxDuplicateProblems": 3,
