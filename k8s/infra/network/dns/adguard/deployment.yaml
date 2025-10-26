@@ -18,12 +18,17 @@ spec:
       initContainers:
         - name: copy-base-config
           image: busybox
-          command: [ "cp", "/tmp/AdGuardHome.yaml", "/opt/adguardhome/conf/AdGuardHome.yaml" ]
+          command:
+            [
+              "cp",
+              "/tmp/AdGuardHome.yaml",
+              "/opt/adguardhome/conf/AdGuardHome.yaml",
+            ]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
-              drop: [ "ALL" ]
+              drop: ["ALL"]
           volumeMounts:
             - name: config
               mountPath: /tmp/AdGuardHome.yaml
@@ -32,12 +37,17 @@ spec:
               mountPath: /opt/adguardhome/conf
         - name: append-users
           image: busybox
-          command: [ "sh", "-c", "cat /tmp/users.yaml >> /opt/adguardhome/conf/AdGuardHome.yaml" ]
+          command:
+            [
+              "sh",
+              "-c",
+              "cat /tmp/users.yaml >> /opt/adguardhome/conf/AdGuardHome.yaml",
+            ]
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             capabilities:
-              drop: [ "ALL" ]
+              drop: ["ALL"]
           volumeMounts:
             - name: users
               mountPath: /tmp/users.yaml
@@ -46,7 +56,7 @@ spec:
               mountPath: /opt/adguardhome/conf
       containers:
         - name: adguard
-          image: docker.io/adguard/adguardhome:v0.107.63 # renovate: docker=docker.io/adguard/adguardhome
+          image: docker.io/adguard/adguardhome:v0.107.68 # renovate: docker=docker.io/adguard/adguardhome
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -85,6 +95,6 @@ spec:
           secret:
             secretName: adguard-users-secrets
         - name: config-folder
-          emptyDir: { }
+          emptyDir: {}
         - name: work-folder
-          emptyDir: { }
+          emptyDir: {}
