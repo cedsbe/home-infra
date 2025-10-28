@@ -16,7 +16,7 @@ spec:
           - path: k8s/infra/monitoring/*
   template:
     metadata:
-      name: '{{.path.basename}}'
+      name: "{{.path.basename}}"
       labels:
         be.ghiot: monitoring
     spec:
@@ -24,11 +24,11 @@ spec:
       source:
         repoURL: https://github.com/cedsbe/home-infra
         targetRevision: HEAD
-        path: '{{.path.path}}'
+        path: "{{.path.path}}"
       destination:
         name: in-cluster
         namespace: argocd
       syncPolicy:
         automated:
-          selfHeal: true
-          prune: true
+          selfHeal: false
+          prune: false
