@@ -32,8 +32,8 @@ dns:
   bootstrap_dns:
     - 10.96.0.11
   fallback_dns:
-    - 1.1.1.1
-    - 9.9.9.9
+    - 86.54.11.1 # DNS4EU - Protective
+    - 9.9.9.9 # Quad9 - Malware Blocking
   upstream_mode: parallel
   fastest_timeout: 1s
   bootstrap_prefer_ipv6: false
@@ -218,7 +218,6 @@ clients:
         - user_child
       upstreams:
         - 86.54.11.11 # DNS4EU - Protective + Child Protection + Ad Blocking
-        - 9.9.9.9 # Quad9 - Malware Blocking
       uid: 019418f8-a0ff-7079-a3ae-1d85f8a6f129
       upstreams_cache_size: 0
       upstreams_cache_enabled: false
