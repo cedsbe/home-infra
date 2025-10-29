@@ -4,6 +4,7 @@ crds:
   keep: true
 extraArgs:
   - "--enable-gateway-api"
+  - "--dns01-recursive-nameservers=86.54.11.100:53,9.9.9.9:53" # DNS4EU Unfiltered + Quad9
 
 resources:
   limits:
