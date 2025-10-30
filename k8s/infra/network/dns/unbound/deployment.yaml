@@ -23,10 +23,10 @@ spec:
           #  readOnlyRootFilesystem: false
           ports:
             - name: unbound-dns-tcp
-              containerPort: 5335
+              containerPort: 53
               protocol: TCP
             - name: unbound-dns-udp
-              containerPort: 5335
+              containerPort: 53
               protocol: UDP
           resources:
             requests:
@@ -37,7 +37,7 @@ spec:
               memory: 128Mi
           startupProbe:
             exec:
-              command: ['drill', '@127.0.0.1', '-p', '53', 'cloudflare.com']
+              command: ["drill", "@127.0.0.1", "-p", "53", "cloudflare.com"]
             initialDelaySeconds: 10
             failureThreshold: 3
             timeoutSeconds: 5
