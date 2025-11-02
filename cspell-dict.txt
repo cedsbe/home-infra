@@ -192,6 +192,7 @@ talos
 temu
 tflint
 tfstate
+tftpl
 tfvars
 tiledatamodelsvc
 timescale
