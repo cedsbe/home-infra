@@ -150,6 +150,7 @@ proxmox
 ptr
 pulsar
 pvscsi
+qbittorrent
 qcow
 qname
 quic
@@ -216,6 +217,7 @@ virtio
 vmbr
 vmdk
 vmid
+vuetorrent
 wcm
 websocket
 whoamigw
