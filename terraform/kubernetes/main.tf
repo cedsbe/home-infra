@@ -1,5 +1,8 @@
 locals {
-  talos_version = "v1.9.0"
+  talos_version = "v1.11.3"
+
+  # tflint-ignore: terraform_unused_declarations
+  talos_update_version = "v1.11.3" # renovate: github-releases=siderolabs/talos
 }
 
 # Generate Cilium Helm template
@@ -147,5 +150,10 @@ module "volumes" {
       node = "hsp-proxmox0"
       size = "10G"
     }
+
+    # pv-torrent = {
+    #   node = "hsp-proxmox0"
+    #   size = "1G"
+    # }
   }
 }

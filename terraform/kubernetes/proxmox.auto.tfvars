@@ -6,4 +6,4 @@ proxmox = {
 }
 
 # Cilium Configuration
-# cilium_version = "v1.17.4"  # Uncomment and modify to override default version
+cilium_version = "v1.18.3" # Uncomment and modify to override default version
