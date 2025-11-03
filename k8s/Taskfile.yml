@@ -1,0 +1,80 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  bootstrap:gateway-api:
+    desc: "Bootstrap the Gateway API"
+    dir: infra/crds
+    cmds:
+      - kubectl kustomize . | kubectl apply -f -
+
+  bootstrap:cilium:
+    desc: "Bootstrap Cilium"
+    dir: infra/network/cilium
+    cmds:
+      - kubectl kustomize --enable-helm . | kubectl apply -f -
+
+  bootstrap:sealed-secrets:
+    desc: "Bootstrap Sealed Secrets"
+    dir: infra/controllers/sealed-secrets
+    cmds:
+      - kubectl kustomize --enable-helm . | kubectl apply -f -
+
+  bootstrap:sealing-secrets:
+    desc: "Seal existing secrets"
+    dir: ../sensitive
+    cmds:
+      - kubeseal -f adguard-users-secrets.yaml -o yaml -w adguard-users-secrets_sealed.yaml
+      - kubeseal -f argocd-github-secret.yaml -o yaml -w argocd-github-secret_sealed.yaml
+      - kubeseal -f cert-manager-secret.yaml -o yaml -w cert-manager-secret_sealed.yaml
+      - cp -f adguard-users-secrets_sealed.yaml ../k8s/infra/network/dns/adguard/secret-users.yaml
+      - cp -f argocd-github-secret_sealed.yaml ../k8s/infra/controllers/argocd/argocd-github-secret_sealed.yaml
+      - cp -f cert-manager-secret_sealed.yaml ../k8s/infra/controllers/cert-manager/cloudflare-api-token.yaml
+
+  bootstrap:cert-manager:
+    desc: "Bootstrap Cert-Manager"
+    dir: infra/controllers/cert-manager
+    cmds:
+      - kubectl kustomize --enable-helm . | kubectl apply -f -
+
+  bootstrap:cilium-gateway:
+    desc: "Bootstrap Cilium Gateway Integration"
+    dir: infra/network/gateway
+    cmds:
+      - kubectl kustomize . | kubectl apply -f -
+
+  bootstrap:metrics-server:
+    desc: "Bootstrap Talos Metrics Server"
+    dir: infra/monitoring/talos-metric-server
+    cmds:
+      - kubectl kustomize . | kubectl apply -f -
+
+  bootstrap:argo-cd:
+    desc: "Bootstrap Argo CD"
+    dir: infra/controllers/argocd
+    cmds:
+      - kubectl kustomize --enable-helm . | kubectl apply -f -
+
+  bootstrap:argo-cd:get-initial-password:
+    desc: "Get Argo CD initial admin password"
+    cmds:
+      - argocd admin initial-password -n argocd
+
+  bootstrap:storage:
+    desc: "Bootstrap Storage Classes"
+    dir: infra/storage
+    cmds:
+      - kubectl kustomize . | kubectl apply -f -
+
+  bootstrap:apps-all:
+    desc: "Bootstrap all apps"
+    dir: apps
+    cmds:
+      - kubectl kustomize --enable-helm . | kubectl apply -f -
+
+  bootstrap:infra-all:
+    desc: "Bootstrap all infra"
+    dir: infra
+    cmds:
+      - kubectl kustomize --enable-helm . | kubectl apply -f -

@@ -67,28 +67,41 @@ resource "talos_machine_bootstrap" "this" {
   client_configuration = talos_machine_secrets.this.client_configuration
 }
 
-data "talos_cluster_health" "this" {
+#
+# For now, we replace the cluster health check with a simple sleep to wait for the cluster to be ready.
+#
+# data "talos_cluster_health" "this" {
+#   depends_on = [
+#     talos_machine_configuration_apply.this,
+#     talos_machine_bootstrap.this
+#   ]
+
+#   skip_kubernetes_checks = false
+#   client_configuration   = data.talos_client_configuration.this.client_configuration
+
+#   control_plane_nodes = [for k, v in var.talos_nodes : v.ip if v.machine_type == "controlplane"]
+#   endpoints           = data.talos_client_configuration.this.endpoints
+#   worker_nodes        = [for k, v in var.talos_nodes : v.ip if v.machine_type == "worker"]
+
+#   timeouts = {
+#     read = "15m"
+#   }
+# }
+
+resource "time_sleep" "wait_for_cluster" {
   depends_on = [
     talos_machine_configuration_apply.this,
     talos_machine_bootstrap.this
   ]
 
-  skip_kubernetes_checks = false
-  client_configuration   = data.talos_client_configuration.this.client_configuration
-
-  control_plane_nodes = [for k, v in var.talos_nodes : v.ip if v.machine_type == "controlplane"]
-  endpoints           = data.talos_client_configuration.this.endpoints
-  worker_nodes        = [for k, v in var.talos_nodes : v.ip if v.machine_type == "worker"]
-
-  timeouts = {
-    read = "15m"
-  }
+  create_duration = "10m"
 }
 
 resource "talos_cluster_kubeconfig" "this" {
   depends_on = [
     talos_machine_bootstrap.this,
-    data.talos_cluster_health.this
+    #data.talos_cluster_health.this
+    time_sleep.wait_for_cluster
   ]
 
   node                 = one([for k, v in var.talos_nodes : v.ip if v.primary_endpoint]) # arbitrary decision
