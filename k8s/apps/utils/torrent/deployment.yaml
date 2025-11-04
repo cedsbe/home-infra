@@ -29,6 +29,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: git-sync-vuetorrent
+          # trivy:ignore:avd-ksv-0125
           image: registry.k8s.io/git-sync/git-sync:v4.5.0 # renovate: docker=registry.k8s.io/git-sync/git-sync
           securityContext:
             allowPrivilegeEscalation: false
@@ -56,6 +57,7 @@ spec:
             - name: tmp
               mountPath: /tmp
         - name: torrent
+          # trivy:ignore:avd-ksv-0125
           # yamllint disable-line rule:line-length
           image: ghcr.io/home-operations/qbittorrent@sha256:536b3e3fcfdc023f4ca49fc1ca4fb21cf48953c0ba1cd6cd368a398a984e2be8 # renovate: docker=ghcr.io/home-operations/qbittorrent
           securityContext:

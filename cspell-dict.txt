@@ -11,6 +11,7 @@ arkade
 astro
 Audiosrv
 autounattend
+avd
 aztfmod
 azurecaf
 behaviour
@@ -89,6 +90,7 @@ jsonrpc
 kctrl
 kerberos
 KICS
+ksv
 kubeconform
 kubeseal
 kustomize
