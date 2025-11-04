@@ -103,6 +103,7 @@ lsi
 lvm
 mantine
 mcp
+mcr
 megasas
 meilisearch
 metallb
@@ -159,6 +160,7 @@ quic
 QWAVE
 rdns
 referencegrant
+rego
 rgl
 rlimit
 rrset
