@@ -1,0 +1,4 @@
+# Trusted registries for this project
+# ghcr.io/home-operations - Custom home operations images
+# registry.k8s.io - Kubernetes official registry
+# docker.io - Docker Hub official images
