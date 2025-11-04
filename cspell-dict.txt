@@ -11,6 +11,7 @@ arkade
 astro
 Audiosrv
 autounattend
+avd
 aztfmod
 azurecaf
 behaviour
@@ -89,6 +90,7 @@ jsonrpc
 kctrl
 kerberos
 KICS
+ksv
 kubeconform
 kubeseal
 kustomize
@@ -101,6 +103,7 @@ lsi
 lvm
 mantine
 mcp
+mcr
 megasas
 meilisearch
 metallb
@@ -150,12 +153,14 @@ proxmox
 ptr
 pulsar
 pvscsi
+qbittorrent
 qcow
 qname
 quic
 QWAVE
 rdns
 referencegrant
+rego
 rgl
 rlimit
 rrset
@@ -216,6 +221,7 @@ virtio
 vmbr
 vmdk
 vmid
+vuetorrent
 wcm
 websocket
 whoamigw

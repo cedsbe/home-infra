@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: torrent
+  namespace: torrent
+  labels:
+    app: torrent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: torrent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: torrent
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: hsp-proxmox0
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 27039
+        runAsGroup: 27039
+        fsGroup: 27039
+        fsGroupChangePolicy: Always
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: git-sync-vuetorrent
+          image: registry.k8s.io/git-sync/git-sync:v4.5.0 # renovate: docker=registry.k8s.io/git-sync/git-sync
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          args:
+            - --repo=https://github.com/VueTorrent/VueTorrent
+            - --root=/tmp/git-sync
+            - --ref=latest-release
+            - --period=12h
+            - --link=/themes/vuetorrent
+            - --max-failures=10
+            - -v=2
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 2000m
+              memory: 256Mi
+          volumeMounts:
+            - name: themes
+              mountPath: /themes
+            - name: tmp
+              mountPath: /tmp
+        - name: torrent
+          # yamllint disable-line rule:line-length
+          image: ghcr.io/home-operations/qbittorrent@sha256:536b3e3fcfdc023f4ca49fc1ca4fb21cf48953c0ba1cd6cd368a398a984e2be8 # renovate: docker=ghcr.io/home-operations/qbittorrent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: torrent-tcp
+              containerPort: 10011
+              protocol: TCP
+            - name: torrent-udp
+              containerPort: 10011
+              protocol: UDP
+          envFrom:
+            - configMapRef:
+                name: common-env
+                optional: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1.5Gi
+            limits:
+              cpu: 2000m
+              memory: 8Gi
+          volumeMounts:
+            - name: torrent-config
+              mountPath: /config
+            - name: tmp
+              mountPath: /tmp
+            - name: themes
+              mountPath: /themes
+      volumes:
+        - name: torrent-config
+          persistentVolumeClaim:
+            claimName: torrent-config
+        - name: tmp
+          emptyDir: {}
+        - name: themes
+          emptyDir: {}

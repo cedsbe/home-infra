@@ -151,9 +151,9 @@ module "volumes" {
       size = "10G"
     }
 
-    # pv-torrent = {
-    #   node = "hsp-proxmox0"
-    #   size = "1G"
-    # }
+    pv-torrent = {
+      node = "hsp-proxmox0"
+      size = "1G"
+    }
   }
 }
