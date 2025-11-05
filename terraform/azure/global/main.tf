@@ -101,7 +101,7 @@ resource "azurerm_key_vault" "main" {
 
   sku_name                  = "standard"
   enable_rbac_authorization = true
-  purge_protection_enabled  = false
+  purge_protection_enabled  = true
 
   network_acls {
     default_action = "Deny"
