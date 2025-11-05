@@ -4,7 +4,6 @@
 global:
   domain: argocd.k8s.ghiot.be
 
-
 configs:
   cm:
     create: true
@@ -39,9 +38,9 @@ dex:
   resources:
     requests:
       cpu: 10m
-      memory: 32Mi
+      memory: 64Mi
     limits:
-      memory: 128Mi
+      memory: 256Mi
 
 redis:
   resources:
