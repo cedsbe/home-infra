@@ -151,6 +151,26 @@ module "volumes" {
       size = "10G"
     }
 
+    pv-sonarr = {
+      node = "hsp-proxmox0"
+      size = "4G"
+    }
+
+    pv-radarr = {
+      node = "hsp-proxmox0"
+      size = "4G"
+    }
+
+    pv-lidarr = {
+      node = "hsp-proxmox0"
+      size = "4G"
+    }
+
+    pv-prowlarr = {
+      node = "hsp-proxmox0"
+      size = "1G"
+    }
+
     pv-torrent = {
       node = "hsp-proxmox0"
       size = "1G"

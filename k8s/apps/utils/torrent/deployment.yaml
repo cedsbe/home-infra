@@ -90,6 +90,8 @@ spec:
               mountPath: /tmp
             - name: themes
               mountPath: /themes
+            - name: data
+              mountPath: /app/data
       volumes:
         - name: torrent-config
           persistentVolumeClaim:
@@ -98,3 +100,7 @@ spec:
           emptyDir: {}
         - name: themes
           emptyDir: {}
+        - name: data
+          nfs:
+            server: 192.168.65.250
+            path: /volume1/media
