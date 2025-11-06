@@ -5,7 +5,7 @@ configMapGenerator:
   - name: common-env
     namespace: arr
     literals:
-      - TZ="Europe/Oslo"
+      - TZ="Europe/Brussels"
 
 resources:
   - ns.yaml
