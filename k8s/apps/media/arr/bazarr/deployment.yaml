@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bazarr
+  namespace: arr
+  labels:
+    app: bazarr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bazarr
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      namespace: bazarr
+      labels:
+        app: bazarr
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: hsp-proxmox0
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 2501
+        runAsGroup: 2501
+        fsGroup: 2501
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      dnsConfig:
+        options:
+          # Lower ndots to avoid search-domain expansion issues (musl/glibc resolver short-circuit)
+          # and ensure external and cluster FQDNs resolve correctly.
+          # Use this on other Alpine based containers if I face similar issues.
+          - name: ndots
+            value: "1"
+      containers:
+        - name: bazarr
+          image: ghcr.io/home-operations/bazarr:1.5.3 # renovate: docker=ghcr.io/home-operations/bazarr
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: http
+              containerPort: 6767
+          envFrom:
+            - configMapRef:
+                name: common-env
+                optional: true
+          volumeMounts:
+            - name: bazarr-config
+              mountPath: /config
+            - name: tmp
+              mountPath: /tmp
+            - name: data
+              mountPath: /app/data
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 256Mi
+      volumes:
+        - name: bazarr-config
+          persistentVolumeClaim:
+            claimName: bazarr-config
+        - name: tmp
+          emptyDir: {}
+        - name: data
+          nfs:
+            server: 192.168.65.250
+            path: /volume1/media
