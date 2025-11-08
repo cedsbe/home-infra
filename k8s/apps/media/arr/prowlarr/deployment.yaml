@@ -28,6 +28,13 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
+      dnsConfig:
+        options:
+          # Lower ndots to avoid search-domain expansion issues (musl/glibc resolver short-circuit)
+          # and ensure external and cluster FQDNs resolve correctly.
+          # Use this on other Alpine based containers if I face similar issues.
+          - name: ndots
+            value: "1"
       containers:
         - name: prowlarr
           image: ghcr.io/home-operations/prowlarr:2.1.5 # renovate: docker=ghcr.io/home-operations/prowlarr
