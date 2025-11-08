@@ -27,6 +27,13 @@ spec:
         fsGroupChangePolicy: Always
         seccompProfile:
           type: RuntimeDefault
+      dnsConfig:
+        options:
+          # Lower ndots to avoid search-domain expansion issues (musl/glibc resolver short-circuit)
+          # and ensure external and cluster FQDNs resolve correctly.
+          # Use this on other Alpine based containers if I face similar issues.
+          - name: ndots
+            value: "1"
       containers:
         - name: git-sync-vuetorrent
           image: registry.k8s.io/git-sync/git-sync:v4.5.0 # renovate: docker=registry.k8s.io/git-sync/git-sync
