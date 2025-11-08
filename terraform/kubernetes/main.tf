@@ -175,5 +175,10 @@ module "volumes" {
       node = "hsp-proxmox0"
       size = "1G"
     }
+
+    pv-bazarr = {
+      node = "hsp-proxmox0"
+      size = "4G"
+    }
   }
 }
