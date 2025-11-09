@@ -66,6 +66,7 @@ esbuild
 eslint
 finalizer
 finops
+flaresolverr
 fmt
 FOWNER
 gatewayclass

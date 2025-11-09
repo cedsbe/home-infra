@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaresolver
+  namespace: flaresolver
+  labels:
+    app: flaresolver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flaresolver
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: flaresolver
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: hsp-proxmox0
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: Always
+        seccompProfile:
+          type: RuntimeDefault
+      dnsConfig:
+        options:
+          # Lower ndots to avoid search-domain expansion issues (musl/glibc resolver short-circuit)
+          # and ensure external and cluster FQDNs resolve correctly.
+          # Use this on other Alpine based containers if I face similar issues.
+          - name: ndots
+            value: "1"
+      containers:
+        - name: flaresolver
+          image: ghcr.io/flaresolverr/flaresolverr:v3.4.4 # renovate: docker=ghcr.io/flaresolverr/flaresolverr
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: flaresolver
+              containerPort: 8191
+          env:
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_FILE
+              value: "/tmp/flaresolverr.log"
+            - name: TZ
+              value: "Europe/Brussels"
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 1.5Gi
+            limits:
+              cpu: 2000m
+              memory: 8Gi
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
