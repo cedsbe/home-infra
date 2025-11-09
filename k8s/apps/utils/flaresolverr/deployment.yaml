@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flaresolver
-  namespace: flaresolver
+  name: flaresolverr
+  namespace: flaresolverr
   labels:
-    app: flaresolver
+    app: flaresolverr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: flaresolver
+      app: flaresolverr
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: flaresolver
+        app: flaresolverr
     spec:
       nodeSelector:
         topology.kubernetes.io/zone: hsp-proxmox0
@@ -35,7 +35,7 @@ spec:
           - name: ndots
             value: "1"
       containers:
-        - name: flaresolver
+        - name: flaresolverr
           image: ghcr.io/flaresolverr/flaresolverr:v3.4.4 # renovate: docker=ghcr.io/flaresolverr/flaresolverr
           securityContext:
             allowPrivilegeEscalation: false
@@ -43,7 +43,7 @@ spec:
             capabilities:
               drop: ["ALL"]
           ports:
-            - name: flaresolver
+            - name: flaresolverr
               containerPort: 8191
           env:
             - name: LOG_LEVEL
