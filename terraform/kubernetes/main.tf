@@ -2,7 +2,7 @@ locals {
   talos_version = "v1.11.3"
 
   # tflint-ignore: terraform_unused_declarations
-  talos_update_version = "v1.11.3" # renovate: github-releases=siderolabs/talos
+  talos_update_version = "v1.11.5" # renovate: github-releases=siderolabs/talos
 }
 
 # Generate Cilium Helm template
