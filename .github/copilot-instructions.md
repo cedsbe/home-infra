@@ -42,7 +42,7 @@ This is a home infrastructure repository that automates the deployment of a Kube
 
 ### `/terraform/kubernetes/modules/`
 - **talos/**: Core Talos Linux cluster module
-  - Machine configuration templates in `talos_machine_config/`
+  - Machine configuration templates in `talos_machine_config_templates/`
   - Talos image factory integration in `talos_images/`
   - Proxmox VM provisioning
 - **proxmox_csi_plugin/**: Proxmox CSI storage plugin

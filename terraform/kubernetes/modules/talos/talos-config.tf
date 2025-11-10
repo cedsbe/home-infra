@@ -1,6 +1,6 @@
 locals {
   talos_cluster_enriched = {
-    endpoint        = coalesce(var.talos_cluster.endpoint, one([for k, v in var.talos_nodes : v.ip if v.primary_endpoint]))
+    endpoint        = coalesce(var.talos_cluster.endpoint, one([for node_name, node_config in var.talos_nodes : node_config.ip if node_config.primary_endpoint]))
     gateway         = var.talos_cluster.gateway
     name            = var.talos_cluster.name
     proxmox_cluster = var.talos_cluster.proxmox_cluster
@@ -16,8 +16,8 @@ resource "talos_machine_secrets" "this" {
 data "talos_client_configuration" "this" {
   cluster_name         = local.talos_cluster_enriched.name
   client_configuration = talos_machine_secrets.this.client_configuration
-  nodes                = [for k, v in var.talos_nodes : v.ip]
-  endpoints            = [for k, v in var.talos_nodes : v.ip if v.machine_type == "controlplane"]
+  nodes                = [for node_name, node_config in var.talos_nodes : node_config.ip]
+  endpoints            = [for node_name, node_config in var.talos_nodes : node_config.ip if node_config.machine_type == "controlplane"]
 }
 
 data "talos_machine_configuration" "this" {
@@ -29,20 +29,29 @@ data "talos_machine_configuration" "this" {
   machine_type     = each.value.machine_type
   machine_secrets  = talos_machine_secrets.this.machine_secrets
 
-  config_patches = each.value.machine_type == "controlplane" ? [
-    templatefile("${path.module}/talos_machine_config/control-plane.yaml.tftpl", {
+  config_patches = compact([ # Compact to remove empty strings
+
+    # Always apply base config
+    templatefile("${path.module}/talos_machine_config_templates/common.yaml.tftpl", {
+      hostname     = each.key
+      node_name    = each.value.host_node
+      cluster_name = local.talos_cluster_enriched.proxmox_cluster
+    }),
+
+    # Apply control plane specific config
+    each.value.machine_type == "controlplane" ?
+    templatefile("${path.module}/talos_machine_config_templates/control-plane.yaml.tftpl", {
       hostname             = each.key
       node_name            = each.value.host_node
       cluster_name         = local.talos_cluster_enriched.proxmox_cluster
       cilium_helm_template = var.cilium.inline_manifest
-    })
-    ] : [
-    templatefile("${path.module}/talos_machine_config/worker.yaml.tftpl", {
-      hostname     = each.key
-      node_name    = each.value.host_node
-      cluster_name = local.talos_cluster_enriched.proxmox_cluster
-    })
-  ]
+    }) : "",
+
+    # Apply worker specific config
+    each.value.machine_type == "worker" ?
+    templatefile("${path.module}/talos_machine_config_templates/worker.yaml.tftpl", {}) : ""
+  ])
+
 }
 
 resource "talos_machine_configuration_apply" "this" {
@@ -62,7 +71,7 @@ resource "talos_machine_configuration_apply" "this" {
 resource "talos_machine_bootstrap" "this" {
   depends_on = [talos_machine_configuration_apply.this]
 
-  node                 = one([for k, v in var.talos_nodes : v.ip if v.primary_endpoint])
+  node                 = one([for node_name, node_config in var.talos_nodes : node_config.ip if node_config.primary_endpoint])
   endpoint             = local.talos_cluster_enriched.endpoint
   client_configuration = talos_machine_secrets.this.client_configuration
 }
@@ -79,9 +88,9 @@ resource "talos_machine_bootstrap" "this" {
 #   skip_kubernetes_checks = false
 #   client_configuration   = data.talos_client_configuration.this.client_configuration
 
-#   control_plane_nodes = [for k, v in var.talos_nodes : v.ip if v.machine_type == "controlplane"]
+#   control_plane_nodes = [for node_name, node_config in var.talos_nodes : node_config.ip if node_config.machine_type == "controlplane"]
 #   endpoints           = data.talos_client_configuration.this.endpoints
-#   worker_nodes        = [for k, v in var.talos_nodes : v.ip if v.machine_type == "worker"]
+#   worker_nodes        = [for node_name, node_config in var.talos_nodes : node_config.ip if node_config.machine_type == "worker"]
 
 #   timeouts = {
 #     read = "15m"
@@ -104,7 +113,7 @@ resource "talos_cluster_kubeconfig" "this" {
     time_sleep.wait_for_cluster
   ]
 
-  node                 = one([for k, v in var.talos_nodes : v.ip if v.primary_endpoint]) # arbitrary decision
+  node                 = one([for node_name, node_config in var.talos_nodes : node_config.ip if node_config.primary_endpoint]) # arbitrary decision
   endpoint             = local.talos_cluster_enriched.endpoint
   client_configuration = talos_machine_secrets.this.client_configuration
   timeouts = {
