@@ -1,4 +1,4 @@
-# Cilium already installed the GatewayClass resource by default. But let's make it explicit.
+# Cilium already installs the GatewayClass resource by default. But let's make it explicit.
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
