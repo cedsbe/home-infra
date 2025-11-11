@@ -4,7 +4,7 @@ variable "images" {
     extensions_base = optional(list(string), ["qemu-guest-agent"])
     platform_base   = optional(string, "metal")
 
-    version_update    = optional(string, null)
+    version_update    = string
     extensions_update = optional(list(string), null)
     platform_update   = optional(string, null)
 

@@ -18,7 +18,7 @@ variable "talos_image_base" {
 
 variable "talos_image_update" {
   type = object({
-    version         = optional(string, null)
+    version         = string
     extensions      = optional(list(string), null)
     extraKernelArgs = optional(list(string), null)
     architecture    = optional(string, null)

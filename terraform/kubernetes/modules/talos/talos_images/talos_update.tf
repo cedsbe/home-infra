@@ -36,6 +36,7 @@ resource "talos_image_factory_schematic" "update" {
   schematic = yamlencode(
     {
       customization = {
+        extraKernelArgs = local.talos_image_update_built.extraKernelArgs
         systemExtensions = {
           officialExtensions = data.talos_image_factory_extensions_versions.update.extensions_info[*].name
         }
