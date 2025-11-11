@@ -1,10 +1,3 @@
-locals {
-  talos_version = "v1.11.3"
-
-  # tflint-ignore: terraform_unused_declarations
-  talos_update_version = "v1.11.3" # renovate: github-releases=siderolabs/talos
-}
-
 # Generate Cilium Helm template
 data "helm_template" "cilium_helm_template_bootstrap" {
   name       = "cilium"
@@ -47,15 +40,19 @@ module "talos" {
   source = "./modules/talos"
 
   images = {
-    version_base      = local.talos_version
+    version_base      = var.talos_version
+    version_update    = var.talos_update_version
     proxmox_datastore = "local"
   }
 
   talos_cluster = {
-    gateway         = "192.168.65.1"
-    name            = "talos0"
-    proxmox_cluster = "homelab"
-    talos_version   = local.talos_version
+    gateway             = "192.168.65.1"
+    name                = "talos0"
+    proxmox_cluster     = "homelab"
+    talos_version       = var.talos_version
+    kubernetes_version  = var.kubernetes_version
+    gateway_api_version = var.gateway_api_version
+
   }
 
   cilium = {

@@ -1,13 +1,15 @@
 locals {
-  talos_cluster_enriched = {
-    endpoint        = coalesce(var.talos_cluster.endpoint, one([for node_name, node_config in var.talos_nodes : node_config.ip if node_config.primary_endpoint]))
-    gateway         = var.talos_cluster.gateway
-    name            = var.talos_cluster.name
-    proxmox_cluster = var.talos_cluster.proxmox_cluster
-    talos_version   = var.talos_cluster.talos_version
-  }
-}
+  # Extract the primary endpoint node's IP if not explicitly provided
+  primary_endpoint_ip = one([for node_name, node_config in var.talos_nodes : node_config.ip if node_config.primary_endpoint])
 
+  # Merge cluster configuration with the derived endpoint
+  talos_cluster_enriched = merge(
+    var.talos_cluster,
+    {
+      endpoint = coalesce(var.talos_cluster.endpoint, local.primary_endpoint_ip)
+    }
+  )
+}
 
 resource "talos_machine_secrets" "this" {
   talos_version = local.talos_cluster_enriched.talos_version
@@ -16,8 +18,12 @@ resource "talos_machine_secrets" "this" {
 data "talos_client_configuration" "this" {
   cluster_name         = local.talos_cluster_enriched.name
   client_configuration = talos_machine_secrets.this.client_configuration
-  nodes                = [for node_name, node_config in var.talos_nodes : node_config.ip]
-  endpoints            = [for node_name, node_config in var.talos_nodes : node_config.ip if node_config.machine_type == "controlplane"]
+
+  # All nodes in the cluster
+  nodes = [for node_name, node_config in var.talos_nodes : node_config.ip]
+
+  # Control plane nodes serve as endpoints
+  endpoints = [for node_name, node_config in var.talos_nodes : node_config.ip if node_config.machine_type == "controlplane"]
 }
 
 data "talos_machine_configuration" "this" {
@@ -31,14 +37,16 @@ data "talos_machine_configuration" "this" {
 
   config_patches = compact([ # Compact to remove empty strings
 
-    # Always apply base config
+    # Always apply base configuration common to all nodes
     templatefile("${path.module}/talos_machine_config_templates/common.yaml.tftpl", {
-      hostname     = each.key
-      node_name    = each.value.host_node
-      cluster_name = local.talos_cluster_enriched.proxmox_cluster
+      hostname           = each.key
+      node_name          = each.value.host_node
+      cluster_name       = local.talos_cluster_enriched.proxmox_cluster
+      kubernetes_version = local.talos_cluster_enriched.kubernetes_version
+      kubelet_extra_args = local.talos_cluster_enriched.kubelet_extra_args
     }),
 
-    # Apply control plane specific config
+    # Apply control plane specific configuration (Cilium CNI injection)
     each.value.machine_type == "controlplane" ?
     templatefile("${path.module}/talos_machine_config_templates/control-plane.yaml.tftpl", {
       hostname             = each.key
@@ -47,7 +55,7 @@ data "talos_machine_configuration" "this" {
       cilium_helm_template = var.cilium.inline_manifest
     }) : "",
 
-    # Apply worker specific config
+    # Apply worker node specific configuration
     each.value.machine_type == "worker" ?
     templatefile("${path.module}/talos_machine_config_templates/worker.yaml.tftpl", {}) : ""
   ])
@@ -71,6 +79,7 @@ resource "talos_machine_configuration_apply" "this" {
 resource "talos_machine_bootstrap" "this" {
   depends_on = [talos_machine_configuration_apply.this]
 
+  # Use the primary endpoint node for etcd bootstrap
   node                 = one([for node_name, node_config in var.talos_nodes : node_config.ip if node_config.primary_endpoint])
   endpoint             = local.talos_cluster_enriched.endpoint
   client_configuration = talos_machine_secrets.this.client_configuration
@@ -113,7 +122,8 @@ resource "talos_cluster_kubeconfig" "this" {
     time_sleep.wait_for_cluster
   ]
 
-  node                 = one([for node_name, node_config in var.talos_nodes : node_config.ip if node_config.primary_endpoint]) # arbitrary decision
+  # Use the primary endpoint node to retrieve the kubeconfig
+  node                 = one([for node_name, node_config in var.talos_nodes : node_config.ip if node_config.primary_endpoint])
   endpoint             = local.talos_cluster_enriched.endpoint
   client_configuration = talos_machine_secrets.this.client_configuration
   timeouts = {

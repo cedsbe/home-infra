@@ -10,18 +10,44 @@ variable "images" {
 
     proxmox_datastore = optional(string, "local")
   })
-  description = "Images configuration."
+  description = <<-EOT
+    Talos image configuration for initial node deployment and optional updates:
+    - version_base: The base Talos Linux version to deploy (e.g., "v1.9.0").
+    - extensions_base: (Optional) System extensions to include in the base image (default: ["qemu-guest-agent"]).
+    - platform_base: (Optional) Target platform for the base image (default: "metal").
+    - version_update: (Optional) Talos version for updating nodes after initial deployment. If null, no update image is built.
+    - extensions_update: (Optional) System extensions for the update image. If null, uses base extensions.
+    - platform_update: (Optional) Target platform for the update image. If null, uses base platform.
+    - proxmox_datastore: (Optional) Proxmox datastore ID where downloaded images are cached (default: "local").
+    EOT
 }
 
 variable "talos_cluster" {
   type = object({
-    endpoint        = optional(string, null)
-    gateway         = string
-    name            = string
-    proxmox_cluster = string
-    talos_version   = string
+    endpoint            = optional(string, null)
+    gateway             = string
+    name                = string
+    proxmox_cluster     = string
+    talos_version       = string
+    kubernetes_version  = string
+    gateway_api_version = string
+    extra_manifests     = optional(list(string))
+    kubelet_extra_args  = optional(string, "")
+    api_server          = optional(string)
   })
-  description = "Talos cluster configuration, including the endpoint, gateway, name, proxmox cluster, and Talos version."
+  description = <<-EOT
+    Talos cluster configuration:
+    - endpoint: (Optional) The Kubernetes API endpoint (e.g., "https://192.168.65.110:6443"). If not provided, derived from the primary endpoint node's IP.
+    - gateway: The default network gateway for cluster nodes (e.g., "192.168.65.1").
+    - name: The Talos cluster name used for identification and resource naming.
+    - proxmox_cluster: The Proxmox cluster name where VMs will be provisioned.
+    - talos_version: The Talos Linux version to deploy (e.g., "v1.9.0").
+    - kubernetes_version: The Kubernetes version to deploy (e.g., "1.32.0").
+    - gateway_api_version: The Kubernetes Gateway API version to enable (e.g., "v1").
+    - extra_manifests: (Optional) Additional Kubernetes manifests (URLs or paths) to apply after cluster bootstrap.
+    - kubelet_extra_args: (Optional) Custom kubelet extra arguments as a JSON string.
+    - api_server: (Optional) Custom Kubernetes API server configuration as a JSON string.
+    EOT
 }
 
 variable "talos_nodes" {
@@ -39,18 +65,19 @@ variable "talos_nodes" {
   }))
 
   description = <<-EOT
-    Map of nodes where the key is the node name and the value is an object containing:
-    - host_node: The hostname of the proxmox host of the node.
-    - datastore_id: (Optional) The ID of the datastore where the node will be stored. Default to 'local-lvm'.
-    - machine_type: The type of the machine, either 'controlplane' or 'worker'.
-    - ip: The IP address of the node.
-    - mac_address: The MAC address of the node.
-    - vm_id: The VM ID of the node.
-    - cpu: The number of CPUs allocated to the node.
-    - ram: The amount of RAM (in MB) allocated to the node.
-    - update: A boolean indicating whether the node should be updated.
-    - primary_endpoint: (Optional) A boolean indicating whether the node is the one used for etcd bootstrap. Default to false.
+    Map of Talos nodes for cluster deployment where key is the node name (e.g., "control-1", "worker-1"):
+    - host_node: Proxmox host node name where this VM will run (e.g., "hsp-proxmox0").
+    - datastore_id: (Optional) Proxmox datastore ID for VM storage (default: "local-lvm").
+    - machine_type: Node role, either "controlplane" or "worker".
+    - ip: Static IP address for the node (e.g., "192.168.65.110").
+    - mac_address: MAC address in format XX:XX:XX:XX:XX:XX (must be unique across nodes).
+    - vm_id: Proxmox VM ID (numeric, must be unique across Proxmox cluster).
+    - cpu: Number of CPU cores to allocate.
+    - ram_dedicated: Amount of dedicated RAM in MB to allocate.
+    - update: Whether to include this node in planned updates.
+    - primary_endpoint: (Optional) Set to true for exactly one controlplane node - used as etcd bootstrap node (default: false).
     EOT
+
 
   #region validations
   validation {
@@ -111,5 +138,8 @@ variable "cilium" {
   type = object({
     inline_manifest = string
   })
-  description = "Cilium configuration"
+  description = <<-EOT
+    Cilium CNI configuration:
+    - inline_manifest: Cilium HelmChart manifest content (typically generated via 'helm template') to be applied as an inline Kubernetes manifest.
+    EOT
 }
