@@ -104,37 +104,36 @@ variable "talos_nodes" {
     ================================================
 
     1. Prepare for Updates:
-       - Decide which Talos version to upgrade to
-       - Set the desired version in components_versions.auto.tfvars:
-         talos_update_version = "v1.12.0"  # Must be > talos_version
-       - Run: terraform plan
-       - Verify no unexpected changes (should only show new ISO download)
+      - Decide which Talos version to upgrade to
+      - Set the desired version in components_versions.auto.tfvars:
+        talos_update_version = "v1.12.0"  # Must be > talos_version
+      - Run: terraform plan
+      - Verify no unexpected changes (should only show new ISO download)
 
     2. Update One Node at a Time (CRITICAL for cluster stability):
-       - Modify main.tf to set update=true for ONE node only:
-         "hsv-kwork0" = {
-           ...
-           update = true    # ← Change from false to true
-         }
-
-       - Run: terraform plan
-       - Review: Should only show ISO change for that node
-       - Run: terraform apply
-       - Wait for the node to boot from the new image
-       - Monitor node health: talosctl health -n <node-ip> --client-configuration output/talos-config.yaml
-       - Wait for node to report Ready status before proceeding
+      - Modify main.tf to set update=true for ONE node only:
+        "hsv-kwork0" = {
+          ...
+          update = true    # ← Change from false to true
+        }
+      - Run: terraform plan
+      - Review: Should only show ISO change for that node
+      - Run: terraform apply
+      - Wait for the node to boot from the new image
+      - Monitor node health: talosctl health -n <node-ip> --client-configuration output/talos-config.yaml
+      - Wait for node to report Ready status before proceeding
 
     3. Repeat for Other Nodes:
-       - Set update=false for the node you just updated
-       - Set update=true for the next node
-       - Repeat terraform plan/apply cycle
-       - IMPORTANT: Always wait for node recovery between updates
+      - Set update=false for the node you just updated
+      - Set update=true for the next node
+      - Repeat terraform plan/apply cycle
+      - IMPORTANT: Always wait for node recovery between updates
 
     4. Finalize After All Updates Complete:
-       - Set all nodes back to update=false
-       - Set talos_update_version = null (or same as talos_version)
-       - Run terraform apply
-       - This locks in the new stable state and prevents accidental re-updates
+      - Set all nodes back to update=false
+      - Set talos_update_version = null (or same as talos_version)
+      - Run terraform apply
+      - This locks in the new stable state and prevents accidental re-updates
 
     EXAMPLE: Three-Step Rolling Update
     ===================================
