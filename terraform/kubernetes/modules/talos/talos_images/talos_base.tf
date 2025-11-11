@@ -41,15 +41,3 @@ data "talos_image_factory_urls" "base" {
   architecture  = var.talos_image_base.architecture
   platform      = var.talos_image_base.platform
 }
-
-output "image_base" {
-  description = "Base Talos image configuration"
-  value = {
-    architecture = var.talos_image_base.architecture
-    image_id     = "${talos_image_factory_schematic.base.id}_${local.talos_image_base_version}"
-    platform     = var.talos_image_base.platform
-    schematic_id = talos_image_factory_schematic.base.id
-    url          = data.talos_image_factory_urls.base.urls.disk_image
-    version      = local.talos_image_base_version
-  }
-}

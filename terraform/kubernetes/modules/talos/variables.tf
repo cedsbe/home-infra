@@ -4,24 +4,50 @@ variable "images" {
     extensions_base = optional(list(string), ["qemu-guest-agent"])
     platform_base   = optional(string, "metal")
 
-    version_update    = optional(string, null)
+    version_update    = string
     extensions_update = optional(list(string), null)
     platform_update   = optional(string, null)
 
     proxmox_datastore = optional(string, "local")
   })
-  description = "Images configuration."
+  description = <<-EOT
+    Talos image configuration for initial node deployment and optional updates:
+    - version_base: The base Talos Linux version to deploy (e.g., "v1.9.0").
+    - extensions_base: (Optional) System extensions to include in the base image (default: ["qemu-guest-agent"]).
+    - platform_base: (Optional) Target platform for the base image (default: "metal").
+    - version_update: (Optional) Talos version for updating nodes after initial deployment. If null, no update image is built.
+    - extensions_update: (Optional) System extensions for the update image. If null, uses base extensions.
+    - platform_update: (Optional) Target platform for the update image. If null, uses base platform.
+    - proxmox_datastore: (Optional) Proxmox datastore ID where downloaded images are cached (default: "local").
+    EOT
 }
 
 variable "talos_cluster" {
   type = object({
-    endpoint        = optional(string, null)
-    gateway         = string
-    name            = string
-    proxmox_cluster = string
-    talos_version   = string
+    endpoint            = optional(string, null)
+    gateway             = string
+    name                = string
+    proxmox_cluster     = string
+    talos_version       = string
+    kubernetes_version  = string
+    gateway_api_version = string
+    extra_manifests     = optional(list(string))
+    kubelet_extra_args  = optional(string, "")
+    api_server          = optional(string)
   })
-  description = "Talos cluster configuration, including the endpoint, gateway, name, proxmox cluster, and Talos version."
+  description = <<-EOT
+    Talos cluster configuration:
+    - endpoint: (Optional) The Kubernetes API endpoint (e.g., "https://192.168.65.110:6443"). If not provided, derived from the primary endpoint node's IP.
+    - gateway: The default network gateway for cluster nodes (e.g., "192.168.65.1").
+    - name: The Talos cluster name used for identification and resource naming.
+    - proxmox_cluster: The Proxmox cluster name where VMs will be provisioned.
+    - talos_version: The Talos Linux version to deploy (e.g., "v1.9.0").
+    - kubernetes_version: The Kubernetes version to deploy (e.g., "1.32.0").
+    - gateway_api_version: The Kubernetes Gateway API version to enable (e.g., "v1").
+    - extra_manifests: (Optional) Additional Kubernetes manifests (URLs or paths) to apply after cluster bootstrap.
+    - kubelet_extra_args: (Optional) Custom kubelet extra arguments as a JSON string.
+    - api_server: (Optional) Custom Kubernetes API server configuration as a JSON string.
+    EOT
 }
 
 variable "talos_nodes" {
@@ -39,18 +65,164 @@ variable "talos_nodes" {
   }))
 
   description = <<-EOT
-    Map of nodes where the key is the node name and the value is an object containing:
-    - host_node: The hostname of the proxmox host of the node.
-    - datastore_id: (Optional) The ID of the datastore where the node will be stored. Default to 'local-lvm'.
-    - machine_type: The type of the machine, either 'controlplane' or 'worker'.
-    - ip: The IP address of the node.
-    - mac_address: The MAC address of the node.
-    - vm_id: The VM ID of the node.
-    - cpu: The number of CPUs allocated to the node.
-    - ram: The amount of RAM (in MB) allocated to the node.
-    - update: A boolean indicating whether the node should be updated.
-    - primary_endpoint: (Optional) A boolean indicating whether the node is the one used for etcd bootstrap. Default to false.
+    Map of Talos nodes for cluster deployment where key is the node name (e.g., "control-1", "worker-1"):
+
+    REQUIRED FIELDS:
+    - host_node: Proxmox host node name where this VM will run (e.g., "hsp-proxmox0").
+    - machine_type: Node role, either "controlplane" or "worker".
+    - ip: Static IP address for the node (e.g., "192.168.65.110").
+    - mac_address: MAC address in format XX:XX:XX:XX:XX:XX (must be unique across nodes).
+    - vm_id: Proxmox VM ID (numeric, must be unique across Proxmox cluster).
+    - cpu: Number of CPU cores to allocate.
+    - ram_dedicated: Amount of dedicated RAM in MB to allocate.
+    - update: Whether to use the update image for this node (see UPDATE MECHANISM below).
+
+    OPTIONAL FIELDS:
+    - datastore_id: (Optional) Proxmox datastore ID for VM storage (default: "local-lvm").
+    - primary_endpoint: (Optional) Set to true for exactly one controlplane node - used as etcd bootstrap node (default: false).
+
+    ============================================================================
+    UPDATE MECHANISM - Manual Rolling Updates
+    ============================================================================
+
+    The 'update' field controls which Talos boot image is used during node provisioning:
+    - update = false: Uses talos_version (initial deployment version from talos_base image)
+    - update = true: Uses talos_update_version (upgrade version from talos_update image)
+
+    VALIDATION (Using terraform_data):
+    ===================================
+    A terraform_data resource named "validate_update_configuration" runs during planning
+    to detect invalid update configurations early:
+    - If any node has update=true AND talos_update_version is null → PLAN FAILS with clear error
+    - This prevents broken configurations from reaching the apply phase
+    - The error message shows exactly which nodes require updates and what to fix
+
+    IMPORTANT: You must set talos_update_version in components_versions.auto.tfvars
+    before setting any node's update=true. The validation will catch this mismatch.
+
+    HOW TO PERFORM ROLLING UPDATES (Manual Process):
+    ================================================
+
+    1. Prepare for Updates:
+      - Decide which Talos version to upgrade to
+      - Set the desired version in components_versions.auto.tfvars:
+        talos_update_version = "v1.12.0"  # Must be > talos_version
+      - Run: terraform plan
+      - Verify no unexpected changes (should only show new ISO download)
+
+    2. Update One Node at a Time (CRITICAL for cluster stability):
+      - Modify main.tf to set update=true for ONE node only:
+        "hsv-kwork0" = {
+          ...
+          update = true    # ← Change from false to true
+        }
+      - Run: terraform plan
+      - Review: Should only show ISO change for that node
+      - Run: terraform apply
+      - Wait for the node to boot from the new image
+      - Monitor node health: talosctl health -n <node-ip> --client-configuration output/talos-config.yaml
+      - Wait for node to report Ready status before proceeding
+
+    3. Repeat for Other Nodes:
+      - Set update=false for the node you just updated
+      - Set update=true for the next node
+      - Repeat terraform plan/apply cycle
+      - IMPORTANT: Always wait for node recovery between updates
+
+    4. Finalize After All Updates Complete:
+      - Set all nodes back to update=false
+      - Set talos_update_version = null (or same as talos_version)
+      - Run terraform apply
+      - This locks in the new stable state and prevents accidental re-updates
+
+    EXAMPLE: Three-Step Rolling Update
+    ===================================
+
+    Initial state (all nodes at v1.11.3):
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = false }
+      "hsv-kwork0" = { ... update = false }
+      "hsv-kwork1" = { ... update = false }
+    }
+
+    Step 1: Update first worker (set update=true for one node only)
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = false }
+      "hsv-kwork0" = { ... update = true }   # ← Updating
+      "hsv-kwork1" = { ... update = false }
+    }
+    terraform apply
+    # Wait for node recovery (5-10 minutes)
+    talosctl health -n 192.168.65.120
+
+    Step 2: Update second worker (toggle update flags)
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = false }
+      "hsv-kwork0" = { ... update = false }  # ← Completed
+      "hsv-kwork1" = { ... update = true }   # ← Updating
+    }
+    terraform apply
+    # Wait for node recovery
+
+    Step 3: Update control plane (most critical, one at a time)
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = true }   # ← Updating
+      "hsv-kwork0" = { ... update = false }
+      "hsv-kwork1" = { ... update = false }
+    }
+    terraform apply
+    # Wait for node recovery
+    # Verify etcd health: talosctl etcd status -n 192.168.65.110
+
+    Step 4: Finalize
+    # Set all back to false, and remove update version
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = false }
+      "hsv-kwork0" = { ... update = false }
+      "hsv-kwork1" = { ... update = false }
+    }
+    # In components_versions.auto.tfvars, set:
+    talos_update_version = null  # or = var.talos_version
+
+    IMPORTANT WARNINGS:
+    ===================
+
+    ⚠️  CLUSTER STABILITY: Updating all nodes simultaneously or too many at once
+        WILL cause loss of quorum and cluster downtime. Always update one node
+        (maximum 2-3 workers if separate from control plane) at a time.
+
+    ⚠️  CONTROL PLANE PRIORITY: Update control plane nodes one at a time ONLY.
+        Losing 2+ control plane nodes = lost quorum = dead cluster.
+
+    ⚠️  MONITOR PROGRESS: Always verify node health after updates using:
+        talosctl health -n <node-ip> --client-configuration output/talos-config.yaml
+        Wait for "Ready" status before updating next node.
+
+    ⚠️  VERSION MISMATCH: Ensure talos_update_version >= talos_version.
+        Updates are for upgrading or same-version refreshes, never downgrading.
+
+    ⚠️  BACKUP STATE: Keep a backup of terraform.tfstate before large updates:
+        cp terraform.tfstate terraform.tfstate.backup
+
+    ⚠️  ETCD HEALTH: For control plane updates, verify etcd cluster remains healthy:
+        talosctl etcd status -n <primary-control-plane-ip>
+        Should show all members as "Leader" or "Follower", no "Unknown"
+
+    TROUBLESHOOTING:
+    ================
+
+    If a node fails to update:
+    - Check Proxmox console for boot errors
+    - Verify the ISO was downloaded: ls -la /var/lib/vz/template/iso/ on Proxmox node
+    - Manually reboot if needed: talosctl reboot -n <node-ip>
+    - Restore previous state: Set update=false and re-apply
+
+    If cluster becomes unhealthy:
+    - Check all nodes are booted: talosctl get nodes
+    - Check control plane: talosctl health (should show nodes as Ready)
+    - May need to rollback by reverting talos_update_version and applying again
     EOT
+
 
   #region validations
   validation {
@@ -111,5 +283,8 @@ variable "cilium" {
   type = object({
     inline_manifest = string
   })
-  description = "Cilium configuration"
+  description = <<-EOT
+    Cilium CNI configuration:
+    - inline_manifest: Cilium HelmChart manifest content (typically generated via 'helm template') to be applied as an inline Kubernetes manifest.
+    EOT
 }

@@ -42,7 +42,7 @@ This is a home infrastructure repository that automates the deployment of a Kube
 
 ### `/terraform/kubernetes/modules/`
 - **talos/**: Core Talos Linux cluster module
-  - Machine configuration templates in `talos_machine_config/`
+  - Machine configuration templates in `talos_machine_config_templates/`
   - Talos image factory integration in `talos_images/`
   - Proxmox VM provisioning
 - **proxmox_csi_plugin/**: Proxmox CSI storage plugin
@@ -321,6 +321,27 @@ When errors or issues occur during development, document the solution in this in
 #### Backend State Management
 - **Mistake**: Hardcoding backend configuration or not handling new vs existing infrastructure scenarios
 - **Solution**: Use conditional initialization in Task files to check for `backend.config` existence and provide clear guidance for both new and existing infrastructure setups.
+
+#### State Validation and Provisioner Resources
+- **Mistake**: Using `null_resource` with provisioners for validation or state management
+- **Solution**: Always use `terraform_data` instead of `null_resource`. The `terraform_data` resource is the modern Terraform pattern for managing state and running provisioners. Example:
+  ```hcl
+  # ✅ CORRECT - Use terraform_data
+  resource "terraform_data" "validate_configuration" {
+    input = local.validation_error
+    provisioner "local-exec" {
+      command = self.input != "" ? "echo '${self.input}' && exit 1" : "echo 'Valid'"
+      interpreter = ["/bin/sh", "-c"]
+    }
+  }
+
+  # ❌ WRONG - Don't use null_resource
+  resource "null_resource" "validate_configuration" {
+    triggers = { validation_error = local.validation_error }
+    provisioner "local-exec" { command = "..." }
+  }
+  ```
+  Benefits of `terraform_data`: Better semantics, built-in state management, clearer intent, and improved compatibility with modern Terraform versions.
 
 ### Instructions for Adding New Mistakes/Solutions
 

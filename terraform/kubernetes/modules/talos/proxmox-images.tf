@@ -19,20 +19,26 @@ locals {
   talos_image_base   = module.talos_images.image_base
   talos_image_update = module.talos_images.image_update
 
-  download_file_loop = { for k, v in var.talos_nodes :
-    k => {
-      architecture      = v.update == true ? local.talos_image_update.architecture : local.talos_image_base.architecture
-      proxmox_node_name = v.host_node
-      platform          = v.update == true ? local.talos_image_update.platform : local.talos_image_base.platform
-      schematic_id      = v.update == true ? local.talos_image_update.schematic_id : local.talos_image_base.schematic_id
-      talos_node_name   = k
-      update            = v.update
-      url               = v.update == true ? local.talos_image_update.url : local.talos_image_base.url
-      version           = v.update == true ? local.talos_image_update.version : local.talos_image_base.version
+  # ============================================================================
+  # Image Selection Loop
+  # ============================================================================
+  # For each node, select the appropriate Talos image based on the update flag.
+  # - update=true: Uses talos_image_update (newer version for upgrades)
+  # - update=false: Uses talos_image_base (initial deployment version)
+
+  download_file_loop = { for node_name, node_config in var.talos_nodes :
+    node_name => {
+      architecture      = node_config.update == true ? local.talos_image_update.architecture : local.talos_image_base.architecture
+      proxmox_node_name = node_config.host_node
+      platform          = node_config.update == true ? local.talos_image_update.platform : local.talos_image_base.platform
+      schematic_id      = node_config.update == true ? local.talos_image_update.schematic_id : local.talos_image_base.schematic_id
+      talos_node_name   = node_name
+      update            = node_config.update
+      url               = node_config.update == true ? local.talos_image_update.url : local.talos_image_base.url
+      version           = node_config.update == true ? local.talos_image_update.version : local.talos_image_base.version
     }
   }
 }
-
 
 resource "proxmox_virtual_environment_download_file" "this" {
   for_each = local.download_file_loop

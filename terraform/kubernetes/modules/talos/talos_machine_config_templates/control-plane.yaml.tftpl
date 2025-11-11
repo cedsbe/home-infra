@@ -1,19 +1,4 @@
-machine:
-  network:
-    hostname: ${hostname}
-    nameservers:
-      - 192.168.65.30
-      - 192.168.65.40
-    searchDomains:
-      - ad.ghiot.be
-      - ghiot.be
-  nodeLabels:
-    topology.kubernetes.io/region: ${cluster_name}
-    topology.kubernetes.io/zone: ${node_name}
-  kubelet:
-    extraArgs:
-      rotate-server-certificates: true
-
+# Any specific control plane configuration
 cluster:
   allowSchedulingOnControlPlanes: false
   network:
