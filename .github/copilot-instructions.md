@@ -322,6 +322,27 @@ When errors or issues occur during development, document the solution in this in
 - **Mistake**: Hardcoding backend configuration or not handling new vs existing infrastructure scenarios
 - **Solution**: Use conditional initialization in Task files to check for `backend.config` existence and provide clear guidance for both new and existing infrastructure setups.
 
+#### State Validation and Provisioner Resources
+- **Mistake**: Using `null_resource` with provisioners for validation or state management
+- **Solution**: Always use `terraform_data` instead of `null_resource`. The `terraform_data` resource is the modern Terraform pattern for managing state and running provisioners. Example:
+  ```hcl
+  # ✅ CORRECT - Use terraform_data
+  resource "terraform_data" "validate_configuration" {
+    input = local.validation_error
+    provisioner "local-exec" {
+      command = self.input != "" ? "echo '${self.input}' && exit 1" : "echo 'Valid'"
+      interpreter = ["/bin/sh", "-c"]
+    }
+  }
+
+  # ❌ WRONG - Don't use null_resource
+  resource "null_resource" "validate_configuration" {
+    triggers = { validation_error = local.validation_error }
+    provisioner "local-exec" { command = "..." }
+  }
+  ```
+  Benefits of `terraform_data`: Better semantics, built-in state management, clearer intent, and improved compatibility with modern Terraform versions.
+
 ### Instructions for Adding New Mistakes/Solutions
 
 When encountering a new mistake or issue:

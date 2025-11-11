@@ -66,16 +66,162 @@ variable "talos_nodes" {
 
   description = <<-EOT
     Map of Talos nodes for cluster deployment where key is the node name (e.g., "control-1", "worker-1"):
+
+    REQUIRED FIELDS:
     - host_node: Proxmox host node name where this VM will run (e.g., "hsp-proxmox0").
-    - datastore_id: (Optional) Proxmox datastore ID for VM storage (default: "local-lvm").
     - machine_type: Node role, either "controlplane" or "worker".
     - ip: Static IP address for the node (e.g., "192.168.65.110").
     - mac_address: MAC address in format XX:XX:XX:XX:XX:XX (must be unique across nodes).
     - vm_id: Proxmox VM ID (numeric, must be unique across Proxmox cluster).
     - cpu: Number of CPU cores to allocate.
     - ram_dedicated: Amount of dedicated RAM in MB to allocate.
-    - update: Whether to include this node in planned updates.
+    - update: Whether to use the update image for this node (see UPDATE MECHANISM below).
+
+    OPTIONAL FIELDS:
+    - datastore_id: (Optional) Proxmox datastore ID for VM storage (default: "local-lvm").
     - primary_endpoint: (Optional) Set to true for exactly one controlplane node - used as etcd bootstrap node (default: false).
+
+    ============================================================================
+    UPDATE MECHANISM - Manual Rolling Updates
+    ============================================================================
+
+    The 'update' field controls which Talos boot image is used during node provisioning:
+    - update = false: Uses talos_version (initial deployment version from talos_base image)
+    - update = true: Uses talos_update_version (upgrade version from talos_update image)
+
+    VALIDATION (Using terraform_data):
+    ===================================
+    A terraform_data resource named "validate_update_configuration" runs during planning
+    to detect invalid update configurations early:
+    - If any node has update=true AND talos_update_version is null → PLAN FAILS with clear error
+    - This prevents broken configurations from reaching the apply phase
+    - The error message shows exactly which nodes require updates and what to fix
+
+    IMPORTANT: You must set talos_update_version in components_versions.auto.tfvars
+    before setting any node's update=true. The validation will catch this mismatch.
+
+    HOW TO PERFORM ROLLING UPDATES (Manual Process):
+    ================================================
+
+    1. Prepare for Updates:
+       - Decide which Talos version to upgrade to
+       - Set the desired version in components_versions.auto.tfvars:
+         talos_update_version = "v1.12.0"  # Must be > talos_version
+       - Run: terraform plan
+       - Verify no unexpected changes (should only show new ISO download)
+
+    2. Update One Node at a Time (CRITICAL for cluster stability):
+       - Modify main.tf to set update=true for ONE node only:
+         "hsv-kwork0" = {
+           ...
+           update = true    # ← Change from false to true
+         }
+
+       - Run: terraform plan
+       - Review: Should only show ISO change for that node
+       - Run: terraform apply
+       - Wait for the node to boot from the new image
+       - Monitor node health: talosctl health -n <node-ip> --client-configuration output/talos-config.yaml
+       - Wait for node to report Ready status before proceeding
+
+    3. Repeat for Other Nodes:
+       - Set update=false for the node you just updated
+       - Set update=true for the next node
+       - Repeat terraform plan/apply cycle
+       - IMPORTANT: Always wait for node recovery between updates
+
+    4. Finalize After All Updates Complete:
+       - Set all nodes back to update=false
+       - Set talos_update_version = null (or same as talos_version)
+       - Run terraform apply
+       - This locks in the new stable state and prevents accidental re-updates
+
+    EXAMPLE: Three-Step Rolling Update
+    ===================================
+
+    Initial state (all nodes at v1.11.3):
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = false }
+      "hsv-kwork0" = { ... update = false }
+      "hsv-kwork1" = { ... update = false }
+    }
+
+    Step 1: Update first worker (set update=true for one node only)
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = false }
+      "hsv-kwork0" = { ... update = true }   # ← Updating
+      "hsv-kwork1" = { ... update = false }
+    }
+    terraform apply
+    # Wait for node recovery (5-10 minutes)
+    talosctl health -n 192.168.65.120
+
+    Step 2: Update second worker (toggle update flags)
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = false }
+      "hsv-kwork0" = { ... update = false }  # ← Completed
+      "hsv-kwork1" = { ... update = true }   # ← Updating
+    }
+    terraform apply
+    # Wait for node recovery
+
+    Step 3: Update control plane (most critical, one at a time)
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = true }   # ← Updating
+      "hsv-kwork0" = { ... update = false }
+      "hsv-kwork1" = { ... update = false }
+    }
+    terraform apply
+    # Wait for node recovery
+    # Verify etcd health: talosctl etcd status -n 192.168.65.110
+
+    Step 4: Finalize
+    # Set all back to false, and remove update version
+    talos_nodes = {
+      "hsv-kctrl0" = { ... update = false }
+      "hsv-kwork0" = { ... update = false }
+      "hsv-kwork1" = { ... update = false }
+    }
+    # In components_versions.auto.tfvars, set:
+    talos_update_version = null  # or = var.talos_version
+
+    IMPORTANT WARNINGS:
+    ===================
+
+    ⚠️  CLUSTER STABILITY: Updating all nodes simultaneously or too many at once
+        WILL cause loss of quorum and cluster downtime. Always update one node
+        (maximum 2-3 workers if separate from control plane) at a time.
+
+    ⚠️  CONTROL PLANE PRIORITY: Update control plane nodes one at a time ONLY.
+        Losing 2+ control plane nodes = lost quorum = dead cluster.
+
+    ⚠️  MONITOR PROGRESS: Always verify node health after updates using:
+        talosctl health -n <node-ip> --client-configuration output/talos-config.yaml
+        Wait for "Ready" status before updating next node.
+
+    ⚠️  VERSION MISMATCH: Ensure talos_update_version >= talos_version.
+        Updates are for upgrading or same-version refreshes, never downgrading.
+
+    ⚠️  BACKUP STATE: Keep a backup of terraform.tfstate before large updates:
+        cp terraform.tfstate terraform.tfstate.backup
+
+    ⚠️  ETCD HEALTH: For control plane updates, verify etcd cluster remains healthy:
+        talosctl etcd status -n <primary-control-plane-ip>
+        Should show all members as "Leader" or "Follower", no "Unknown"
+
+    TROUBLESHOOTING:
+    ================
+
+    If a node fails to update:
+    - Check Proxmox console for boot errors
+    - Verify the ISO was downloaded: ls -la /var/lib/vz/template/iso/ on Proxmox node
+    - Manually reboot if needed: talosctl reboot -n <node-ip>
+    - Restore previous state: Set update=false and re-apply
+
+    If cluster becomes unhealthy:
+    - Check all nodes are booted: talosctl get nodes
+    - Check control plane: talosctl health (should show nodes as Ready)
+    - May need to rollback by reverting talos_update_version and applying again
     EOT
 
 
