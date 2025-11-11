@@ -1,4 +1,11 @@
-# Generate Cilium Helm template
+# ============================================================================
+# Cilium CNI Bootstrap - Generate Helm template for initial cluster bootstrap
+# ============================================================================
+# Cilium is rendered as a Helm template here because it needs to be applied
+# during the Talos bootstrap process before the cluster is fully operational.
+# This approach uses the Helm provider to generate the manifest that will be
+# embedded in the Talos machine configuration.
+
 data "helm_template" "cilium_helm_template_bootstrap" {
   name       = "cilium"
   repository = "https://helm.cilium.io/"
@@ -20,10 +27,15 @@ data "helm_template" "cilium_helm_template_bootstrap" {
   ]
 }
 
+# Track Cilium version changes to trigger manifest regeneration when version is updated
 resource "terraform_data" "trigger_cilium_manifest_on_version_change" {
   input = var.cilium_version
 }
 
+# This resource ensures the Cilium manifest is regenerated when the version changes,
+# even though we ignore subsequent changes to the rendered manifest. This allows
+# updating Cilium by changing the version variable while preventing accidental
+# re-application of unchanged manifests.
 resource "terraform_data" "cilium_helm_template_bootstrap" {
   input = data.helm_template.cilium_helm_template_bootstrap.manifest
 
@@ -35,6 +47,14 @@ resource "terraform_data" "cilium_helm_template_bootstrap" {
   }
 }
 
+# ============================================================================
+# Talos Linux Cluster Provisioning
+# ============================================================================
+# Creates a complete Talos Linux Kubernetes cluster on Proxmox VE with:
+# - Custom node configuration templates
+# - Talos image factory integration for customized boot images
+# - Kubernetes bootstrap with embedded Cilium CNI
+# - TLS certificate management and kubeconfig generation
 
 module "talos" {
   source = "./modules/talos"
@@ -124,12 +144,30 @@ module "talos" {
   }
 }
 
+# ============================================================================
+# Proxmox CSI Plugin - Enable persistent storage integration
+# ============================================================================
+# Deploys and configures the Proxmox CSI plugin in the cluster to enable
+# Kubernetes persistent volumes backed by Proxmox storage. Creates:
+# - Service account and RBAC roles
+# - Authentication token for CSI driver
+# - Kubernetes secret with Proxmox credentials
+
 module "proxmox_csi_plugin" {
   source     = "./modules/proxmox_csi_plugin"
   depends_on = [module.talos]
 
   proxmox = var.proxmox
 }
+
+# ============================================================================
+# Persistent Volumes - Application storage provisioning
+# ============================================================================
+# Creates Proxmox volumes and corresponding Kubernetes PersistentVolumes for
+# application workloads. Each volume is:
+# - Allocated in Proxmox storage
+# - Registered as a Kubernetes PersistentVolume
+# - Available for pod attachment via dynamic provisioning
 
 module "volumes" {
   depends_on = [module.proxmox_csi_plugin]
@@ -142,6 +180,7 @@ module "volumes" {
     kubernetes = kubernetes
   }
 
+  # Application storage volumes mapping to deployment names and capacities
   volumes = {
     pv-prometheus = {
       node = "hsp-proxmox0"
