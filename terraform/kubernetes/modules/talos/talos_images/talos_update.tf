@@ -17,7 +17,7 @@ locals {
   # Build effective configuration by merging update config with base defaults
   # Any unspecified update parameter falls back to the base configuration
   talos_image_update_built = {
-    version         = coalesce(local.talos_image_update_version, var.talos_image_base.version)
+    version         = local.talos_image_update_version
     extensions      = coalesce(var.talos_image_update.extensions, var.talos_image_base.extensions)
     extraKernelArgs = coalesce(var.talos_image_update.extraKernelArgs, var.talos_image_base.extraKernelArgs)
     architecture    = coalesce(var.talos_image_update.architecture, var.talos_image_base.architecture)
