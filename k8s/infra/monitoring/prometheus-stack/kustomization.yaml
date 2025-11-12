@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - ns.yaml
-  - kube-prometheus-stack.yaml
+  - alertmanager-http-route.yaml
   - prometheus-http-route.yaml
 
 helmCharts:
