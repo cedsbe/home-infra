@@ -11,6 +11,7 @@ resources:
   - service-monitors/argocd-redis.yaml
   - service-monitors/argocd-repo-server.yaml
   - service-monitors/argocd-server.yaml
+  - dashboard.yaml
 
 helmCharts:
   - name: argo-cd
