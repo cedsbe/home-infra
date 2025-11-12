@@ -1,5 +1,40 @@
 prometheus:
   prometheusSpec:
+    # Allows to monitor all namespaces
+
+    ## If nil, select own namespace. Namespaces to be selected for PodMonitor discovery.
+    ## An empty label selector matches all namespaces.
+    ##
+    podMonitorNamespaceSelector: {}
+
+    ## If true, a nil or {} value for prometheus.prometheusSpec.podMonitorSelector will cause the
+    ## prometheus resource to be created with selectors based on values in the helm deployment,
+    ## which will also match the podmonitors created
+    ##
+    podMonitorSelectorNilUsesHelmValues: false
+
+    ## PodMonitors to be selected for target discovery.
+    ## If {}, select all PodMonitors
+    ##
+    podMonitorSelector: {}
+
+    ## Namespaces to be selected for ServiceMonitor discovery.
+    ## An empty label selector matches all namespaces.
+    ##
+    serviceMonitorNamespaceSelector: {}
+
+    ## Namespaces to be selected for ServiceMonitor discovery.
+    ##
+    serviceMonitorSelectorNilUsesHelmValues: false
+
+    ## ServiceMonitors to be selected for target discovery.
+    ## If {}, select all ServiceMonitors
+    ##
+    serviceMonitorSelector: {}
+
+    ## Define which Nodes the Pods are scheduled on.
+    ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+    ##
     nodeSelector:
       topology.kubernetes.io/zone: hsp-proxmox0
     storageSpec:
@@ -15,3 +50,82 @@ prometheus:
           selector:
             matchLabels:
               app: prometheus
+
+## Component scraping the kube controller manager
+# https://github.com/siderolabs/talos/discussions/7214
+##
+kubeControllerManager:
+  enabled: true
+  serviceMonitor:
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_pod_node_name]
+        separator: ;
+        regex: ^(.*)$
+        targetLabel: nodename
+        replacement: $1
+        action: replace
+    metricRelabelings:
+      - action: labeldrop
+        regex: pod
+
+## Component scraping etcd
+##
+kubeEtcd:
+  enabled: true
+  service:
+    selector:
+      # etcd doesn't run as a container,
+      # but most probably runs on the same nodes that host a controller
+      k8s-app: kube-controller-manager
+  serviceMonitor:
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_pod_node_name]
+        separator: ;
+        regex: ^(.*)$
+        targetLabel: nodename
+        replacement: $1
+        action: replace
+    metricRelabelings:
+      - action: labeldrop
+        regex: pod
+
+kubeProxy:
+  # Cilium replaces Kube Proxy
+  enabled: false
+
+## Component scraping kube scheduler
+##
+kubeScheduler:
+  enabled: true
+  serviceMonitor:
+    relabelings:
+      - sourceLabels: [__meta_kubernetes_pod_node_name]
+        separator: ;
+        regex: ^(.*)$
+        targetLabel: nodename
+        replacement: $1
+        action: replace
+    metricRelabelings:
+      - action: labeldrop
+        regex: pod
+
+## Deploy node exporter as a daemonset to all nodes
+##
+nodeExporter:
+  enabled: true
+
+# Provide some Grafana configuration but do not deploy it here
+##
+grafana:
+  enabled: false # Disable Grafana deployment. Will do elsewhere.
+  forceDeployDatasources: false # Prevents the chart from automatically creating data source configurations.
+  forceDeployDashboards: true # Forces the deployment of pre-built dashboards.
+  defaultDashboardsEnabled: true # Enables Grafana's curated default dashboards.
+  defaultDashboardsTimezone: Europe/Brussels
+
+  # Configures how the Grafana Operator (if installed) discovers and manages dashboards.
+  operator:
+    dashboardsConfigMapRefEnabled: true # Allows dashboards to be stored as Kubernetes ConfigMaps and automatically loaded by Grafana.
+    matchLabels:
+      app: grafana # Label selector for discovering ConfigMaps with this label.
+    folder: Kubernetes # Organizes discovered dashboards into a folder named "Kubernetes" within the Grafana UI.
