@@ -11,13 +11,15 @@ spec:
   destinations:
     - namespace: "argocd"
       server: "*"
+    - namespace: "default"
+      server: "*"
     - namespace: "grafana"
       server: "*"
-    - namespace: "monitoring"
+    - namespace: "kube-system"
       server: "*"
     - namespace: "kubelet-serving-cert-approver"
       server: "*"
-    - namespace: "kube-system"
+    - namespace: "monitoring"
       server: "*"
   clusterResourceWhitelist:
     - group: "*"
