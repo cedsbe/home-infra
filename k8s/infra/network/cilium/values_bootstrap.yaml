@@ -26,6 +26,11 @@ cgroup:
     enabled: false
   hostRoot: /sys/fs/cgroup
 
+# https://www.talos.dev/latest/talos-guides/network/host-dns/#forwarding-kube-dns-to-host-dns
+# https://docs.cilium.io/en/stable/operations/performance/tuning/#ebpf-host-routing
+bpf:
+  hostLegacyRouting: true
+
 # https://docs.cilium.io/en/stable/network/concepts/ipam/
 ipam:
   mode: kubernetes
@@ -38,6 +43,8 @@ rollOutCiliumPods: true
 
 gatewayAPI:
   enabled: true
+  gatewayClass:
+    create: "true" # Create a GatewayClass for Cilium - With Helm it detects the CDR, but not with Kustomize/templates
 
 hubble:
   enabled: true

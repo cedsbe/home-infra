@@ -17,6 +17,7 @@ A comprehensive Infrastructure as Code solution for home lab automation using Ta
 ### Prerequisites
 
 **Required Tools:**
+
 - [Terraform](https://www.terraform.io/) - Infrastructure provisioning
 - [Task](https://taskfile.dev/) - Build automation
 - [Packer](https://www.packer.io/) - Template building
@@ -27,12 +28,14 @@ A comprehensive Infrastructure as Code solution for home lab automation using Ta
 ### Initial Setup
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/your-username/home-infra.git
    cd home-infra
    ```
 
 2. **Configure credentials:**
+
    ```bash
    # Terraform secrets
    cp terraform/kubernetes/proxmox.secrets.auto.tfvars.template terraform/kubernetes/proxmox.secrets.auto.tfvars
@@ -45,6 +48,7 @@ A comprehensive Infrastructure as Code solution for home lab automation using Ta
    ```
 
 3. **Customize configuration:**
+
    - Update `terraform/kubernetes/proxmox.auto.tfvars` with your environment details
    - Modify node configurations in `terraform/kubernetes/main.tf`
 
@@ -75,12 +79,14 @@ A comprehensive Infrastructure as Code solution for home lab automation using Ta
 ## 🔐 Security Best Practices
 
 ### Credential Management
+
 - **Never commit secrets**: All sensitive files are gitignored
 - **Use templates**: Provided `.template` files for easy setup
 - **Environment variables**: Packer uses `PKR_VAR_*` pattern
 - **Sealed secrets**: Kubernetes secrets are sealed with kubeseal
 
 ### Network Security
+
 - **Private networks**: Uses RFC 1918 address space
 - **Certificate management**: Automatic cert rotation with cert-manager
 - **Pod security**: Enforced pod security standards
@@ -88,6 +94,7 @@ A comprehensive Infrastructure as Code solution for home lab automation using Ta
 ## 🛠️ Development Workflow
 
 ### Infrastructure Changes
+
 ```bash
 # Plan changes
 task terraform:plan
@@ -100,6 +107,7 @@ task terraform:destroy
 ```
 
 ### Application Deployment
+
 ```bash
 # Deploy through GitOps (ArgoCD will auto-sync)
 kubectl apply -k k8s/sets/
@@ -109,6 +117,7 @@ kubectl kustomize k8s/apps/dev/whoami | kubectl apply -f -
 ```
 
 ### Windows Template Building
+
 ```bash
 # Validate Packer config
 task packer:validate
@@ -141,7 +150,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 Heavily inspired by Vegard S. Hagen's Home lab:
-- [Blog](https://blog.stonegarden.dev/articles/2024/08/talos-proxmox-tofu/)
+
+- [Blog](https://blog.k8s.ghiot.be/articles/2024/08/talos-proxmox-tofu/)
 - [Github](https://github.com/vehagn/homelab)
 
 ## 🔍 Troubleshooting

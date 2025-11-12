@@ -27,6 +27,10 @@ crds:
   keep: false
 
 controller:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   resources:
     requests:
       cpu: 100m
@@ -35,6 +39,11 @@ controller:
       memory: 4Gi
 
 dex:
+  enabled: false
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   resources:
     requests:
       cpu: 10m
@@ -43,6 +52,10 @@ dex:
       memory: 256Mi
 
 redis:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   resources:
     requests:
       cpu: 100m
@@ -51,6 +64,10 @@ redis:
       memory: 1Gi
 
 server:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   resources:
     requests:
       cpu: 50m
@@ -59,6 +76,10 @@ server:
       memory: 1Gi
 
 repoServer:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   resources:
     requests:
       cpu: 100m
@@ -67,6 +88,10 @@ repoServer:
       memory: 2Gi
 
 applicationSet:
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   resources:
     requests:
       cpu: 50m
@@ -76,6 +101,10 @@ applicationSet:
 
 notifications:
   enabled: false
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   resources:
     requests:
       cpu: 100m
