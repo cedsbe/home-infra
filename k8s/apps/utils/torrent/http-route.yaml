@@ -5,7 +5,9 @@ metadata:
   namespace: torrent
 spec:
   parentRefs:
-    - name: internal
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: internal
       namespace: gateway
   hostnames:
     - "torrent.k8s.ghiot.be"
@@ -15,5 +17,8 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: torrent
+        - group: ""
+          kind: Service
+          name: torrent
           port: 80
+          weight: 1
