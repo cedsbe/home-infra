@@ -37,23 +37,97 @@ ipam:
 
 operator:
   rollOutPods: true
+  prometheus:
+    metricsService: true
+    enabled: true
+    port: 9963
+    serviceMonitor:
+      enabled: true
+  dashboards:
+    enabled: true
+  resources:
+    limits:
+      cpu: 500m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
 
 # Roll out cilium agent pods automatically when ConfigMap is updated.
 rollOutCiliumPods: true
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+
+externalIPs:
+  enabled: true
+
+loadBalancer:
+  # https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/#maglev-consistent-hashing
+  algorithm: maglev
 
 gatewayAPI:
   enabled: true
   gatewayClass:
     create: "true" # Create a GatewayClass for Cilium - With Helm it detects the CDR, but not with Kustomize/templates
 
+envoy:
+  prometheus:
+    enabled: true
+    port: "9964"
+    serviceMonitor:
+      enabled: true
 hubble:
   enabled: true
+  metrics:
+    enabled:
+      - dns
+      - drop
+      - tcp
+      - flow
+      - port-distribution
+      - icmp
+      - "httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction;sourceContext=workload-name|reserved-identity;destinationContext=workload-name|reserved-identity"
+    enableOpenMetrics: true
+    port: 9965
+    serviceMonitor:
+      enabled: true
+    dashboards:
+      enabled: true
   relay:
     enabled: true
     rollOutPods: true
+    prometheus:
+      enabled: true
+      port: 9966
+      serviceMonitor:
+        enabled: true
   ui:
     enabled: true
     rollOutPods: true
+
+clustermesh:
+  apiserver:
+    metrics:
+      enabled: true
+      port: 9962
+      serviceMonitor:
+        enabled: true
+
+prometheus:
+  metricsService: true
+  enabled: true
+  port: 9962
+  serviceMonitor:
+    enabled: true
+    trustCRDsExist: true
+
+dashboards:
+  enabled: true
 
 # Increase rate limit when doing L2 announcements
 k8sClientRateLimit:
@@ -62,10 +136,3 @@ k8sClientRateLimit:
 
 l2announcements:
   enabled: true
-
-externalIPs:
-  enabled: true
-
-loadBalancer:
-  # https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/#maglev-consistent-hashing
-  algorithm: maglev
