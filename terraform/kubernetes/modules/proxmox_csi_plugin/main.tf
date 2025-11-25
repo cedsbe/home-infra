@@ -7,6 +7,7 @@ resource "proxmox_virtual_environment_role" "csi" {
   # - Datastore.AllocateSpace: Provision new storage
   # - Datastore.Audit: Read datastore information
   privileges = [
+    "Sys.Audit",
     "VM.Audit",
     "VM.Config.Disk",
     "Datastore.Allocate",
