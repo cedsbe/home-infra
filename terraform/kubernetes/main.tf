@@ -184,7 +184,7 @@ module "volumes" {
   volumes = {
     pv-prometheus = {
       node = "hsp-proxmox0"
-      size = "10G"
+      size = "50G"
     }
 
     pv-sonarr = {
