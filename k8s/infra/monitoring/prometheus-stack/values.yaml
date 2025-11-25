@@ -46,7 +46,7 @@ prometheus:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 10G
+              storage: 50G
           selector:
             matchLabels:
               app: prometheus
