@@ -107,10 +107,9 @@ ansible/
 This Ansible project integrates with:
 
 - **Windows**: Manage Windows Server VMs
-- **Proxmox**: Automate VM management
 - **Active Directory**: Configure domain controllers
 
-**Note**: Kubernetes/Talos infrastructure is managed by Terraform and ArgoCD, not Ansible.
+**Note**: Kubernetes/Talos and Proxmox infrastructure are managed by Terraform and ArgoCD, not Ansible.
 
 ## Documentation
 

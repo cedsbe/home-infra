@@ -85,9 +85,8 @@ ansible/
 - ✅ `linux` - All Linux systems
 - ✅ `windows` - All Windows systems
 - ✅ `domain_controllers` - Active Directory DCs
-- ✅ `proxmox` - Proxmox hosts (placeholder)
 
-**Note**: Kubernetes/Talos nodes are managed by Terraform and ArgoCD, not Ansible.
+**Note**: Kubernetes/Talos and Proxmox infrastructure are managed by Terraform and ArgoCD, not Ansible.
 
 ### 4. **Ready-to-Use Playbooks**
 
@@ -194,11 +193,10 @@ Run `task --list | grep ansible` to see all available commands:
 
 ### With Existing Infrastructure
 
-- **Proxmox**: Can manage Proxmox VMs (placeholder in inventory)
 - **Windows**: Manages Windows Server VMs and Active Directory
 - **Terraform**: Can use Terraform outputs for dynamic inventory
 
-**Note**: Kubernetes/Talos infrastructure is exclusively managed by Terraform and ArgoCD.
+**Note**: Kubernetes/Talos and Proxmox infrastructure are exclusively managed by Terraform and ArgoCD.
 
 ### Collections Included
 

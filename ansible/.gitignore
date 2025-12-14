@@ -4,6 +4,7 @@
 logs/
 cache/
 .vault_password
+.task/
 
 # Sensitive files
 inventory/**/secrets.yml

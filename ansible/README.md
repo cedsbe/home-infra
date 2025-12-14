@@ -185,10 +185,9 @@ ansible windows -m win_shell -a "Get-Service | Where-Object {$_.Status -eq 'Runn
 This Ansible project integrates with the broader home-infra repository:
 
 - **Terraform**: Can use Terraform outputs to generate dynamic inventory
-- **Proxmox**: Can manage Proxmox VMs and containers
 - **Windows**: Can configure Windows Server VMs created by Packer
 
-**Note**: Kubernetes/Talos infrastructure is managed exclusively by Terraform and ArgoCD, not by Ansible.
+**Note**: Kubernetes/Talos and Proxmox infrastructure are managed exclusively by Terraform, not by Ansible.
 
 ## Troubleshooting
 
