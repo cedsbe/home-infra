@@ -1,0 +1,26 @@
+---
+# Linux-specific variables
+
+# Package management
+package_update_cache: true
+package_upgrade: true
+
+# SSH configuration
+ssh_port: 22
+ssh_password_authentication: false
+ssh_permit_root_login: "without-password"
+
+# Firewall rules (using ufw)
+firewall_rules:
+  - { rule: "allow", port: 22, proto: "tcp" }
+
+# System tuning
+swappiness: 10
+vm_max_map_count: 262144
+
+# Users to create
+linux_users: []
+  # - name: ansible
+  #   groups: ['sudo']
+  #   shell: /bin/bash
+  #   ssh_key: "{{ vault_ansible_ssh_key }}"

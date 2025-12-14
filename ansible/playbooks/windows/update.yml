@@ -1,0 +1,43 @@
+---
+# Windows Update playbook
+
+- name: Update Windows systems
+  hosts: windows
+  gather_facts: true
+  tags:
+    - update
+    - windows
+    - maintenance
+
+  tasks:
+    - name: Check for Windows updates
+      ansible.windows.win_updates:
+        category_names:
+          - CriticalUpdates
+          - SecurityUpdates
+          - UpdateRollups
+        state: searched
+      register: update_search_result
+
+    - name: Display available updates
+      ansible.builtin.debug:
+        msg: "{{ update_search_result.found_update_count }} updates available"
+
+    - name: Install Windows updates
+      ansible.windows.win_updates:
+        category_names:
+          - CriticalUpdates
+          - SecurityUpdates
+          - UpdateRollups
+        reboot: true
+        reboot_timeout: 3600
+      register: update_result
+      when: update_search_result.found_update_count > 0
+
+    - name: Display update results
+      ansible.builtin.debug:
+        msg:
+          - "Updates installed: {{ update_result.installed_update_count | default(0) }}"
+          - "Updates failed: {{ update_result.failed_update_count | default(0) }}"
+          - "Reboot required: {{ update_result.reboot_required | default(false) }}"
+      when: update_search_result.found_update_count > 0

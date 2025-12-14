@@ -1,0 +1,14 @@
+---
+# Default variables for base-linux role
+
+# SSH configuration
+ssh_port: 22
+ssh_permit_root_login: "without-password"
+ssh_password_authentication: false
+
+# Firewall configuration
+firewall_enabled: true
+firewall_default_policy: deny
+
+# Package management
+auto_update_enabled: false

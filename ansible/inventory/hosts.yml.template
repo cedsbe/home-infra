@@ -1,0 +1,48 @@
+---
+# Main Inventory File
+# Copy this template to hosts.yml and customize for your environment
+# NOTE: hosts.yml is gitignored for security (contains actual IPs)
+
+all:
+  children:
+    # Linux hosts group
+    linux:
+      children:
+        proxmox:
+          hosts:
+            proxmox-01:
+              ansible_host: 192.168.x.x
+              ansible_user: root
+              ansible_connection: ssh
+
+    # Windows hosts group
+    windows:
+      children:
+        domain_controllers:
+          hosts:
+            dc01:
+              ansible_host: 192.168.x.x
+              ansible_user: Administrator
+              ansible_connection: winrm
+              ansible_winrm_transport: ntlm
+              ansible_winrm_server_cert_validation: ignore
+              ansible_port: 5985
+
+        member_servers:
+          hosts:
+            win-server-01:
+              ansible_host: 192.168.x.x
+              ansible_user: Administrator
+              ansible_connection: winrm
+              ansible_winrm_transport: ntlm
+              ansible_winrm_server_cert_validation: ignore
+              ansible_port: 5985
+
+  vars:
+    # Global variables for all hosts
+    ansible_python_interpreter: auto_silent
+    domain_name: ad.ghiot.be
+    dns_servers:
+      - 192.168.65.30
+      - 192.168.65.40
+    timezone: Europe/Brussels

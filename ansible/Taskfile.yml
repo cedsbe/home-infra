@@ -1,0 +1,209 @@
+version: "3"
+
+# Ansible Task Automation
+# Provides convenient commands for common Ansible operations
+
+vars:
+  ANSIBLE_DIR: "{{.TASKFILE_DIR}}"
+  INVENTORY: "{{.ANSIBLE_DIR}}/inventory/hosts.yml"
+  PLAYBOOK_DIR: "{{.ANSIBLE_DIR}}/playbooks"
+
+tasks:
+  # Setup and validation tasks
+  install:
+    desc: Install Ansible collections and roles
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-galaxy collection install -r requirements.yml --force
+      - ansible-galaxy role install -r requirements.yml --force-with-deps
+    sources:
+      - requirements.yml
+
+  validate:
+    desc: Validate Ansible configuration and syntax
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - echo "Validating Ansible configuration..."
+      - ansible --version
+      - ansible-inventory --list -i {{.INVENTORY}} > /dev/null
+      - echo "✓ Inventory is valid"
+      - ansible-playbook site.yml --syntax-check
+      - echo "✓ Playbook syntax is valid"
+
+  lint:
+    desc: Lint Ansible playbooks and roles with ansible-lint
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-lint site.yml
+      - ansible-lint playbooks/
+      - ansible-lint roles/
+
+  # Inventory tasks
+  inventory:list:
+    desc: List all hosts in inventory
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-inventory --list -i {{.INVENTORY}}
+
+  inventory:graph:
+    desc: Show inventory graph
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-inventory --graph -i {{.INVENTORY}}
+
+  inventory:host:
+    desc: Show variables for a specific host
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-inventory --host {{.HOST}} -i {{.INVENTORY}}
+    requires:
+      vars: [HOST]
+
+  # Connectivity tests
+  ping:all:
+    desc: Ping all hosts to test connectivity
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible all -m ping -i {{.INVENTORY}}
+
+  ping:linux:
+    desc: Ping all Linux hosts
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible linux -m ping -i {{.INVENTORY}}
+
+  ping:windows:
+    desc: Ping all Windows hosts
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible windows -m win_ping -i {{.INVENTORY}}
+
+  # Playbook execution
+  run:site:
+    desc: Run the master site.yml playbook
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook site.yml -i {{.INVENTORY}} {{.CLI_ARGS}}
+
+  run:check:
+    desc: Run site.yml in check mode (dry-run)
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook site.yml -i {{.INVENTORY}} --check {{.CLI_ARGS}}
+
+  run:playbook:
+    desc: Run a specific playbook (usage - task ansible:run:playbook PLAYBOOK=path/to/playbook.yml)
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.PLAYBOOK}} -i {{.INVENTORY}} {{.CLI_ARGS}}
+    requires:
+      vars: [PLAYBOOK]
+
+  # Common playbook shortcuts
+  update:linux:
+    desc: Update all Linux systems
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.PLAYBOOK_DIR}}/linux/update.yml -i {{.INVENTORY}} {{.CLI_ARGS}}
+
+  update:windows:
+    desc: Update all Windows systems
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.PLAYBOOK_DIR}}/windows/update.yml -i {{.INVENTORY}} {{.CLI_ARGS}}
+
+  baseline:
+    desc: Run baseline configuration on all hosts
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-playbook {{.PLAYBOOK_DIR}}/common/baseline.yml -i {{.INVENTORY}} {{.CLI_ARGS}}
+
+  # Ad-hoc commands
+  adhoc:
+    desc: Run ad-hoc command (usage - task ansible:adhoc HOST=all MODULE=shell ARGS="uptime")
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible {{.HOST}} -m {{.MODULE}} -a "{{.ARGS}}" -i {{.INVENTORY}}
+    requires:
+      vars: [HOST, MODULE, ARGS]
+
+  # Vault operations
+  vault:create:
+    desc: Create a new encrypted vault file
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-vault create {{.FILE}}
+    requires:
+      vars: [FILE]
+
+  vault:edit:
+    desc: Edit an encrypted vault file
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-vault edit {{.FILE}}
+    requires:
+      vars: [FILE]
+
+  vault:encrypt:
+    desc: Encrypt an existing file
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-vault encrypt {{.FILE}}
+    requires:
+      vars: [FILE]
+
+  vault:decrypt:
+    desc: Decrypt a vault file
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-vault decrypt {{.FILE}}
+    requires:
+      vars: [FILE]
+
+  vault:view:
+    desc: View contents of encrypted vault file
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible-vault view {{.FILE}}
+    requires:
+      vars: [FILE]
+
+  # Facts gathering
+  facts:
+    desc: Gather and display facts for a host
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - ansible {{.HOST}} -m setup -i {{.INVENTORY}}
+    requires:
+      vars: [HOST]
+
+  # Cleanup
+  clean:
+    desc: Clean logs and cache
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - rm -rf logs/*.log
+      - rm -rf cache/*
+      - echo "✓ Cleaned logs and cache"
+
+  # Documentation
+  docs:
+    desc: Generate documentation for roles
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - echo "Roles documentation:"
+      - find roles -name README.md -exec echo "  - {}" \;
+
+  # Setup helper
+  setup:
+    desc: Initial setup for Ansible project
+    dir: "{{.ANSIBLE_DIR}}"
+    cmds:
+      - echo "Setting up Ansible project..."
+      - cp inventory/hosts.yml.template inventory/hosts.yml || true
+      - mkdir -p logs cache
+      - chmod 700 logs cache
+      - echo "✓ Created logs and cache directories"
+      - echo "⚠ Edit inventory/hosts.yml with your actual hosts"
+      - echo "⚠ Create .vault_password file if using Ansible Vault"
+      - task: install

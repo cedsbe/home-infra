@@ -1,0 +1,54 @@
+---
+# Base Windows configuration role - Main tasks
+
+- name: Set computer name
+  ansible.windows.win_hostname:
+    name: "{{ inventory_hostname }}"
+  register: hostname_change
+
+- name: Reboot if hostname changed
+  ansible.windows.win_reboot:
+    reboot_timeout: 600
+  when: hostname_change.reboot_required
+
+- name: Configure Windows Firewall
+  ansible.windows.win_firewall:
+    state: "{{ 'enabled' if windows_firewall_enabled else 'disabled' }}"
+    profiles:
+      - Domain
+      - Private
+      - Public
+
+- name: Install Windows features
+  ansible.windows.win_feature:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ windows_features }}"
+  when: windows_features is defined
+
+- name: Set PowerShell execution policy
+  ansible.windows.win_shell: |
+    Set-ExecutionPolicy -ExecutionPolicy {{ powershell_execution_policy }} -Force
+  changed_when: false
+
+- name: Configure Windows Update settings
+  ansible.windows.win_updates:
+    category_names: "{{ windows_update_categories }}"
+    state: installed
+  when: windows_auto_update | default(false)
+
+- name: Disable unnecessary services
+  ansible.windows.win_service:
+    name: "{{ item }}"
+    state: stopped
+    start_mode: disabled
+  loop:
+    - XblAuthManager
+    - XblGameSave
+  failed_when: false
+
+- name: Configure DNS client
+  ansible.windows.win_dns_client:
+    adapter_names: "*"
+    dns_servers: "{{ dns_servers }}"
+  when: dns_servers is defined

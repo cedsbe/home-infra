@@ -1,0 +1,20 @@
+---
+# Ansible Collections Requirements
+collections:
+  # Windows Management
+  - name: ansible.windows
+    version: ">=2.0.0"
+
+  # Community General Collection (includes many useful modules)
+  - name: community.general
+    version: ">=8.0.0"
+
+  # Community Windows Collection
+  - name: community.windows
+    version: ">=2.0.0"
+
+# Ansible Roles Requirements (optional)
+roles: []
+  # Example role from Ansible Galaxy:
+  # - name: geerlingguy.docker
+  #   version: "7.0.0"

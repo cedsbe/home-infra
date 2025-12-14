@@ -1,0 +1,12 @@
+127.0.0.1   localhost
+::1         localhost ip6-localhost ip6-loopback
+
+# Host configuration
+{{ ansible_default_ipv4.address }}  {{ inventory_hostname }} {{ inventory_hostname_short }}
+
+# Domain controllers
+{% if groups['domain_controllers'] is defined %}
+{% for host in groups['domain_controllers'] %}
+{{ hostvars[host]['ansible_host'] }}  {{ host }}
+{% endfor %}
+{% endif %}

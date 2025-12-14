@@ -49,3 +49,16 @@ paths = [
   '''terraform/.*/\.env$''',
   '''backend\.config$'''
 ]
+
+[[rules]]
+id = "private-key"
+[[rules.allowlists]]
+condition = "AND"
+# Allow private keys stored in *.template files or encrypted secrets files managed by git-crypt
+paths = [
+  '''.*\.template$''',
+  '''.*\.secrets\.auto\.tfvars$''',
+  '''packer/.*/\.env$''',
+  '''terraform/.*/\.env$''',
+  '''backend\.config$'''
+]

@@ -44,11 +44,13 @@ rules:
 
   # Truthy values (allow yes/no, on/off, etc.)
   truthy:
-    allowed-values: ['true', 'false', 'yes', 'no', 'on', 'off']
+    allowed-values: ["true", "false", "yes", "no", "on", "off"]
     check-keys: false
 
 # Ignore certain files
-# ignore: |
-#   .github/workflows/
-#   k8s/
-#   .pre-commit-config.yaml
+ignore: |
+  .github/workflows/
+  .pre-commit-config.yaml
+  ansible/
+  k8s/
+  terraform/

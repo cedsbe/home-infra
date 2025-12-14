@@ -1,0 +1,17 @@
+---
+# Default variables for base-windows role
+
+# Windows Firewall
+windows_firewall_enabled: true
+
+# PowerShell
+powershell_execution_policy: RemoteSigned
+
+# Windows Update
+windows_auto_update: false
+windows_update_categories:
+  - CriticalUpdates
+  - SecurityUpdates
+
+# Windows Features
+windows_features: []

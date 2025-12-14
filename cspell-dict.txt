@@ -69,7 +69,9 @@ finops
 flaresolverr
 fmt
 FOWNER
+FSMO
 gatewayclass
+geerlingguy
 ghiot
 gitops
 golang
@@ -88,6 +90,7 @@ iad
 ICS
 img
 iothread
+iotop
 IPC
 jsonrpc
 kctrl
@@ -165,6 +168,7 @@ QWAVE
 rdns
 referencegrant
 rego
+resolv
 rgl
 rlimit
 rrset
@@ -213,6 +217,7 @@ typescript
 typesense
 udp
 UDP
+ufw
 UID
 unattend
 unattended

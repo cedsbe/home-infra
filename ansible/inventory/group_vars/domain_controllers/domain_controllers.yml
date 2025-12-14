@@ -1,0 +1,27 @@
+---
+# Active Directory Domain Controller variables
+
+# Active Directory configuration
+ad_domain_name: ad.ghiot.be
+ad_netbios_name: GHIOT
+ad_forest_mode: Win2016
+ad_domain_mode: Win2016
+
+# FSMO roles
+ad_install_dns: true
+ad_create_dns_delegation: false
+
+# Domain admin credentials
+ad_safe_mode_password: "{{ vault_ad_safe_mode_password }}"
+ad_domain_admin_password: "{{ vault_ad_domain_admin_password }}"
+
+# DNS forwarders
+ad_dns_forwarders:
+  - 1.1.1.1
+  - 8.8.8.8
+
+# Sites and subnets
+ad_sites: []
+  # - name: MainSite
+  #   subnets:
+  #     - 192.168.65.0/24

@@ -1,0 +1,14 @@
+---
+# Encrypted variables for all hosts
+# Use ansible-vault to encrypt this file:
+# ansible-vault encrypt inventory/group_vars/all/vault.yml
+#
+# Template - replace with actual encrypted values
+
+# Example encrypted variables:
+# vault_admin_password: "changeme"
+# vault_api_token: "your-secret-token"
+# vault_ssh_private_key: |
+#   -----BEGIN OPENSSH PRIVATE KEY-----
+#   ...
+#   -----END OPENSSH PRIVATE KEY-----

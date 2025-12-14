@@ -1,0 +1,26 @@
+---
+# Example host_vars for a specific host
+# Create this file for hosts that need unique configuration
+# File location: inventory/host_vars/<hostname>/vars.yml
+
+# Example for a Linux server
+# ansible_host: 192.168.x.x
+# ansible_user: root
+#
+# # Additional packages specific to this host
+# additional_packages:
+#   - htop
+#   - iotop
+#
+# # Custom firewall rules
+# custom_firewall_rules:
+#   - { rule: 'allow', port: 8080, proto: 'tcp' }
+
+# Example for a Windows domain controller
+# ansible_host: 192.168.x.x
+# ansible_user: Administrator
+# ansible_password: "{{ vault_windows_admin_password }}"
+#
+# # Domain controller specific settings
+# dc_role: primary
+# ad_site: MainSite

@@ -62,18 +62,23 @@ A comprehensive Infrastructure as Code solution for home lab automation using Ta
 ## 📁 Repository Structure
 
 ```
-├── terraform/kubernetes/     # Main Kubernetes cluster IaC
-│   ├── modules/             # Reusable Terraform modules
-│   │   ├── talos/          # Talos Linux cluster module
+├── ansible/                # Configuration management (NEW!)
+│   ├── inventory/         # Host inventory and variables
+│   ├── playbooks/         # Task-specific playbooks
+│   ├── roles/             # Reusable Ansible roles
+│   └── Taskfile.yml       # Ansible task automation
+├── terraform/kubernetes/  # Main Kubernetes cluster IaC
+│   ├── modules/          # Reusable Terraform modules
+│   │   ├── talos/       # Talos Linux cluster module
 │   │   ├── proxmox_csi_plugin/ # Storage integration
-│   │   └── volumes/        # Persistent volume management
-│   └── output/             # Generated configs (kubeconfig, etc.)
-├── k8s/                    # Kubernetes manifests (GitOps)
-│   ├── infra/             # Infrastructure components
-│   ├── apps/              # Application deployments
-│   └── sets/              # ArgoCD ApplicationSets
+│   │   └── volumes/     # Persistent volume management
+│   └── output/          # Generated configs (kubeconfig, etc.)
+├── k8s/                  # Kubernetes manifests (GitOps)
+│   ├── infra/           # Infrastructure components
+│   ├── apps/            # Application deployments
+│   └── sets/            # ArgoCD ApplicationSets
 ├── packer/windows_server_2025/ # Windows template automation
-└── sensitive-templates/    # Templates for sensitive configs
+└── sensitive-templates/  # Templates for sensitive configs
 ```
 
 ## 🔐 Security Best Practices
