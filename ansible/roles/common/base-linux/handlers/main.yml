@@ -1,12 +1,12 @@
 ---
 # Base Linux role handlers
 
-- name: restart sshd
+- name: Restart sshd
   ansible.builtin.service:
     name: "{{ 'ssh' if ansible_os_family == 'Debian' else 'sshd' }}"
     state: restarted
 
-- name: reload firewall
+- name: Reload firewall
   ansible.builtin.service:
     name: ufw
     state: reloaded

@@ -19,6 +19,10 @@ collections:
   - name: community.windows
     version: ">=3.1.0"
 
+  # Microsoft Active Directory Collection
+  - name: microsoft.ad
+    version: ">=1.7.1"
+
 # Ansible Roles Requirements (optional)
 roles: []
   # Example role from Ansible Galaxy:

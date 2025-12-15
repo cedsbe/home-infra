@@ -7,7 +7,6 @@
   tags:
     - ad
     - domain
-
   tasks:
     - name: Install AD DS role
       ansible.windows.win_feature:
@@ -24,21 +23,16 @@
       changed_when: false
 
     - name: Install new AD forest
-      ansible.windows.win_domain:
+      microsoft.ad.domain:
         dns_domain_name: "{{ ad_domain_name }}"
         safe_mode_password: "{{ ad_safe_mode_password }}"
         domain_netbios_name: "{{ ad_netbios_name }}"
-        forest_mode: "{{ ad_forest_mode }}"
-        domain_mode: "{{ ad_domain_mode }}"
+        forest_level: "{{ ad_forest_mode }}"
+        domain_level: "{{ ad_domain_mode }}"
         install_dns: "{{ ad_install_dns }}"
       register: domain_install
       when: domain_check.rc != 0
-
-    - name: Reboot after domain installation
-      ansible.windows.win_reboot:
-        reboot_timeout: 600
-        post_reboot_delay: 60
-      when: domain_install.changed
+      notify: Reboot After Domain Installation
 
     - name: Configure DNS forwarders
       ansible.windows.win_shell: |
@@ -52,3 +46,9 @@
     - name: Display AD configuration status
       ansible.builtin.debug:
         msg: "Active Directory domain {{ ad_domain_name }} is configured"
+
+  handlers:
+    - name: Reboot After Domain Installation
+      ansible.windows.win_reboot:
+        reboot_timeout: 600
+        post_reboot_delay: 60

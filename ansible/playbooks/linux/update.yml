@@ -24,17 +24,17 @@
       when: ansible_os_family == "Debian"
       register: apt_upgrade_result
 
-    - name: Update yum cache (RedHat/CentOS)
-      ansible.builtin.yum:
+    - name: Update dnf cache (RedHat/CentOS)
+      ansible.builtin.dnf:
         update_cache: true
       when: ansible_os_family == "RedHat"
 
     - name: Upgrade all packages (RedHat/CentOS)
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: "*"
-        state: latest
+        state: latest # noqa: package-latest
       when: ansible_os_family == "RedHat"
-      register: yum_upgrade_result
+      register: dnf_upgrade_result
 
     - name: Check if reboot is required (Debian/Ubuntu)
       ansible.builtin.stat:

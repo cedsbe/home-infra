@@ -51,6 +51,7 @@ devops
 dhcpv
 digitalocean
 dmwappushservice
+dnf
 dnscrypt
 dnssec
 duckduckgo
@@ -131,6 +132,7 @@ nocloudservice
 nodepool
 nodeport
 nofile
+noqa
 nsec
 NTFS
 ntlm

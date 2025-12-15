@@ -34,9 +34,7 @@ tasks:
     desc: Lint Ansible playbooks and roles with ansible-lint
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-lint site.yml
-      - ansible-lint playbooks/
-      - ansible-lint roles/
+      - ansible-lint
 
   # Inventory tasks
   inventory:list:
