@@ -1,17 +1,23 @@
 ---
 # Ansible Collections Requirements
 collections:
+  - name: ansible.posix
+    version: ">=2.1.0"
+
   # Windows Management
   - name: ansible.windows
-    version: ">=2.0.0"
+    version: ">=3.3.0"
+
+  - name: community.docker
+    version: ">=5.0.4"
 
   # Community General Collection (includes many useful modules)
   - name: community.general
-    version: ">=8.0.0"
+    version: ">=12.1.0"
 
   # Community Windows Collection
   - name: community.windows
-    version: ">=2.0.0"
+    version: ">=3.1.0"
 
 # Ansible Roles Requirements (optional)
 roles: []
