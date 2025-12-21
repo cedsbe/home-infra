@@ -105,12 +105,6 @@ tasks:
     cmds:
       - ansible-playbook {{.PLAYBOOK_DIR}}/windows/update.yml -i {{.INVENTORY}} {{.CLI_ARGS}}
 
-  baseline:
-    desc: Run baseline configuration on all hosts
-    dir: "{{.ANSIBLE_DIR}}"
-    cmds:
-      - ansible-playbook {{.PLAYBOOK_DIR}}/common/baseline.yml -i {{.INVENTORY}} {{.CLI_ARGS}}
-
   # Ad-hoc commands
   adhoc:
     desc: Run ad-hoc command (usage - task ansible:adhoc HOST=all MODULE=shell ARGS="uptime")

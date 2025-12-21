@@ -13,5 +13,6 @@ ad_dns_forwarders:
   - 8.8.8.8
   - 8.8.4.4
 
-# Safe Mode Password (should be overridden in vault)
-ad_safe_mode_password: "ChangeMe123!"
+# Safe Mode Password (MUST be overridden via vault in group_vars)
+# Never use a default password, even for testing
+ad_safe_mode_password: ""

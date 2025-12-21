@@ -48,7 +48,7 @@
     install_dns: "{{ ad_install_dns }}"
   register: domain_install
   when: domain_check.rc != 0
-  notify: reboot after domain installation
+  notify: Reboot after domain installation
 
 - name: Configure DNS forwarders
   ansible.windows.win_shell: |

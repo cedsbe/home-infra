@@ -41,7 +41,7 @@
       tags: domain-controller
 
 - name: Configure Windows Member Servers
-  hosts: windows_members
+  hosts: member_servers
   gather_facts: true
   tags:
     - ad

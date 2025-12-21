@@ -25,6 +25,8 @@ all:
               ansible_user: Administrator
               ansible_connection: winrm
               ansible_winrm_transport: ntlm
+              # WARNING: Disabling certificate validation exposes to man-in-the-middle attacks
+              # Use proper certificates in production environments
               ansible_winrm_server_cert_validation: ignore
               ansible_port: 5985
 
@@ -35,6 +37,8 @@ all:
               ansible_user: Administrator
               ansible_connection: winrm
               ansible_winrm_transport: ntlm
+              # WARNING: Disabling certificate validation exposes to man-in-the-middle attacks
+              # Use proper certificates in production environments
               ansible_winrm_server_cert_validation: ignore
               ansible_port: 5985
 

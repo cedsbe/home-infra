@@ -45,10 +45,16 @@
   loop: "{{ windows_features }}"
   when: windows_features is defined
 
+- name: Get current PowerShell execution policy
+  ansible.windows.win_shell: Get-ExecutionPolicy
+  register: current_policy
+  changed_when: false
+  failed_when: false
+
 - name: Set PowerShell execution policy
   ansible.windows.win_shell: |
     Set-ExecutionPolicy -ExecutionPolicy {{ powershell_execution_policy }} -Force
-  changed_when: false
+  when: current_policy.stdout | trim != powershell_execution_policy
 
 - name: Configure Windows Update settings
   ansible.windows.win_updates:

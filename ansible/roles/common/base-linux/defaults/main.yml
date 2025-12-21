@@ -19,6 +19,13 @@ ssh_password_authentication: false
 # Firewall configuration
 firewall_enabled: true
 firewall_default_policy: deny
+firewall_rules: []  # Additional firewall rules (SSH is automatically allowed)
 
 # Package management
 auto_update_enabled: false
+common_packages:  # Packages to install on all Linux systems
+  - curl
+  - wget
+  - vim
+  - htop
+  - net-tools
