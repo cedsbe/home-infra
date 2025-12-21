@@ -1,6 +1,7 @@
 # System Administration Workstation Configuration
 # Uses the windows_clone_vm module to create a Windows Server 2025 admin workstation
 # Purpose: Central management console with all sysadmin tools (RSAT, PowerShell, consoles)
+# Note: This VM will be domain-joined to ad.ghiot.be for Active Directory management
 
 module "hsv_admin_workstation_0" {
   source = "./modules/windows_clone_vm"

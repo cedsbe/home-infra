@@ -127,7 +127,7 @@ EOF
 # Install additional packages from additional repositories
 RUN <<EOF
   apt update
-  apt install -y \
+  apt install --no-install-recommends -y \
     gh \
     nodejs \
     postgresql-client \

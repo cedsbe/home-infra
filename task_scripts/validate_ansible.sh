@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
+set -eux -o pipefail
 # Script to validate Ansible configuration
-
-set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ANSIBLE_DIR="$SCRIPT_DIR/../ansible"

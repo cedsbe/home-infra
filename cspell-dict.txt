@@ -67,6 +67,7 @@ EFI
 emotion
 esbuild
 eslint
+eux
 finalizer
 finops
 flaresolverr
