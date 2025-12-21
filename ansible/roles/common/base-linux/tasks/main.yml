@@ -43,14 +43,27 @@
   register: resolved_status
   failed_when: false
 
+- name: Check if NetworkManager is running
+  ansible.builtin.set_fact:
+    nm_running: "{{ ansible_facts.services['NetworkManager.service'] is defined and ansible_facts.services['NetworkManager.service'].state == 'running' }}"
+
+- name: Determine DNS configuration method
+  ansible.builtin.set_fact:
+    dns_config_method: |
+      {% if resolved_status.status is defined and resolved_status.status.ActiveState == "active" %}
+      resolved
+      {% elif nm_running | bool %}
+      networkmanager
+      {% else %}
+      resolv
+      {% endif %}
+
 - name: Configure DNS via systemd-resolved
   ansible.builtin.template:
     src: resolved.conf.j2
     dest: /etc/systemd/resolved.conf
     mode: "0644"
-  when:
-    - resolved_status.status is defined
-    - resolved_status.status.ActiveState == "active"
+  when: dns_config_method | trim == "resolved"
   notify: Restart systemd-resolved
 
 - name: Configure DNS via NetworkManager
@@ -59,19 +72,14 @@
     conn_name: "{{ ansible_default_ipv4.interface }}"
     dns4: "{{ dns_servers }}"
     state: present
-  when:
-    - resolved_status.status is not defined or resolved_status.status.ActiveState != "active"
-    - ansible_facts.services['NetworkManager.service'] is defined
-    - ansible_facts.services['NetworkManager.service'].state == "running"
+  when: dns_config_method | trim == "networkmanager"
 
 - name: Configure DNS via resolv.conf (fallback for legacy systems)
   ansible.builtin.template:
     src: resolv.conf.j2
     dest: /etc/resolv.conf
     mode: "0644"
-  when:
-    - resolved_status.status is not defined or resolved_status.status.ActiveState != "active"
-    - ansible_facts.services['NetworkManager.service'] is not defined or ansible_facts.services['NetworkManager.service'].state != "running"
+  when: dns_config_method | trim == "resolv"
 
 - name: Update package cache
   ansible.builtin.apt:
@@ -90,7 +98,7 @@
     dest: /etc/ssh/sshd_config
     mode: "0644"
     validate: "/usr/sbin/sshd -t -f %s"
-  notify: restart sshd
+  notify: Restart sshd
 
 - name: Ensure firewall is installed (Debian/Ubuntu)
   ansible.builtin.apt:
@@ -116,6 +124,15 @@
     port: "{{ ssh_port }}"
     proto: tcp
     comment: "SSH access - managed by Ansible"
+  when: firewall_enabled | default(true)
+  register: ssh_rule_result
+
+- name: Verify SSH rule was applied successfully
+  ansible.builtin.assert:
+    that:
+      - not ssh_rule_result.failed | default(false)
+    fail_msg: "Failed to add SSH rule - aborting firewall configuration to prevent lockout"
+    success_msg: "SSH rule successfully configured"
   when: firewall_enabled | default(true)
 
 - name: Configure firewall rules

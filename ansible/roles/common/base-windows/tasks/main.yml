@@ -5,10 +5,20 @@
   ansible.windows.win_timezone:
     timezone: "{{ timezone }}"
 
+- name: Get current NTP configuration
+  ansible.windows.win_shell: |
+    (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" -Name NtpServer).NtpServer
+  register: current_ntp
+  changed_when: false
+  failed_when: false
+
 - name: Configure NTP servers
   ansible.windows.win_shell: |
     w32tm /config /manualpeerlist:"{{ ntp_servers | join(',') }}" /syncfromflags:manual /reliable:yes /update
-    Restart-Service w32time
+  register: ntp_config
+  changed_when: ntp_config.rc == 0
+  when: current_ntp.stdout_lines[0] | default('') != ntp_servers | join(',')
+  notify: Restart w32time
 
 - name: Set computer name
   ansible.windows.win_hostname:
@@ -46,16 +56,23 @@
     state: installed
   when: windows_auto_update | default(false)
 
+- name: Check which services exist before disabling
+  ansible.windows.win_service_info:
+  register: all_services
+  when: windows_services_to_disable | default([]) | length > 0
+
+- name: Build list of existing services to disable
+  ansible.builtin.set_fact:
+    existing_services_to_disable: "{{ all_services.services | selectattr('name', 'in', windows_services_to_disable) | map(attribute='name') | list }}"
+  when: windows_services_to_disable | default([]) | length > 0
+
 - name: Disable unnecessary services
   ansible.windows.win_service:
     name: "{{ item }}"
     state: stopped
     start_mode: disabled
-  loop: "{{ windows_services_to_disable | default([]) }}"
-  register: service_disable_result
-  failed_when:
-    - service_disable_result.failed
-    - "'does not exist' not in service_disable_result.msg"
+  loop: "{{ existing_services_to_disable | default([]) }}"
+  when: existing_services_to_disable is defined
 
 - name: Configure DNS client
   ansible.windows.win_dns_client:

@@ -62,6 +62,7 @@ eddsa
 editorconfig
 edns
 efi
+elif
 EFI
 emotion
 esbuild
@@ -197,6 +198,7 @@ sni
 srv
 SSDP
 SSDPSRV
+selectattr
 stisvc
 styled
 stylelint
