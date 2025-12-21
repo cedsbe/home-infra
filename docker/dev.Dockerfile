@@ -3,6 +3,7 @@ SHELL ["/bin/bash","-eux","-o","pipefail","-c"]
 
 ARG ARCH=amd64
 ARG NODE_VERSION=24.x
+ARG USERNAME=vscode
 
 # Install dependencies
 RUN <<EOF
@@ -83,11 +84,11 @@ EOF
 # Install GitHub CLI
 RUN <<EOF
   mkdir -p -m 755 /etc/apt/keyrings
-	out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg
-	cat $out | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
-	chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
-	mkdir -p -m 755 /etc/apt/sources.list.d
-	echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+  out=$(mktemp) && curl -fsSL -o "$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg
+  cat $out | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+  chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+  mkdir -p -m 755 /etc/apt/sources.list.d
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
 EOF
 
 # Configure nodesource - The installation will be done in later step
@@ -137,3 +138,27 @@ RUN <<EOF
   apt -y autoclean
   rm -rf /var/lib/apt/lists/*
 EOF
+
+# Create vscode user if it does not exist
+RUN <<EOF
+  if ! id -u $USERNAME >/dev/null 2>&1; then
+    useradd -m -s /bin/zsh $USERNAME
+  fi
+EOF
+
+# Set locale
+RUN <<EOF
+  locale-gen en_US.UTF-8
+  update-locale LANG=en_US.UTF-8
+EOF
+
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+ENV TZ=Europe/Brussels
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Set working directory
+WORKDIR /home/$USERNAME
+USER $USERNAME
+ENV HOME=/home/$USERNAME
