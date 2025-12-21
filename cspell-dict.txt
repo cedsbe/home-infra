@@ -27,6 +27,7 @@ cdrom
 cedsbe
 chacha
 chakra
+chronyd
 cicd
 cilium
 Cim
@@ -213,6 +214,7 @@ tftpl
 tfvars
 tiledatamodelsvc
 timescale
+timesyncd
 tlsroute
 tpm
 traefik

@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+# systemd-timesyncd configuration
+
+[Time]
+# NTP servers to use for time synchronization
+NTP={{ ntp_servers | join(' ') }}
+
+# Fallback NTP servers (used when primary NTP servers are unavailable)
+FallbackNTP=0.pool.ntp.org 1.pool.ntp.org 2.pool.ntp.org 3.pool.ntp.org
+
+# Root distance maximum (in seconds)
+#RootDistanceMaxSec=5
+
+# Poll interval settings
+#PollIntervalMinSec=32
+#PollIntervalMaxSec=2048

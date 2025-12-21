@@ -6,11 +6,35 @@
   community.general.timezone:
     name: "{{ timezone }}"
 
-- name: Configure NTP servers
+- name: Configure time synchronization via systemd-timesyncd
+  ansible.builtin.template:
+    src: timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf
+    mode: "0644"
+  when:
+    - ansible_service_mgr == "systemd"
+    - ansible_facts.services['systemd-timesyncd.service'] is defined
+  notify: Restart systemd-timesyncd
+
+- name: Configure time synchronization via chrony
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: "{{ '/etc/chrony/chrony.conf' if ansible_os_family == 'Debian' else '/etc/chrony.conf' }}"
+    mode: "0644"
+  when:
+    - ansible_facts.services['chronyd.service'] is defined or ansible_facts.services['chrony.service'] is defined
+  notify: Restart chronyd
+
+- name: Configure time synchronization via ntp (legacy)
   ansible.builtin.template:
     src: ntp.conf.j2
     dest: /etc/ntp.conf
     mode: "0644"
+  when:
+    - ansible_facts.services['ntp.service'] is defined or ansible_facts.services['ntpd.service'] is defined
+    - ansible_facts.services['systemd-timesyncd.service'] is not defined
+    - ansible_facts.services['chronyd.service'] is not defined
+    - ansible_facts.services['chrony.service'] is not defined
   notify: Restart ntp
 
 - name: Check if systemd-resolved is active
