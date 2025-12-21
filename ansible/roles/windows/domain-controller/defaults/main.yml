@@ -1,0 +1,17 @@
+---
+# Default variables for domain-controller role
+
+# Active Directory Domain Configuration
+ad_domain_name: ad.example.com
+ad_netbios_name: EXAMPLE
+ad_forest_mode: WinThreshold
+ad_domain_mode: WinThreshold
+
+# DNS Configuration
+ad_install_dns: true
+ad_dns_forwarders:
+  - 8.8.8.8
+  - 8.8.4.4
+
+# Safe Mode Password (should be overridden in vault)
+ad_safe_mode_password: "ChangeMe123!"

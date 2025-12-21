@@ -1,0 +1,28 @@
+---
+# Member Server role - Main tasks
+
+- name: Check if server is already domain-joined
+  ansible.windows.win_shell: |
+    (Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain
+  register: domain_status
+  changed_when: false
+
+- name: Join server to domain
+  microsoft.ad.membership:
+    dns_domain_name: "{{ ad_domain_name }}"
+    domain_admin_user: "{{ ad_domain_admin_user }}"
+    domain_admin_password: "{{ ad_domain_admin_password }}"
+    state: domain
+  register: domain_join
+  when: domain_status.stdout | trim | lower == "false"
+  notify: reboot after domain join
+
+- name: Configure DNS to use domain controllers
+  ansible.windows.win_dns_client:
+    adapter_names: "*"
+    dns_servers: "{{ ad_dns_servers }}"
+  when: ad_dns_servers is defined
+
+- name: Display domain membership status
+  ansible.builtin.debug:
+    msg: "Server is joined to domain {{ ad_domain_name }}"

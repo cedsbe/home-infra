@@ -1,0 +1,12 @@
+---
+# Default variables for member-server role
+
+# Active Directory Domain
+ad_domain_name: ad.example.com
+
+# Domain Admin Credentials (should be overridden in vault)
+ad_domain_admin_user: Administrator
+ad_domain_admin_password: "ChangeMe123!"
+
+# DNS Configuration (optional - domain controllers)
+ad_dns_servers: []

@@ -1,0 +1,7 @@
+---
+# Member Server role handlers
+
+- name: reboot after domain join
+  ansible.windows.win_reboot:
+    reboot_timeout: 600
+    post_reboot_delay: 60

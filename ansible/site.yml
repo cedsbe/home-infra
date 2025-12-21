@@ -29,14 +29,23 @@
   roles:
     - role: common/base-windows
       tags: base
-# - name: Configure Domain Controllers
-#   hosts: domain_controllers
-#   gather_facts: true
-#   tags:
-#     - ad
-#     - domain
-#   tasks:
-#     - name: Include Active Directory tasks
-#       ansible.builtin.include_tasks: playbooks/windows/active-directory.yml
-#       tags:
-#         - ad-config
+
+- name: Configure Domain Controllers
+  hosts: domain_controllers
+  gather_facts: true
+  tags:
+    - ad
+    - domain
+  roles:
+    - role: windows/domain-controller
+      tags: domain-controller
+
+- name: Configure Windows Member Servers
+  hosts: windows_members
+  gather_facts: true
+  tags:
+    - ad
+    - members
+  roles:
+    - role: windows/member-server
+      tags: member-server
