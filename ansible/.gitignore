@@ -25,13 +25,7 @@ venv/
 .venv/
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
 *~
-
-# Terraform state (if mixing with Terraform)
-*.tfstate
-*.tfstate.*
-.terraform/
