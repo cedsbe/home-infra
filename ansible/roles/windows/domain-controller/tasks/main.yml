@@ -52,7 +52,7 @@
 - name: Configure DNS forwarders
   ansible.windows.win_shell: |
     {% for forwarder in ad_dns_forwarders %}
-    Add-DnsServerForwarder -IPAddress {{ forwarder }}
+    Add-DnsServerForwarder -IPAddress {{ forwarder }} -ErrorAction SilentlyContinue
     {% endfor %}
   when:
     - domain_install.changed

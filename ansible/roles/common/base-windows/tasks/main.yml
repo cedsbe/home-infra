@@ -69,7 +69,11 @@
 
 - name: Build list of existing services to disable
   ansible.builtin.set_fact:
-    existing_services_to_disable: "{{ all_services.services | selectattr('name', 'in', windows_services_to_disable) | map(attribute='name') | list }}"
+    existing_services_to_disable: >-
+      {{ all_services.services
+         | selectattr('name', 'in', windows_services_to_disable | default([]))
+         | map(attribute='name')
+         | list }}
   when: windows_services_to_disable | default([]) | length > 0
 
 - name: Disable unnecessary services

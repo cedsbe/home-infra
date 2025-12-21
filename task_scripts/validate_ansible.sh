@@ -72,13 +72,15 @@ fi
 if [ -d "$ANSIBLE_DIR/roles/common/base-linux" ]; then
   echo "✓ base-linux role exists"
 else
-  echo "⚠ base-linux role not found"
+  echo "❌ base-linux role not found"
+  exit 1
 fi
 
 if [ -d "$ANSIBLE_DIR/roles/common/base-windows" ]; then
   echo "✓ base-windows role exists"
 else
-  echo "⚠ base-windows role not found"
+  echo "❌ base-windows role not found"
+  exit 1
 fi
 
 echo ""

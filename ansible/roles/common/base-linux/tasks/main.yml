@@ -116,7 +116,9 @@
     - { direction: "incoming", policy: "deny" }
     - { direction: "outgoing", policy: "allow" }
     - { direction: "routed", policy: "deny" }
-  when: firewall_enabled | default(true)
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
 
 - name: Allow SSH before enabling firewall (prevent lockout)
   community.general.ufw:
@@ -124,7 +126,9 @@
     port: "{{ ssh_port }}"
     proto: tcp
     comment: "SSH access - managed by Ansible"
-  when: firewall_enabled | default(true)
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
   register: ssh_rule_result
 
 - name: Verify SSH rule was applied successfully
@@ -133,7 +137,9 @@
       - not ssh_rule_result.failed | default(false)
     fail_msg: "Failed to add SSH rule - aborting firewall configuration to prevent lockout"
     success_msg: "SSH rule successfully configured"
-  when: firewall_enabled | default(true)
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
 
 - name: Configure firewall rules
   community.general.ufw:
@@ -142,12 +148,16 @@
     proto: "{{ item.proto }}"
     comment: "{{ item.comment | default(omit) }}"
   loop: "{{ firewall_rules }}"
-  when: firewall_enabled | default(true)
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
 
 - name: Enable firewall
   community.general.ufw:
     state: enabled
-  when: firewall_enabled | default(true)
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
 
 - name: Set system hostname
   ansible.builtin.hostname:
