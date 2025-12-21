@@ -58,12 +58,6 @@ tasks:
       vars: [HOST]
 
   # Connectivity tests
-  ping:all:
-    desc: Ping all hosts to test connectivity
-    dir: "{{.ANSIBLE_DIR}}"
-    cmds:
-      - ansible all -m ping -i {{.INVENTORY}}
-
   ping:linux:
     desc: Ping all Linux hosts
     dir: "{{.ANSIBLE_DIR}}"

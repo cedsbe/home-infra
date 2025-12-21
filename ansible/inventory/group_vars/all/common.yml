@@ -25,11 +25,3 @@ backup_destination: /mnt/backup
 # Security settings
 security_updates_enabled: true
 firewall_enabled: true
-
-# Common packages (Linux)
-common_packages:
-  - curl
-  - wget
-  - vim
-  - htop
-  - net-tools

@@ -10,16 +10,16 @@
   tasks:
     - name: Display host information
       ansible.builtin.debug:
-        msg: "Configuring {{ inventory_hostname }} ({{ ansible_os_family }})"
+        msg: "Configuring {{ inventory_hostname }} ({{ ansible_facts['os_family'] }})"
 
-- name: Configure Linux hosts
-  hosts: linux
-  gather_facts: true
-  tags:
-    - linux
-  roles:
-    - role: common/base-linux
-      tags: base
+# - name: Configure Linux hosts
+#   hosts: linux
+#   gather_facts: true
+#   tags:
+#     - linux
+#   roles:
+#     - role: common/base-linux
+#       tags: base
 
 - name: Configure Windows hosts
   hosts: windows
@@ -29,15 +29,14 @@
   roles:
     - role: common/base-windows
       tags: base
-
-- name: Configure Domain Controllers
-  hosts: domain_controllers
-  gather_facts: true
-  tags:
-    - ad
-    - domain
-  tasks:
-    - name: Include Active Directory tasks
-      ansible.builtin.include_tasks: playbooks/windows/active-directory.yml
-      tags:
-        - ad-config
+# - name: Configure Domain Controllers
+#   hosts: domain_controllers
+#   gather_facts: true
+#   tags:
+#     - ad
+#     - domain
+#   tasks:
+#     - name: Include Active Directory tasks
+#       ansible.builtin.include_tasks: playbooks/windows/active-directory.yml
+#       tags:
+#         - ad-config

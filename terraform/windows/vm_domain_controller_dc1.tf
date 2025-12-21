@@ -7,7 +7,7 @@ module "hsv_dc1" {
   # Basic VM Configuration
   vm_name     = "hsv-dc1"
   vm_id       = 301 # Using 300+ range for domain controllers
-  clone_vm_id = 100 # Template VM ID to clone from
+  clone_vm_id = 105 # Template VM ID to clone from
   node_name   = var.proxmox.node_name
   datastore   = "local-lvm"
 

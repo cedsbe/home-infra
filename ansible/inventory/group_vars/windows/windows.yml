@@ -1,6 +1,9 @@
 ---
 # Windows-specific variables
 
+# Disable become for Windows (not supported with PowerShell over SSH)
+ansible_become: false
+
 # Windows Update configuration
 windows_auto_update: true
 windows_update_categories:

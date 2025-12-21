@@ -43,8 +43,22 @@
     state: stopped
     start_mode: disabled
   loop:
+    # Xbox services (not needed on servers)
     - XblAuthManager
-    - XblGameSave
+    # Print Spooler (security risk if not needed)
+    - Spooler
+    # Remote Registry (security risk)
+    - RemoteRegistry
+    # Windows Error Reporting (not needed on servers)
+    - WerSvc
+    # Retail Demo Service (not needed)
+    - RetailDemo
+    # Distributed Link Tracking Client (rarely needed)
+    - TrkWks
+    # Superfetch/SysMain (not beneficial on servers)
+    - SysMain
+    # Windows Search (resource intensive, rarely needed on servers)
+    - WSearch
   failed_when: false
 
 - name: Configure DNS client
