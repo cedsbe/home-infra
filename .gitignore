@@ -54,3 +54,12 @@ logs/
 *.tmp
 *.temp
 *.cache
+
+# Ansible specific
+*.retry
+*.log
+logs/
+cache/
+.vault_password
+.task/
+.ansible
