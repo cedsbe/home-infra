@@ -51,24 +51,11 @@
     name: "{{ item }}"
     state: stopped
     start_mode: disabled
-  loop:
-    # Xbox services (not needed on servers)
-    - XblAuthManager
-    # Print Spooler (security risk if not needed)
-    - Spooler
-    # Remote Registry (security risk)
-    - RemoteRegistry
-    # Windows Error Reporting (not needed on servers)
-    - WerSvc
-    # Retail Demo Service (not needed)
-    - RetailDemo
-    # Distributed Link Tracking Client (rarely needed)
-    - TrkWks
-    # Superfetch/SysMain (not beneficial on servers)
-    - SysMain
-    # Windows Search (resource intensive, rarely needed on servers)
-    - WSearch
-  failed_when: false
+  loop: "{{ windows_services_to_disable | default([]) }}"
+  register: service_disable_result
+  failed_when:
+    - service_disable_result.failed
+    - "'does not exist' not in service_disable_result.msg"
 
 - name: Configure DNS client
   ansible.windows.win_dns_client:

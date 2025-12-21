@@ -22,3 +22,14 @@ windows_update_categories:
 
 # Windows Features
 windows_features: []
+
+# Services to disable (customize per environment)
+windows_services_to_disable:
+  - XblAuthManager # Xbox services (not needed on servers)
+  - Spooler # Print Spooler (security risk if not needed)
+  - RemoteRegistry # Remote Registry (security risk)
+  - WerSvc # Windows Error Reporting (not needed on servers)
+  - RetailDemo # Retail Demo Service (not needed)
+  - TrkWks # Distributed Link Tracking Client (rarely needed)
+  - SysMain # Superfetch/SysMain (not beneficial on servers)
+  - WSearch # Windows Search (resource intensive, rarely needed on servers)
