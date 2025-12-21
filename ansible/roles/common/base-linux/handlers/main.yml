@@ -1,7 +1,7 @@
 ---
 # Base Linux role handlers
 
-- name: restart ntp
+- name: Restart ntp
   ansible.builtin.service:
     name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpd' }}"
     state: restarted
