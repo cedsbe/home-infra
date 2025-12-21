@@ -1,7 +1,11 @@
 ---
 # Windows-specific variables
 
-# Disable become for Windows (not supported with PowerShell over SSH)
+# Disable become for Windows (not supported with PowerShell over SSH).
+# NOTE: The ansible_user for Windows hosts MUST already have local administrator
+#       privileges (e.g. member of the local Administrators group or equivalent
+#       domain rights), since role tasks may install features or configure
+#       services and cannot use become for privilege escalation.
 ansible_become: false
 
 # Windows Update configuration
@@ -18,7 +22,8 @@ windows_features:
 
 # Windows Firewall
 windows_firewall_enabled: true
-windows_firewall_rules: []
+windows_firewall_rules:
+  []
   # - name: Allow WinRM
   #   localport: 5985
   #   action: allow
