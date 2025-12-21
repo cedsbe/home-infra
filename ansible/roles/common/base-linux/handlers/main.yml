@@ -6,6 +6,11 @@
     name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpd' }}"
     state: restarted
 
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+
 - name: Restart sshd
   ansible.builtin.service:
     name: "{{ 'ssh' if ansible_os_family == 'Debian' else 'sshd' }}"

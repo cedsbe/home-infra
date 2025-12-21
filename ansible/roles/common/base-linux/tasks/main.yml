@@ -11,13 +11,43 @@
     src: ntp.conf.j2
     dest: /etc/ntp.conf
     mode: "0644"
-  notify: restart ntp
+  notify: Restart ntp
 
-- name: Ensure DNS servers are configured
+- name: Check if systemd-resolved is active
+  ansible.builtin.systemd:
+    name: systemd-resolved
+  register: resolved_status
+  failed_when: false
+
+- name: Configure DNS via systemd-resolved
+  ansible.builtin.template:
+    src: resolved.conf.j2
+    dest: /etc/systemd/resolved.conf
+    mode: "0644"
+  when:
+    - resolved_status.status is defined
+    - resolved_status.status.ActiveState == "active"
+  notify: Restart systemd-resolved
+
+- name: Configure DNS via NetworkManager
+  community.general.nmcli:
+    type: ethernet
+    conn_name: "{{ ansible_default_ipv4.interface }}"
+    dns4: "{{ dns_servers }}"
+    state: present
+  when:
+    - resolved_status.status is not defined or resolved_status.status.ActiveState != "active"
+    - ansible_facts.services['NetworkManager.service'] is defined
+    - ansible_facts.services['NetworkManager.service'].state == "running"
+
+- name: Configure DNS via resolv.conf (fallback for legacy systems)
   ansible.builtin.template:
     src: resolv.conf.j2
     dest: /etc/resolv.conf
     mode: "0644"
+  when:
+    - resolved_status.status is not defined or resolved_status.status.ActiveState != "active"
+    - ansible_facts.services['NetworkManager.service'] is not defined or ansible_facts.services['NetworkManager.service'].state != "running"
 
 - name: Update package cache
   ansible.builtin.apt:

@@ -127,6 +127,7 @@ NDRG
 netkvm
 netops
 netsh
+nmcli
 noatime
 nocloudservice
 nodepool
