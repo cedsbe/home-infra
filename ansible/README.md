@@ -39,7 +39,7 @@ ansible/
 
 ### Windows Hosts
 
-- WinRM configured and enabled
+- SSH configured and enabled
 - PowerShell 5.1+ or PowerShell Core
 - User with Administrator privileges
 
@@ -127,16 +127,51 @@ This file is gitignored for security.
 
 ## Windows Configuration
 
-### Enable WinRM on Windows Hosts
+### Enable SSH on Windows Hosts
 
-Run this PowerShell script on Windows hosts:
+Run these PowerShell commands on the Windows host to install and enable OpenSSH, configure the firewall, add your public key, and start the service:
 
 ```powershell
-# Download and run ConfigureRemotingForAnsible.ps1
-$url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
-$file = "$env:temp\ConfigureRemotingForAnsible.ps1"
-(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
-powershell.exe -ExecutionPolicy ByPass -File $file
+# Install OpenSSH Server
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+
+# Start and enable the service
+Start-Service sshd
+Set-Service -Name sshd -StartupType Automatic
+
+# Allow SSH through the firewall
+New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH Server (sshd)' `
+  -Direction Inbound -Protocol TCP -LocalPort 22 -Action Allow
+
+# Create .ssh and add your public key (replace <public-key> and adjust user as needed)
+$sshDir = "$env:USERPROFILE\.ssh"
+New-Item -ItemType Directory -Path $sshDir -Force
+Set-Content -Path "$sshDir\authorized_keys" -Value "<public-key>"
+icacls $sshDir /inheritance:r
+icacls $sshDir /grant "$($env:USERNAME):(R,W)"
+icacls "$sshDir\authorized_keys" /grant "$($env:USERNAME):(R)"
+
+# Restart sshd to apply changes
+Restart-Service sshd
+```
+
+Optional: edit C:\ProgramData\ssh\sshd_config to harden settings (disable PasswordAuthentication if using keys) and restart sshd.
+
+Inventory example (use SSH connection for Windows hosts):
+
+```yaml
+windows_host:
+  ansible_host: 192.168.65.130
+  ansible_user: Administrator
+  ansible_connection: ssh
+  ansible_ssh_private_key_file: ~/.ssh/id_rsa
+```
+
+Test connectivity from your control host:
+
+```bash
+# Use the normal ping module (not win_ping) when using SSH
+ansible windows -m ping
 ```
 
 ### Test Windows Connection
@@ -200,15 +235,14 @@ ansible-playbook site.yml -vvv
 # Test SSH connection
 ssh -i ~/.ssh/id_rsa user@host
 
-# Test WinRM connection
+# Test Windows connection
 ansible windows -m win_ping -vvv
 ```
 
 ### Common Windows Issues
 
 - **401 Unauthorized**: Check credentials in inventory
-- **Connection Timeout**: Verify WinRM is enabled and firewall allows it
-- **SSL Certificate**: Use `ansible_winrm_server_cert_validation=ignore` for self-signed certs
+- **Connection Timeout**: Verify SSH is enabled and firewall allows it
 
 ### Common Linux Issues
 

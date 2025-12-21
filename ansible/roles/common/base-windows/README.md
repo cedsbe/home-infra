@@ -6,7 +6,7 @@ This role provides baseline configuration for Windows Server systems.
 
 - Ansible 2.9+
 - Target systems: Windows Server 2016+
-- WinRM configured
+- SSH configured
 
 ## Role Variables
 

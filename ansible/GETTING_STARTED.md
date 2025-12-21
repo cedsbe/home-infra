@@ -58,15 +58,35 @@ task ansible:baseline
 
 ## Windows Host Setup
 
-For Windows hosts, ensure WinRM is configured. Run this on each Windows host as Administrator:
+Windows hosts use SSH for Ansible connections. Run the following as Administrator on each Windows host to install and enable OpenSSH and prepare for key-based authentication:
 
 ```powershell
-# Download and run the Ansible WinRM configuration script
-$url = "https://raw.githubusercontent.com/ansible/ansible/devel/examples/scripts/ConfigureRemotingForAnsible.ps1"
-$file = "$env:temp\ConfigureRemotingForAnsible.ps1"
-(New-Object -TypeName System.Net.WebClient).DownloadFile($url, $file)
-powershell.exe -ExecutionPolicy ByPass -File $file
+# Install and enable OpenSSH Server
+Add-WindowsCapability -Online -Name OpenSSH.Server~~~~0.0.1.0
+Start-Service sshd
+Set-Service -Name sshd -StartupType 'Automatic'
+
+# Open firewall for SSH
+if (-not (Get-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -ErrorAction SilentlyContinue)) {
+  New-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -DisplayName 'OpenSSH SSH Server' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+}
+
+# Prepare authorized_keys for Administrator (or target user)
+$sshDir = "$env:ProgramData\ssh"
+New-Item -ItemType Directory -Path $sshDir -Force | Out-Null
+New-Item -ItemType File -Path "$sshDir\administrators_authorized_keys" -Force | Out-Null
+# Place your public keys into administrators_authorized_keys (or the user's %USERPROFILE%\.ssh\authorized_keys)
 ```
+
+In your inventory, set SSH connection variables, for example:
+
+```yaml
+ansible_user: Administrator
+ansible_connection: ssh
+ansible_ssh_private_key_file: /path/to/id_rsa
+```
+
+Use key-based authentication where possible; enable/require it in sshd_config for improved security.
 
 ## Managing Secrets
 
