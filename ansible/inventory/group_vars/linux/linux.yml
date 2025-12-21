@@ -24,15 +24,20 @@ ssh_password_authentication: false
 ssh_permit_root_login: "without-password"
 
 # Firewall rules (using ufw)
+# Note: SSH is automatically allowed before firewall is enabled
 firewall_rules:
-  - { rule: "allow", port: 22, proto: "tcp" }
+  []
+  # Example additional rules:
+  # - { rule: "allow", port: 80, proto: "tcp", comment: "HTTP" }
+  # - { rule: "allow", port: 443, proto: "tcp", comment: "HTTPS" }
 
 # System tuning
 swappiness: 10
 vm_max_map_count: 262144
 
 # Users to create
-linux_users: []
+linux_users:
+  []
   # - name: ansible
   #   groups: ['sudo']
   #   shell: /bin/bash

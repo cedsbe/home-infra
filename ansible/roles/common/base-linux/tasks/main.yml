@@ -100,11 +100,30 @@
     - ansible_os_family == "Debian"
     - firewall_enabled | default(true)
 
+- name: Set UFW default policies
+  community.general.ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - { direction: "incoming", policy: "deny" }
+    - { direction: "outgoing", policy: "allow" }
+    - { direction: "routed", policy: "deny" }
+  when: firewall_enabled | default(true)
+
+- name: Allow SSH before enabling firewall (prevent lockout)
+  community.general.ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
+    comment: "SSH access - managed by Ansible"
+  when: firewall_enabled | default(true)
+
 - name: Configure firewall rules
   community.general.ufw:
     rule: "{{ item.rule }}"
     port: "{{ item.port }}"
     proto: "{{ item.proto }}"
+    comment: "{{ item.comment | default(omit) }}"
   loop: "{{ firewall_rules }}"
   when: firewall_enabled | default(true)
 
