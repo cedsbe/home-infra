@@ -22,7 +22,9 @@
   "files.associations": {
     "**/ansible/**/*.yaml": "ansible",
     "**/ansible/**/*.yml": "ansible",
-    "*.xml.pkrtpl": "xml"
+    "*.xml.pkrtpl": "xml",
+    "*.yaml": "yaml",
+    "*.yml": "yaml"
   },
   "xml.format.maxLineWidth": 250
 }
