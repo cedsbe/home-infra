@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+# DNS resolver configuration
+
+{% for dns in dns_servers %}
+nameserver {{ dns }}
+{% endfor %}
+
+# Search domain (optional)
+{% if dns_search_domain is defined %}
+search {{ dns_search_domain }}
+{% endif %}
+
+# Options
+options timeout:2 attempts:3

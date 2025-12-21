@@ -1,6 +1,23 @@
 ---
 # Base Linux configuration role - Main tasks
 
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: Configure NTP servers
+  ansible.builtin.template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+    mode: "0644"
+  notify: restart ntp
+
+- name: Ensure DNS servers are configured
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    mode: "0644"
+
 - name: Update package cache
   ansible.builtin.apt:
     update_cache: true

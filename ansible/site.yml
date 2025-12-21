@@ -12,14 +12,14 @@
       ansible.builtin.debug:
         msg: "Configuring {{ inventory_hostname }} ({{ ansible_facts['os_family'] }})"
 
-# - name: Configure Linux hosts
-#   hosts: linux
-#   gather_facts: true
-#   tags:
-#     - linux
-#   roles:
-#     - role: common/base-linux
-#       tags: base
+- name: Configure Linux hosts
+  hosts: linux
+  gather_facts: true
+  tags:
+    - linux
+  roles:
+    - role: common/base-linux
+      tags: base
 
 - name: Configure Windows hosts
   hosts: windows
