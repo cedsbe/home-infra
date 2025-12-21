@@ -1,6 +1,18 @@
 ---
 # Member Server role - Main tasks
 
+- name: Validate required variables are set
+  ansible.builtin.assert:
+    that:
+      - ad_domain_admin_user is defined
+      - ad_domain_admin_user | length > 0
+      - ad_domain_admin_password is defined
+      - ad_domain_admin_password | length > 0
+      - ad_domain_admin_password != "ChangeMe123!"
+      - ad_domain_name is defined
+    fail_msg: "Required AD variables not set. Ensure credentials are set via vault in group_vars."
+    success_msg: "All required AD variables are properly configured."
+
 - name: Check if server is already domain-joined
   ansible.windows.win_shell: |
     (Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain

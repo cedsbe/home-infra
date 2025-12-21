@@ -4,9 +4,10 @@
 # Active Directory Domain
 ad_domain_name: ad.example.com
 
-# Domain Admin Credentials (should be overridden in vault)
-ad_domain_admin_user: Administrator
-ad_domain_admin_password: "ChangeMe123!"
+# Domain Admin Credentials - MUST be overridden via group_vars with vault
+# DO NOT set default values here for security reasons
+ad_domain_admin_user: ""
+ad_domain_admin_password: ""
 
 # DNS Configuration (optional - domain controllers)
 ad_dns_servers: []
