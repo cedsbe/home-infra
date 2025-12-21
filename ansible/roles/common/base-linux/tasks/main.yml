@@ -1,5 +1,6 @@
 ---
 # Base Linux configuration role - Main tasks
+# Note: become is handled at playbook/group_vars level
 
 - name: Set timezone
   community.general.timezone:

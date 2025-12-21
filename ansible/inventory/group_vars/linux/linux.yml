@@ -1,6 +1,11 @@
 ---
 # Linux-specific variables
 
+# Privilege escalation
+ansible_become: true
+ansible_become_method: sudo
+ansible_become_user: root
+
 # Common packages
 common_packages:
   - curl
