@@ -65,10 +65,10 @@ tasks:
       - ansible linux -m ping -i {{.INVENTORY}}
 
   ping:windows:
-    desc: Ping all Windows hosts
+    desc: Ping all Windows hosts (via SSH)
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible windows -m win_ping -i {{.INVENTORY}}
+      - ansible windows -m ping -i {{.INVENTORY}}
 
   # Playbook execution
   run:site:

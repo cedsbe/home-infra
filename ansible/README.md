@@ -39,7 +39,7 @@ ansible/
 
 ### Windows Hosts
 
-- SSH configured and enabled
+- SSH configured and enabled (OpenSSH Server)
 - PowerShell 5.1+ or PowerShell Core
 - User with Administrator privileges
 
@@ -70,8 +70,8 @@ cp inventory/hosts.yml.template inventory/hosts.yml
 # Test Linux hosts
 ansible linux -m ping
 
-# Test Windows hosts
-ansible windows -m win_ping
+# Test Windows hosts (using SSH)
+ansible windows -m ping
 
 # Test all hosts
 ansible all -m ping
@@ -235,14 +235,14 @@ ansible-playbook site.yml -vvv
 # Test SSH connection
 ssh -i ~/.ssh/id_rsa user@host
 
-# Test Windows connection
-ansible windows -m win_ping -vvv
+# Test Windows connection (via SSH)
+ansible windows -m ping -vvv
 ```
 
 ### Common Windows Issues
 
-- **401 Unauthorized**: Check credentials in inventory
-- **Connection Timeout**: Verify SSH is enabled and firewall allows it
+- **Connection Timeout**: Verify OpenSSH Server is enabled and firewall allows it
+- **Authentication Failed**: Check SSH keys or credentials in inventory
 
 ### Common Linux Issues
 

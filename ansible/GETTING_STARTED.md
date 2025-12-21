@@ -33,7 +33,7 @@ Replace placeholder IP addresses with your actual hosts.
 # Test Linux hosts
 task ansible:ping:linux
 
-# Test Windows hosts
+# Test Windows hosts (via SSH)
 task ansible:ping:windows
 
 # Test all hosts
@@ -51,9 +51,6 @@ task ansible:update:linux
 
 # Update Windows systems
 task ansible:update:windows
-
-# Run baseline configuration
-task ansible:baseline
 ```
 
 ## Windows Host Setup
@@ -83,6 +80,7 @@ In your inventory, set SSH connection variables, for example:
 ```yaml
 ansible_user: Administrator
 ansible_connection: ssh
+ansible_shell_type: powershell
 ansible_ssh_private_key_file: /path/to/id_rsa
 ```
 

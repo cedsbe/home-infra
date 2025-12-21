@@ -50,7 +50,7 @@
 - name: Determine DNS configuration method
   ansible.builtin.set_fact:
     dns_config_method: |
-      {% if resolved_status.status is defined and resolved_status.status.ActiveState == "active" %}
+      {% if resolved_status.status is defined and resolved_status.status.ActiveState is defined and resolved_status.status.ActiveState == "active" %}
       resolved
       {% elif nm_running | bool %}
       networkmanager
