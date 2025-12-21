@@ -60,7 +60,6 @@ logs/
 *.log
 logs/
 cache/
-.vault_password
 .task/
 .ansible
 

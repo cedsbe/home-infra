@@ -9,6 +9,7 @@ backend.config filter=git-crypt diff=git-crypt
 #Ansible secrets
 secrets.yml filter=git-crypt diff=git-crypt
 *.secrets.yml filter=git-crypt diff=git-crypt
+.vault_password filter=git-crypt diff=git-crypt
 
 # All environment files
 **/.env filter=git-crypt diff=git-crypt

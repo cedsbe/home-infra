@@ -7,7 +7,6 @@ vars:
   ANSIBLE_DIR: "{{.TASKFILE_DIR}}"
   INVENTORY: "{{.ANSIBLE_DIR}}/inventory/hosts.yml"
   PLAYBOOK_DIR: "{{.ANSIBLE_DIR}}/playbooks"
-  VAULT_PASSWORD_FILE: "{{.ANSIBLE_DIR}}/.vault_password"
 
 tasks:
   # Setup and validation tasks
@@ -119,7 +118,7 @@ tasks:
     desc: Create a new encrypted vault file
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-vault create {{.FILE}} --vault-password-file {{.VAULT_PASSWORD_FILE}}
+      - ansible-vault create {{.FILE}}
     requires:
       vars: [FILE]
 
@@ -127,7 +126,7 @@ tasks:
     desc: Edit an encrypted vault file
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-vault edit {{.FILE}} --vault-password-file {{.VAULT_PASSWORD_FILE}}
+      - ansible-vault edit {{.FILE}}
     requires:
       vars: [FILE]
 
@@ -135,7 +134,7 @@ tasks:
     desc: Encrypt an existing file
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-vault encrypt {{.FILE}} --vault-password-file {{.VAULT_PASSWORD_FILE}}
+      - ansible-vault encrypt {{.FILE}}
     requires:
       vars: [FILE]
 
@@ -143,7 +142,7 @@ tasks:
     desc: Decrypt a vault file
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-vault decrypt {{.FILE}} --vault-password-file {{.VAULT_PASSWORD_FILE}}
+      - ansible-vault decrypt {{.FILE}}
     requires:
       vars: [FILE]
 
@@ -151,7 +150,7 @@ tasks:
     desc: View contents of encrypted vault file
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - ansible-vault view {{.FILE}} --vault-password-file {{.VAULT_PASSWORD_FILE}}
+      - ansible-vault view {{.FILE}}
     requires:
       vars: [FILE]
 
