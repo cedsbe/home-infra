@@ -63,3 +63,15 @@ cache/
 .vault_password
 .task/
 .ansible
+
+# Collections and roles downloaded from Galaxy
+ansible/collections/ansible_collections/
+ansible/roles/external/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/

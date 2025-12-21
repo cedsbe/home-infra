@@ -1,6 +1,17 @@
 ---
 # Domain Controller role - Main tasks
 
+- name: Validate required variables are set
+  ansible.builtin.assert:
+    that:
+      - ad_safe_mode_password is defined
+      - ad_safe_mode_password | length > 0
+      - ad_safe_mode_password != "ChangeMe123!"
+      - ad_domain_name is defined
+      - ad_netbios_name is defined
+    fail_msg: "Required AD variables not set. Ensure ad_safe_mode_password is set via vault in group_vars."
+    success_msg: "All required AD variables are properly configured."
+
 - name: Install AD DS role
   ansible.windows.win_feature:
     name: AD-Domain-Services
