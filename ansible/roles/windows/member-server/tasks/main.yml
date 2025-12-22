@@ -1,0 +1,41 @@
+---
+# Member Server role - Main tasks
+
+- name: Validate required variables are set
+  ansible.builtin.assert:
+    that:
+      - ad_domain_admin_user is defined
+      - ad_domain_admin_user | length > 0
+      - ad_domain_admin_password is defined
+      - ad_domain_admin_password | length > 0
+      - ad_domain_name is defined
+    fail_msg: "Required AD variables not set. Ensure credentials are set via vault in group_vars."
+    success_msg: "All required AD variables are properly configured."
+
+- name: Check if server is already domain-joined
+  ansible.windows.win_shell: |
+    (Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain
+  register: domain_status
+  changed_when: false
+
+- name: Join server to domain
+  microsoft.ad.membership:
+    dns_domain_name: "{{ ad_domain_name }}"
+    domain_admin_user: "{{ ad_domain_admin_user }}"
+    domain_admin_password: "{{ ad_domain_admin_password }}"
+    state: domain
+  register: domain_join
+  when: domain_status.stdout | trim | lower == "false"
+  notify: Reboot after domain join
+
+- name: Configure DNS to use domain controllers
+  ansible.windows.win_dns_client:
+    adapter_names: "*"
+    dns_servers: "{{ ad_dns_servers }}"
+  when:
+    - ad_dns_servers is defined
+    - domain_join.changed | default(false)
+
+- name: Display domain membership status
+  ansible.builtin.debug:
+    msg: "Server is joined to domain {{ ad_domain_name }}"

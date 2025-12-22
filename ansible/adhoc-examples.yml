@@ -1,0 +1,47 @@
+---
+# Example ad-hoc commands for common tasks
+
+# System Information
+# ansible all -m setup -a "filter=ansible_distribution*"
+# ansible all -m shell -a "df -h"
+# ansible all -m shell -a "free -m"
+
+# Package Management (Linux)
+# ansible linux -m apt -a "name=vim state=present" --become
+# ansible linux -m yum -a "name=vim state=present" --become
+
+# Service Management (Linux)
+# ansible linux -m systemd -a "name=sshd state=restarted" --become
+# ansible linux -m service -a "name=nginx state=started enabled=yes" --become
+
+# Windows Commands (via SSH)
+# ansible windows -m ansible.windows.win_shell -a "Get-Service"
+# ansible windows -m ansible.windows.win_feature -a "name=Web-Server state=present"
+# ansible windows -m ansible.windows.win_updates -a "category_names=SecurityUpdates state=searched"
+
+# File Operations (Linux)
+# ansible linux -m copy -a "src=/local/file dest=/remote/file mode=0644" --become
+# ansible linux -m file -a "path=/tmp/testdir state=directory mode=0755" --become
+
+# File Operations (Windows)
+# ansible windows -m ansible.windows.win_copy -a "src=/local/file dest=C:\\remote\\file"
+# ansible windows -m ansible.windows.win_file -a "path=C:\\temp\\testdir state=directory"
+
+# User Management (Linux)
+# ansible linux -m user -a "name=testuser state=present groups=sudo" --become
+
+# Execute Scripts
+# ansible linux -m script -a "/path/to/script.sh"
+# ansible windows -m ansible.windows.win_shell -a "C:\\scripts\\script.ps1"
+
+# Gather Specific Facts
+# ansible all -m setup -a "filter=ansible_eth*"
+# ansible all -m setup -a "filter=ansible_memory*"
+# ansible all -m setup -a "filter=ansible_processor*"
+
+# Reboot Hosts
+# ansible linux -m reboot -a "reboot_timeout=600" --become
+# ansible windows -m ansible.windows.win_reboot -a "reboot_timeout=600"
+
+# Check Connectivity
+# ansible all -m ping

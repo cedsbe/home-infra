@@ -1,0 +1,27 @@
+---
+# Global variables for all hosts
+# These variables apply to both Linux and Windows hosts
+
+# NTP servers
+ntp_servers:
+  - 192.168.65.1
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+
+# DNS configuration
+dns_domain: ghiot.be
+dns_search_domains:
+  - ghiot.be
+  - ad.ghiot.be
+
+# Monitoring and logging
+monitoring_enabled: true
+log_retention_days: 30
+
+# Backup configuration
+backup_enabled: true
+backup_destination: /mnt/backup
+
+# Security settings
+security_updates_enabled: true
+firewall_enabled: true

@@ -1,0 +1,33 @@
+# {{ ansible_managed }}
+# systemd-resolved configuration
+
+[Resolve]
+# DNS servers
+DNS={{ dns_servers | join(' ') }}
+
+# Fallback DNS servers (used when primary DNS is unavailable)
+FallbackDNS=1.1.1.1 8.8.8.8
+
+# Search domains
+{% if dns_search_domain is defined %}
+Domains={{ dns_search_domain }}
+{% endif %}
+
+# DNSSEC validation
+DNSSEC=allow-downgrade
+
+# DNS over TLS
+#DNSOverTLS=opportunistic
+
+# MulticastDNS
+MulticastDNS=yes
+
+# LLMNR (Link-Local Multicast Name Resolution)
+LLMNR=yes
+
+# Cache settings
+Cache=yes
+CacheFromLocalhost=no
+
+# DNS stub listener
+DNSStubListener=yes

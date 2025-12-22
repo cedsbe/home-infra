@@ -1,0 +1,20 @@
+---
+# Ansible-lint configuration
+
+# Exclude directories
+exclude_paths:
+  - collections/
+  - cache/
+  - logs/
+  - .github/
+
+# Skip specific rules for our use case
+skip_list:
+  - var-naming[no-role-prefix] # Role variables don't need role prefix in defaults
+  - role-name[path] # Allow path-based role names for directory organization
+  - experimental # Skip experimental rules
+  - parser-error # Skip parser errors (handled by syntax-check)
+  - schema[tasks] # Skip schema validation for tasks
+
+# Enable offline mode (don't check for updates)
+offline: true

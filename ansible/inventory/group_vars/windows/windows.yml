@@ -1,0 +1,38 @@
+---
+# Windows-specific variables
+
+# Disable become for Windows (not supported with PowerShell over SSH).
+# NOTE: The ansible_user for Windows hosts MUST already have local administrator
+#       privileges (e.g. member of the local Administrators group or equivalent
+#       domain rights), since role tasks may install features or configure
+#       services and cannot use become for privilege escalation.
+ansible_become: false
+
+# Windows Update configuration
+windows_auto_update: true
+windows_update_categories:
+  - CriticalUpdates
+  - SecurityUpdates
+  - UpdateRollups
+
+# Windows Features to enable
+windows_features:
+  - NET-Framework-45-Core
+  - NET-Framework-45-Features
+
+# Windows Firewall
+windows_firewall_enabled: true
+windows_firewall_rules:
+  []
+  # - name: Allow WinRM
+  #   localport: 5985
+  #   action: allow
+  #   direction: in
+  #   protocol: tcp
+
+# PowerShell configuration
+powershell_execution_policy: RemoteSigned
+# Domain configuration (for domain-joined hosts)
+# domain_name: ad.ghiot.be
+# domain_admin_user: "{{ vault_domain_admin_user }}"
+# domain_admin_password: "{{ vault_domain_admin_password }}"

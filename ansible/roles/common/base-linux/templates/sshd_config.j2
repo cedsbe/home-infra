@@ -1,0 +1,20 @@
+# SSH Server Configuration
+# Managed by Ansible - DO NOT EDIT MANUALLY
+
+Port {{ ssh_port }}
+Protocol 2
+
+# Authentication
+PermitRootLogin {{ ssh_permit_root_login }}
+PasswordAuthentication {{ 'yes' if ssh_password_authentication else 'no' }}
+PubkeyAuthentication yes
+ChallengeResponseAuthentication no
+
+# Security
+UsePAM yes
+X11Forwarding no
+PrintMotd no
+AcceptEnv LANG LC_*
+
+# Subsystem
+Subsystem sftp /usr/lib/openssh/sftp-server

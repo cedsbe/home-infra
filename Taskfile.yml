@@ -14,6 +14,10 @@ dotenv:
   - "terraform/cloudflare/.env"
 
 includes:
+  ansible:
+    taskfile: ./ansible/Taskfile.yml
+    dir: ./ansible
+
   packer:
     taskfile: ./packer/windows_server_2025/Taskfile.yml
     dir: ./packer/windows_server_2025

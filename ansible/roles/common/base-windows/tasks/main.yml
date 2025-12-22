@@ -1,0 +1,93 @@
+---
+# Base Windows configuration role - Main tasks
+
+- name: Set timezone
+  ansible.windows.win_timezone:
+    timezone: "{{ timezone }}"
+
+- name: Get current NTP configuration
+  ansible.windows.win_shell: |
+    (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\W32Time\Parameters" -Name NtpServer).NtpServer
+  register: current_ntp
+  changed_when: false
+  failed_when: false
+
+- name: Configure NTP servers
+  ansible.windows.win_shell: |
+    w32tm /config /manualpeerlist:"{{ ntp_servers | join(',') }}" /syncfromflags:manual /reliable:yes /update
+  register: ntp_config
+  changed_when: ntp_config.rc == 0
+  when: current_ntp.stdout_lines[0] | default('') | replace(' ', '') != ntp_servers | join(',') | replace(' ', '')
+  notify: Restart w32time
+
+- name: Set computer name
+  ansible.windows.win_hostname:
+    name: "{{ inventory_hostname }}"
+  register: hostname_change
+
+- name: Reboot if hostname changed
+  ansible.windows.win_reboot:
+    reboot_timeout: 600
+  when: hostname_change.reboot_required
+
+- name: Configure Windows Firewall
+  ansible.windows.win_firewall:
+    state: "{{ 'enabled' if windows_firewall_enabled else 'disabled' }}"
+    profiles:
+      - Domain
+      - Private
+      - Public
+
+- name: Install Windows features
+  ansible.windows.win_feature:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ windows_features }}"
+  when: windows_features is defined
+
+- name: Get current PowerShell execution policy
+  ansible.windows.win_shell: Get-ExecutionPolicy
+  register: current_policy
+  changed_when: false
+  failed_when: false
+
+- name: Set PowerShell execution policy
+  ansible.windows.win_shell: |
+    Set-ExecutionPolicy -ExecutionPolicy {{ powershell_execution_policy }} -Force
+  when: current_policy.stdout | trim != powershell_execution_policy
+
+- name: Configure Windows Update settings
+  ansible.windows.win_updates:
+    category_names: "{{ windows_update_categories }}"
+    state: installed
+  when: windows_auto_update | default(false)
+
+- name: Check which services exist before disabling
+  ansible.windows.win_service_info:
+  register: all_services
+  when: windows_services_to_disable | default([]) | length > 0
+
+- name: Build list of existing services to disable
+  ansible.builtin.set_fact:
+    existing_services_to_disable: >-
+      {{ all_services.services
+         | selectattr('name', 'in', windows_services_to_disable | default([]))
+         | map(attribute='name')
+         | list }}
+  when:
+    - windows_services_to_disable | default([]) | length > 0
+    - all_services.services is defined
+
+- name: Disable unnecessary services
+  ansible.windows.win_service:
+    name: "{{ item }}"
+    state: stopped
+    start_mode: disabled
+  loop: "{{ existing_services_to_disable | default([]) }}"
+  when: existing_services_to_disable is defined
+
+- name: Configure DNS client
+  ansible.windows.win_dns_client:
+    adapter_names: "*"
+    dns_servers: "{{ dns_servers }}"
+  when: dns_servers is defined

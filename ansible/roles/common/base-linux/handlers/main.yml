@@ -1,0 +1,32 @@
+---
+# Base Linux role handlers
+
+- name: Restart systemd-timesyncd
+  ansible.builtin.service:
+    name: systemd-timesyncd
+    state: restarted
+
+- name: Restart chronyd
+  ansible.builtin.service:
+    name: "{{ 'chronyd' if ansible_os_family == 'RedHat' else 'chrony' }}"
+    state: restarted
+
+- name: Restart ntp
+  ansible.builtin.service:
+    name: "{{ 'ntp' if ansible_os_family == 'Debian' else 'ntpd' }}"
+    state: restarted
+
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+
+- name: Restart sshd
+  ansible.builtin.service:
+    name: "{{ 'ssh' if ansible_os_family == 'Debian' else 'sshd' }}"
+    state: restarted
+
+- name: Reload firewall
+  ansible.builtin.service:
+    name: ufw
+    state: reloaded

@@ -1,0 +1,24 @@
+---
+# Encrypted variables for all hosts
+# Use ansible-vault to encrypt this file:
+# ansible-vault create inventory/group_vars/all/vault.yml
+# ansible-vault edit inventory/group_vars/all/vault.yml
+#
+# Template - replace with actual encrypted values
+
+# Linux SSH Keys (optional)
+# vault_ansible_ssh_key: |
+#   ssh-rsa AAAAB3... ansible@homelab
+
+# Windows Admin Credentials (optional)
+# vault_windows_admin_password: "REPLACE_WITH_STRONG_RANDOM_PASSWORD_FROM_PASSWORD_MANAGER"
+
+# Active Directory - Domain Controller
+# Required for domain-controller role
+vault_ad_safe_mode_password: "REPLACE_WITH_STRONG_RANDOM_PASSWORD_FROM_PASSWORD_MANAGER"
+vault_ad_domain_admin_password: "REPLACE_WITH_STRONG_RANDOM_PASSWORD_FROM_PASSWORD_MANAGER"
+
+# Active Directory - Member Servers
+# Required for member-server role (can reference domain admin above)
+vault_ad_domain_admin_user: "GHIOT\\Administrator"
+# vault_ad_domain_admin_password: (use a strong, randomly generated password)

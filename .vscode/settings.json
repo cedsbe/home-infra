@@ -14,12 +14,17 @@
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
+  "ansible.lightspeed.enabled": false,
+  "ansible.python.interpreterPath": "/bin/python",
   "chat.mcp.autostart": "newAndOutdated",
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
   "files.associations": {
+    "**/ansible/**/*.yaml": "ansible",
+    "**/ansible/**/*.yml": "ansible",
     "*.xml.pkrtpl": "xml",
-    "*.yaml": "yaml"
+    "*.yaml": "yaml",
+    "*.yml": "yaml"
   },
   "xml.format.maxLineWidth": 250
 }

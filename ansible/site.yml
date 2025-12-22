@@ -1,0 +1,51 @@
+---
+# Master playbook for home infrastructure
+# This playbook includes all role assignments and configurations
+
+- name: Configure all hosts - common tasks
+  hosts: all
+  gather_facts: true
+  tags:
+    - always
+  tasks:
+    - name: Display host information
+      ansible.builtin.debug:
+        msg: "Configuring {{ inventory_hostname }} ({{ ansible_facts['os_family'] }})"
+
+- name: Configure Linux hosts
+  hosts: linux
+  gather_facts: true
+  tags:
+    - linux
+  roles:
+    - role: common/base-linux
+      tags: base
+
+- name: Configure Windows hosts
+  hosts: windows
+  gather_facts: true
+  tags:
+    - windows
+  roles:
+    - role: common/base-windows
+      tags: base
+
+- name: Configure Domain Controllers
+  hosts: domain_controllers
+  gather_facts: true
+  tags:
+    - ad
+    - domain
+  roles:
+    - role: windows/domain-controller
+      tags: domain-controller
+
+- name: Configure Windows Member Servers
+  hosts: member_servers
+  gather_facts: true
+  tags:
+    - ad
+    - members
+  roles:
+    - role: windows/member-server
+      tags: member-server

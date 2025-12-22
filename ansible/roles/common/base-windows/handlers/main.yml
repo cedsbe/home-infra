@@ -1,0 +1,12 @@
+---
+# Base Windows role handlers
+
+- name: Reboot Windows
+  ansible.windows.win_reboot:
+    reboot_timeout: 600
+    post_reboot_delay: 60
+
+- name: Restart w32time
+  ansible.windows.win_service:
+    name: w32time
+    state: restarted

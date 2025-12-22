@@ -1,0 +1,61 @@
+---
+# Example Linux system update playbook
+
+- name: Update all Linux systems
+  hosts: linux
+  become: true
+  gather_facts: true
+  tags:
+    - update
+    - maintenance
+
+  tasks:
+    - name: Update apt cache (Debian/Ubuntu)
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_os_family == "Debian"
+
+    - name: Upgrade all packages (Debian/Ubuntu)
+      ansible.builtin.apt:
+        upgrade: dist
+        autoclean: true
+        autoremove: true
+      when: ansible_os_family == "Debian"
+      register: apt_upgrade_result
+
+    - name: Update dnf cache (RedHat/CentOS)
+      ansible.builtin.dnf:
+        update_cache: true
+      when: ansible_os_family == "RedHat"
+
+    - name: Upgrade all packages (RedHat/CentOS)
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest # noqa: package-latest
+      when: ansible_os_family == "RedHat"
+      register: dnf_upgrade_result
+
+    - name: Check if reboot is required (Debian/Ubuntu)
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required_file
+      when: ansible_os_family == "Debian"
+
+    - name: Display reboot requirement
+      ansible.builtin.debug:
+        msg: "System requires reboot"
+      when:
+        - ansible_os_family == "Debian"
+        - reboot_required_file.stat.exists
+
+    - name: Reboot if required
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible after system update"
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+      when:
+        - ansible_os_family == "Debian"
+        - reboot_required_file.stat.exists
+        - auto_reboot | default(false)

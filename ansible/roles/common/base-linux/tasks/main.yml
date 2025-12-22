@@ -1,0 +1,179 @@
+---
+# Base Linux configuration role - Main tasks
+# Note: become is handled at playbook/group_vars level
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: Configure time synchronization via systemd-timesyncd
+  ansible.builtin.template:
+    src: timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf
+    mode: "0644"
+  when:
+    - ansible_service_mgr == "systemd"
+    - ansible_facts.services['systemd-timesyncd.service'] is defined
+  notify: Restart systemd-timesyncd
+
+- name: Configure time synchronization via chrony
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: "{{ '/etc/chrony/chrony.conf' if ansible_os_family == 'Debian' else '/etc/chrony.conf' }}"
+    mode: "0644"
+  when:
+    - ansible_facts.services['chronyd.service'] is defined or ansible_facts.services['chrony.service'] is defined
+  notify: Restart chronyd
+
+- name: Configure time synchronization via ntp (legacy)
+  ansible.builtin.template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+    mode: "0644"
+  when:
+    - ansible_facts.services['ntp.service'] is defined or ansible_facts.services['ntpd.service'] is defined
+    - ansible_facts.services['systemd-timesyncd.service'] is not defined
+    - ansible_facts.services['chronyd.service'] is not defined
+    - ansible_facts.services['chrony.service'] is not defined
+  notify: Restart ntp
+
+- name: Check if systemd-resolved is active
+  ansible.builtin.systemd:
+    name: systemd-resolved
+  register: resolved_status
+  failed_when: false
+
+- name: Check if NetworkManager is running
+  ansible.builtin.set_fact:
+    nm_running: "{{ ansible_facts.services['NetworkManager.service'] is defined and ansible_facts.services['NetworkManager.service'].state == 'running' }}"
+
+- name: Determine DNS configuration method
+  ansible.builtin.set_fact:
+    dns_config_method: |
+      {% if resolved_status.status is defined and resolved_status.status.ActiveState is defined and resolved_status.status.ActiveState == "active" %}
+      resolved
+      {% elif nm_running | bool %}
+      networkmanager
+      {% else %}
+      resolv
+      {% endif %}
+
+- name: Configure DNS via systemd-resolved
+  ansible.builtin.template:
+    src: resolved.conf.j2
+    dest: /etc/systemd/resolved.conf
+    mode: "0644"
+  when: dns_config_method | trim == "resolved"
+  notify: Restart systemd-resolved
+
+- name: Configure DNS via NetworkManager
+  community.general.nmcli:
+    type: ethernet
+    conn_name: "{{ ansible_default_ipv4.interface }}"
+    dns4: "{{ dns_servers }}"
+    state: present
+  when: dns_config_method | trim == "networkmanager"
+
+- name: Configure DNS via resolv.conf (fallback for legacy systems)
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    mode: "0644"
+  when: dns_config_method | trim == "resolv"
+
+- name: Update package cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+
+- name: Install common packages
+  ansible.builtin.package:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Configure SSH
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    mode: "0644"
+    validate: "/usr/sbin/sshd -t -f %s"
+  notify: Restart sshd
+
+- name: Ensure firewall is installed (Debian/Ubuntu)
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
+
+- name: Set UFW default policies
+  community.general.ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - { direction: "incoming", policy: "deny" }
+    - { direction: "outgoing", policy: "allow" }
+    - { direction: "routed", policy: "deny" }
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
+
+- name: Allow SSH before enabling firewall (prevent lockout)
+  community.general.ufw:
+    rule: allow
+    port: "{{ ssh_port }}"
+    proto: tcp
+    comment: "SSH access - managed by Ansible"
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
+  register: ssh_rule_result
+
+- name: Verify SSH rule was applied successfully
+  ansible.builtin.assert:
+    that:
+      - not ssh_rule_result.failed | default(false)
+    fail_msg: "Failed to add SSH rule - aborting firewall configuration to prevent lockout"
+    success_msg: "SSH rule successfully configured"
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
+
+- name: Configure firewall rules
+  community.general.ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+    comment: "{{ item.comment | default(omit) }}"
+  loop: "{{ firewall_rules }}"
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
+
+- name: Enable firewall
+  community.general.ufw:
+    state: enabled
+  when:
+    - ansible_os_family == "Debian"
+    - firewall_enabled | default(true)
+
+- name: Set system hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Configure hosts file
+  ansible.builtin.template:
+    src: hosts.j2
+    dest: /etc/hosts
+    mode: "0644"
+
+- name: Create admin users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+    shell: "{{ item.shell }}"
+    create_home: true
+  loop: "{{ linux_users }}"
+  when: linux_users is defined

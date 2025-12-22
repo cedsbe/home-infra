@@ -1,0 +1,44 @@
+---
+# Main Inventory File
+# Copy this template to hosts.yml and customize for your environment
+# NOTE: hosts.yml is gitignored for security (contains actual IPs)
+
+all:
+  children:
+    # Linux hosts group
+    linux:
+      children:
+        linux_servers:
+          hosts:
+            linux-server-01:
+              ansible_host: 192.168.x.x
+              ansible_user: root
+              ansible_connection: ssh
+
+    # Windows hosts group
+    windows:
+      children:
+        domain_controllers:
+          hosts:
+            dc01:
+              ansible_host: 192.168.x.x
+              ansible_user: winadmin
+              ansible_connection: ssh
+              ansible_shell_type: powershell
+
+        member_servers:
+          hosts:
+            win-server-01:
+              ansible_host: 192.168.x.x
+              ansible_user: winadmin
+              ansible_connection: ssh
+              ansible_shell_type: powershell
+
+  vars:
+    # Global variables for all hosts
+    ansible_python_interpreter: auto_silent
+    domain_name: ad.ghiot.be
+    dns_servers:
+      - 192.168.65.30
+      - 192.168.65.40
+    timezone: Europe/Brussels
