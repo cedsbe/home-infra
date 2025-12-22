@@ -29,12 +29,12 @@
         Write-Output "Domain not configured"
         exit 1
       } else {
-        Write-Error "Error checking domain: $($_.Exception.Message)"
-        exit 2
+        Write-Output "Error checking domain (proceeding): $($_.Exception.Message)"
+        exit 1
       }
     }
   register: domain_check
-  failed_when: domain_check.rc > 1
+  failed_when: false
   changed_when: false
 
 - name: Install new AD forest

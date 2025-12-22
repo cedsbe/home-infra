@@ -53,4 +53,3 @@ ignore: |
   .pre-commit-config.yaml
   ansible/
   k8s/
-  terraform/

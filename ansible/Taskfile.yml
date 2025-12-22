@@ -34,7 +34,10 @@ tasks:
     desc: Lint Ansible playbooks and roles with ansible-lint
     dir: "{{.ANSIBLE_DIR}}"
     cmds:
-      - sh -c 'if ! command -v ansible-lint >/dev/null 2>&1; then echo "ansible-lint is not installed. Please install it (e.g. pip install --user ansible-lint) before running this task."; exit 1; fi'
+      - >
+        sh -c 'if ! command -v ansible-lint >/dev/null 2>&1; then
+        echo "ansible-lint is not installed. Install with: pip install --user ansible-lint";
+        exit 1; fi'
       - ansible-lint
 
   # Inventory tasks

@@ -17,7 +17,7 @@
     w32tm /config /manualpeerlist:"{{ ntp_servers | join(',') }}" /syncfromflags:manual /reliable:yes /update
   register: ntp_config
   changed_when: ntp_config.rc == 0
-  when: current_ntp.stdout_lines[0] | default('') != ntp_servers | join(',')
+  when: current_ntp.stdout_lines[0] | default('') | replace(' ', '') != ntp_servers | join(',') | replace(' ', '')
   notify: Restart w32time
 
 - name: Set computer name
@@ -74,7 +74,9 @@
          | selectattr('name', 'in', windows_services_to_disable | default([]))
          | map(attribute='name')
          | list }}
-  when: windows_services_to_disable | default([]) | length > 0
+  when:
+    - windows_services_to_disable | default([]) | length > 0
+    - all_services.services is defined
 
 - name: Disable unnecessary services
   ansible.windows.win_service:

@@ -32,7 +32,9 @@
   ansible.windows.win_dns_client:
     adapter_names: "*"
     dns_servers: "{{ ad_dns_servers }}"
-  when: ad_dns_servers is defined
+  when:
+    - ad_dns_servers is defined
+    - domain_join.changed | default(false)
 
 - name: Display domain membership status
   ansible.builtin.debug:
