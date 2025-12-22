@@ -1,16 +1,17 @@
-FROM ubuntu:noble
+FROM ubuntu:24.04
 SHELL ["/bin/bash","-eux","-o","pipefail","-c"]
 
-ARG ARCH=amd64
 ARG NODE_VERSION=24.x
 ARG USERNAME=vscode
+ARG DEBIAN_FRONTEND=noninteractive
+ARG TZ=Europe/Brussels
+ENV TZ=$TZ
 
 # Install dependencies
 RUN <<EOF
-  apt update
-  apt upgrade -y
-  apt install -y --no-install-recommends \
-    apt-transport-https \
+  apt-get update && apt-get -y upgrade && \
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
+  apt-get install -y --no-install-recommends \
     apt-utils \
     bash-completion \
     build-essential \
@@ -36,7 +37,7 @@ RUN <<EOF
     libgssapi-krb5-2 \
     libicu-dev \
     libkrb5-3 \
-    liblttng-ust1 \
+    liblttng-ust1t64 \
     libncurses-dev \
     libssh-dev \
     libssl-dev \
@@ -59,9 +60,8 @@ RUN <<EOF
     psmisc \
     python3 python3-cffi python3-pip python3-yaml python3-wheel \
     rsync \
-    sq \
     strace \
-    \
+    sudo \
     tar \
     tree \
     tzdata \
@@ -75,10 +75,7 @@ RUN <<EOF
     zip \
     zlib1g \
     zsh \
-  ;
-  apt -y autoremove
-  apt -y autoclean
-  rm -rf /var/lib/apt/lists/*
+  && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF
 
 # Install GitHub CLI
@@ -87,6 +84,7 @@ RUN <<EOF
   out=$(mktemp) && curl -fsSL -o "$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg
   cat $out | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
   chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+  rm -f "$out"
   mkdir -p -m 755 /etc/apt/sources.list.d
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
 EOF
@@ -136,23 +134,21 @@ EOF
 
 # Install additional packages from additional repositories
 RUN <<EOF
-  apt update
-  apt install --no-install-recommends -y \
+  apt-get update && apt-get install -y --no-install-recommends \
     gh \
     nodejs \
     postgresql-client \
     helm \
     terraform \
-  ;
-  apt -y autoremove
-  apt -y autoclean
-  rm -rf /var/lib/apt/lists/*
+  && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF
 
-# Create vscode user if it does not exist
+# Create vscode user with sudo access for devcontainer
 RUN <<EOF
   if ! id -u $USERNAME >/dev/null 2>&1; then
-    useradd -m -s /bin/zsh $USERNAME
+    useradd -m -s /bin/zsh -G sudo $USERNAME
+    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
+    chmod 0440 /etc/sudoers.d/$USERNAME
   fi
 EOF
 
@@ -166,7 +162,6 @@ ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 ENV TZ=Europe/Brussels
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Set working directory
 WORKDIR /home/$USERNAME
