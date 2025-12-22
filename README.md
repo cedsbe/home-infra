@@ -62,7 +62,7 @@ A comprehensive Infrastructure as Code solution for home lab automation using Ta
 ## 📁 Repository Structure
 
 ```
-├── ansible/                # Configuration management (NEW!)
+├── ansible/                # Configuration management
 │   ├── inventory/         # Host inventory and variables
 │   ├── playbooks/         # Task-specific playbooks
 │   ├── roles/             # Reusable Ansible roles
