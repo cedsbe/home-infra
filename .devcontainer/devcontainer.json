@@ -2,7 +2,9 @@
   "build": {
     "args": {
       "NODE_VERSION": "24.x",
-      "USERNAME": "vscode"
+      "USERNAME": "vscode",
+      "USER_UID": "1000",
+      "USER_GID": "1000"
     },
     "context": ".",
     "dockerfile": "Dockerfile"
@@ -32,8 +34,7 @@
       "settings": {
         "files.associations": {
           "*.hcl": "terraform",
-          "*.tfvars": "terraform",
-          "Taskfile.yml": "yaml"
+          "*.tfvars": "terraform"
         },
         "files.watcherExclude": {
           "**/.terraform/**": true,

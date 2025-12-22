@@ -29,7 +29,6 @@ alias tf 'terraform'
 alias tfi 'terraform init'
 alias tfp 'terraform plan'
 alias tfa 'terraform apply'
-alias az 'azure-cli'
 
 # Ansible aliases
 alias ap 'ansible-playbook'

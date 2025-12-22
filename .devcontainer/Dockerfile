@@ -26,6 +26,7 @@ ARG YQ_VERSION=v4.44.6
 ARG LAZYGIT_VERSION=v0.44.1
 ARG TASK_VERSION=v3.40.1
 ARG STARSHIP_VERSION=v1.21.1
+ARG CSPELL_VERSION=8.16.1
 
 # Install system dependencies grouped by purpose
 RUN <<EOF
@@ -213,9 +214,9 @@ RUN <<EOF
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF
 
-# Install cspell globally via npm
+# Install cspell globally via npm with pinned version
 RUN <<EOF
-  npm install -g cspell
+  npm install -g cspell@${CSPELL_VERSION}
 EOF
 
 # Install Kubernetes ecosystem tools with pinned versions
@@ -302,9 +303,8 @@ RUN <<EOF
   curl -fsSL "https://github.com/go-task/task/releases/download/${TASK_VERSION}/task_linux_${ARCH}.tar.gz" | tar -xz -C /usr/local/bin task
 
   # Create symlinks for Ubuntu package names
-  # Suppress errors if symlinks already exist or directories don't match expectations
-  ln -sf /usr/bin/batcat /usr/local/bin/bat 2>&1 | grep -v "File exists" || true
-  ln -sf /usr/bin/fdfind /usr/local/bin/fd 2>&1 | grep -v "File exists" || true
+  ln -sf /usr/bin/batcat /usr/local/bin/bat
+  ln -sf /usr/bin/fdfind /usr/local/bin/fd
 EOF
 
 # Install Starship prompt with pinned version
@@ -335,7 +335,7 @@ RUN <<EOF
 
   # Create vscode user with explicit UID/GID for devcontainer compatibility
   groupadd -g $USER_GID $USERNAME
-  useradd -m -u $USER_UID -g $USER_GID -s /usr/bin/fish -G sudo $USERNAME
+  useradd -m -l -u $USER_UID -g $USER_GID -s /usr/bin/fish -G sudo $USERNAME
   echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
   chmod 0440 /etc/sudoers.d/$USERNAME
 EOF
@@ -349,7 +349,6 @@ EOF
 ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
-ENV TZ=Europe/Brussels
 
 # Set working directory
 WORKDIR /home/$USERNAME
@@ -366,9 +365,21 @@ RUN <<EOF
 EOF
 
 # Configure Fish shell with settings from separate config files
-RUN mkdir -p ~/.config/fish/conf.d
+RUN mkdir -p ~/.config/fish/conf.d ~/.config/fish/completions
 COPY --chown=$USERNAME:$USERNAME fish/config.fish /home/$USERNAME/.config/fish/config.fish
 COPY --chown=$USERNAME:$USERNAME fish/conf.d/ /home/$USERNAME/.config/fish/conf.d/
+
+# Generate shell completions at build time for faster shell startup
+RUN <<EOF
+  # Generate kubectl completions
+  kubectl completion fish > ~/.config/fish/completions/kubectl.fish
+
+  # Generate task completions
+  task --completion fish > ~/.config/fish/completions/task.fish
+
+  # Install terraform completions
+  terraform -install-autocomplete 2>/dev/null || true
+EOF
 
 # Start fish shell by default
 CMD ["/usr/bin/fish"]
