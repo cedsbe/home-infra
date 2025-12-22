@@ -10,30 +10,29 @@ ARG TZ=Europe/Brussels
 ENV TZ=$TZ
 
 # Tool versions - automatically updated by Renovate
-ARG K9S_VERSION=v0.32.7 # renovate: datasource=github-releases depName=derailed/k9s
-ARG STERN_VERSION=v1.31.0 # renovate: datasource=github-releases depName=stern/stern
-ARG KUBECTX_VERSION=v0.9.5 # renovate: datasource=github-releases depName=ahmetb/kubectx
-ARG KUSTOMIZE_VERSION=v5.5.0 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
-ARG KUBECOLOR_VERSION=v0.4.0 # renovate: datasource=github-releases depName=kubecolor/kubecolor
-ARG ARGOCD_VERSION=v2.13.2 # renovate: datasource=github-releases depName=argoproj/argo-cd
-ARG KUBECONFORM_VERSION=v0.7.1 # renovate: datasource=github-releases depName=yannh/kubeconform
-ARG TALOS_VERSION=v1.9.2 # renovate: datasource=github-releases depName=siderolabs/talos
-ARG TFLINT_VERSION=v0.54.0 # renovate: datasource=github-releases depName=terraform-linters/tflint
-ARG TRIVY_VERSION=v0.58.1 # renovate: datasource=github-releases depName=aquasecurity/trivy
-ARG HADOLINT_VERSION=v2.12.0 # renovate: datasource=github-releases depName=hadolint/hadolint
-ARG EZA_VERSION=v0.20.14 # renovate: datasource=github-releases depName=eza-community/eza
-ARG YQ_VERSION=v4.44.6 # renovate: datasource=github-releases depName=mikefarah/yq
-ARG LAZYGIT_VERSION=v0.44.1 # renovate: datasource=github-releases depName=jesseduffield/lazygit
-ARG TASK_VERSION=v3.40.1 # renovate: datasource=github-releases depName=go-task/task
-ARG STARSHIP_VERSION=v1.21.1 # renovate: datasource=github-releases depName=starship/starship
-ARG CSPELL_VERSION=8.16.1 # renovate: datasource=npm depName=cspell
+ARG K9S_VERSION=v0.32.7         # renovate: datasource=github-releases depName=derailed/k9s
+ARG STERN_VERSION=v1.31.0       # renovate: datasource=github-releases depName=stern/stern
+ARG KUBECTX_VERSION=v0.9.5      # renovate: datasource=github-releases depName=ahmetb/kubectx
+ARG KUSTOMIZE_VERSION=v5.5.0    # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
+ARG KUBECOLOR_VERSION=v0.4.0    # renovate: datasource=github-releases depName=kubecolor/kubecolor
+ARG ARGOCD_VERSION=v2.13.2      # renovate: datasource=github-releases depName=argoproj/argo-cd
+ARG KUBECONFORM_VERSION=v0.7.0  # renovate: datasource=github-releases depName=yannh/kubeconform
+ARG TALOS_VERSION=v1.9.2        # renovate: datasource=github-releases depName=siderolabs/talos
+ARG TFLINT_VERSION=v0.54.0      # renovate: datasource=github-releases depName=terraform-linters/tflint
+ARG TRIVY_VERSION=v0.58.1       # renovate: datasource=github-releases depName=aquasecurity/trivy
+ARG HADOLINT_VERSION=v2.12.0    # renovate: datasource=github-releases depName=hadolint/hadolint
+ARG EZA_VERSION=v0.20.14        # renovate: datasource=github-releases depName=eza-community/eza
+ARG YQ_VERSION=v4.44.6          # renovate: datasource=github-releases depName=mikefarah/yq
+ARG LAZYGIT_VERSION=v0.44.1     # renovate: datasource=github-releases depName=jesseduffield/lazygit
+ARG TASK_VERSION=v3.40.1        # renovate: datasource=github-releases depName=go-task/task
+ARG STARSHIP_VERSION=v1.21.1    # renovate: datasource=github-releases depName=starship/starship
+ARG CSPELL_VERSION=8.16.1       # renovate: datasource=npm depName=cspell
 
 # Install system dependencies grouped by purpose
 RUN <<EOF
   apt-get update && apt-get -y upgrade && \
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && \
   apt-get install -y --no-install-recommends \
-    # Core system utilities
     apt-utils \
     ca-certificates \
     curl \
@@ -46,12 +45,10 @@ RUN <<EOF
     tzdata \
     wget \
     which \
-    # Build tools and compilers
     build-essential \
     cmake \
     gcc \
     pkg-config \
-    # Shell and terminal tools
     bash-completion \
     dumb-init \
     init-system-helpers \
@@ -62,21 +59,17 @@ RUN <<EOF
     nano \
     tmux \
     vim \
-    # Modern CLI replacements
     bat \
     direnv \
     fd-find \
     fzf \
     git-delta \
     ripgrep \
-    # Git and version control
     git \
-    # Networking tools
     iproute2 \
     net-tools \
     netbase \
     openssh-client \
-    # Monitoring and system tools
     htop \
     lsof \
     ncdu \
@@ -84,23 +77,18 @@ RUN <<EOF
     psmisc \
     strace \
     tree \
-    # Archive and compression
     bzip2 \
     tar \
     unzip \
     xz-utils \
     zip \
-    # Container runtime
     fuse-overlayfs \
     podman \
-    # Python and development
     pipx \
     python3 python3-cffi python3-pip python3-venv python3-yaml python3-wheel \
-    # Infrastructure as Code tools
     ansible \
     ansible-lint \
     yamllint \
-    # Development libraries
     libc6 \
     libgcc1 \
     libgssapi-krb5-2 \
@@ -113,7 +101,6 @@ RUN <<EOF
     libssl3 \
     libstdc++6 \
     zlib1g \
-    # Documentation and help
     dirmngr \
     jq \
     pinentry-curses \
