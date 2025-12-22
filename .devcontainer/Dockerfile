@@ -361,8 +361,26 @@ RUN <<EOF
   # Generate kubectl completions
   kubectl completion fish > ~/.config/fish/completions/kubectl.fish
 
+  # Generate helm completions
+  helm completion fish > ~/.config/fish/completions/helm.fish
+
   # Generate task completions
   task --completion fish > ~/.config/fish/completions/task.fish
+
+  # Generate talosctl completions
+  talosctl completion fish > ~/.config/fish/completions/talosctl.fish
+
+  # Generate argocd completions
+  argocd completion fish > ~/.config/fish/completions/argocd.fish
+
+  # Generate gh completions
+  gh completion -s fish > ~/.config/fish/completions/gh.fish
+
+  # Generate stern completions
+  stern --completion fish > ~/.config/fish/completions/stern.fish
+
+  # Generate k9s completions
+  k9s completion fish > ~/.config/fish/completions/k9s.fish
 
   # Install terraform completions
   if ! terraform -install-autocomplete >/dev/null 2>&1; then
