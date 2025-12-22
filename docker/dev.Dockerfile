@@ -241,7 +241,7 @@ RUN <<EOF
   ARCH=$(dpkg --print-architecture)
   # Install eza (modern ls)
   EZA_VERSION=$(curl -s https://api.github.com/repos/eza-community/eza/releases/latest | grep tag_name | cut -d '"' -f 4)
-  curl -fsSL "https://github.com/eza-community/eza/releases/download/${EZA_VERSION}/eza_x86_64-unknown-linux-gnu.tar.gz" | tar -xz -C /usr/local/bin eza
+  curl -fsSL "https://github.com/eza-community/eza/releases/download/${EZA_VERSION}/eza_x86_64-unknown-linux-gnu.tar.gz" | tar -xz -C /usr/local/bin
 
   # Install yq
   YQ_VERSION=$(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep tag_name | cut -d '"' -f 4)
@@ -255,6 +255,11 @@ RUN <<EOF
   # Create symlinks for Ubuntu package names
   ln -sf /usr/bin/batcat /usr/local/bin/bat 2>/dev/null || true
   ln -sf /usr/bin/fdfind /usr/local/bin/fd 2>/dev/null || true
+EOF
+
+# Install Starship prompt
+RUN <<EOF
+  curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 EOF
 
 # Create vscode user with sudo access for devcontainer
@@ -282,11 +287,6 @@ WORKDIR /home/$USERNAME
 USER $USERNAME
 ENV HOME=/home/$USERNAME
 
-# Install Starship prompt
-RUN <<EOF
-  curl -fsSL https://starship.rs/install.sh | sh -s -- -y
-EOF
-
 # Configure Fish with useful aliases and settings
 RUN <<EOF
   # Create fish config directory
@@ -298,8 +298,14 @@ RUN <<EOF
   # Configure direnv
   echo 'direnv hook fish | source' > ~/.config/fish/conf.d/direnv.fish
 
-  # Configure fzf key bindings
-  echo 'fzf --fish | source' > ~/.config/fish/conf.d/fzf.fish
+  # Configure fzf key bindings (apt version uses different paths)
+  cat > ~/.config/fish/conf.d/fzf.fish << 'FZF'
+# Source fzf key bindings if available
+if test -f /usr/share/doc/fzf/examples/key-bindings.fish
+  source /usr/share/doc/fzf/examples/key-bindings.fish
+  fzf_key_bindings
+end
+FZF
 
   # Create aliases file
   cat > ~/.config/fish/conf.d/aliases.fish << 'ALIASES'
@@ -358,3 +364,6 @@ kubectl completion fish | source
 terraform -install-autocomplete 2>/dev/null || true
 CONFIG
 EOF
+
+# Start fish shell by default
+CMD ["/usr/bin/fish"]
