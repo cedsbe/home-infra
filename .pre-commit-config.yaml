@@ -34,8 +34,16 @@ repos:
             backend\.config$
           )$
       - id: check-json
+        exclude: |
+          (?x)^(
+            .devcontainer\/devcontainer\.json$
+          )$
       - id: pretty-format-json
-        args: ['--autofix']
+        args: ["--autofix"]
+        exclude: |
+          (?x)^(
+            .devcontainer\/devcontainer\.json$
+          )$
       - id: mixed-line-ending
         exclude: |
           (?x)^(

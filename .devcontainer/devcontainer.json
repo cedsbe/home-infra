@@ -62,6 +62,8 @@
     "--network=host",
     "--privileged"
   ],
+  // Note: --privileged required for podman container runtime within devcontainer
+  // Note: --network=host required for direct access to Kubernetes clusters and Proxmox API
   "workspaceFolder": "/workspace",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
 }
