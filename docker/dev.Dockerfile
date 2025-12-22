@@ -162,19 +162,22 @@ RUN <<EOF
     kubectl \
     nodejs \
     packer \
+    pipx \
     postgresql-client \
     terraform \
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF
 
-# Install Python tools via pip
+# Install Python CLI tools via pipx (isolated environments)
 RUN <<EOF
-  pip3 install --no-cache-dir --break-system-packages \
-    pipx \
-    pre-commit \
-    poetry \
-    black \
-    ruff
+  # Ensure pipx path is available
+  pipx ensurepath
+
+  # Install Python development tools in isolated environments
+  pipx install pre-commit
+  pipx install poetry
+  pipx install black
+  pipx install ruff
 EOF
 
 # Install Kubernetes ecosystem tools
