@@ -9,6 +9,10 @@
     "context": ".",
     "dockerfile": "Dockerfile"
   },
+  "remoteEnv": {
+    "KUBECONFIG": "/workspace/terraform/kubernetes/output/kube-config.yaml",
+    "TALOSCONFIG": "/workspace/terraform/kubernetes/output/talos-config.yaml"
+  },
   "customizations": {
     "vscode": {
       "extensions": [
