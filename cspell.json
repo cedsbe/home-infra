@@ -36,7 +36,8 @@
     "packer/windows_server_2025/.env",
     "**/*.secrets.*",
     "sensitive/**",
-    "backend.config"
+    "backend.config",
+    ".devcontainer/**"
   ],
   "language": "en",
   "maxDuplicateProblems": 3,

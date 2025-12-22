@@ -1,0 +1,92 @@
+{
+  "build": {
+    "args": {
+      "NODE_VERSION": "24.x",
+      "USERNAME": "vscode",
+      "USER_UID": "1000",
+      "USER_GID": "1000"
+    },
+    "context": ".",
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "eamodio.gitlens",
+        "esbenp.prettier-vscode",
+        "foxundermoon.shell-format",
+        "GitHub.copilot-chat",
+        "GitHub.copilot",
+        "hashicorp.terraform",
+        "ms-azuretools.vscode-docker",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-vscode-remote.remote-containers",
+        "redhat.ansible",
+        "redhat.vscode-yaml",
+        "streetsidesoftware.code-spell-checker",
+        "tamasfe.even-better-toml",
+        "task.vscode-task",
+        "timonwong.shellcheck"
+      ],
+      "settings": {
+        "files.associations": {
+          "*.hcl": "terraform",
+          "*.tfvars": "terraform"
+        },
+        "files.watcherExclude": {
+          "**/.terraform/**": true,
+          "**/node_modules/**": true,
+          "**/vendor/**": true
+        },
+        "terminal.integrated.defaultProfile.linux": "fish",
+        "terminal.integrated.profiles.linux": {
+          "fish": {
+            "path": "/usr/bin/fish"
+          }
+        }
+      }
+    }
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached"
+  ],
+  "name": "Home Infrastructure Dev Container",
+  "postCreateCommand": "fish -c 'echo Welcome to Home Infrastructure Dev Container!'",
+  "remoteUser": "vscode",
+  "runArgs": [
+    "--network=host",
+    "--privileged"
+  ],
+  // Security Notes:
+  // - --privileged: Required for podman container runtime within devcontainer.
+  //   This grants extended privileges and effectively disables most container
+  //   isolation but is necessary for nested containerization in this setup.
+  //   Alternative approaches (--cap-add, rootless podman) are not yet compatible
+  //   with all required workflows.
+  //   DO NOT:
+  //   * Run untrusted or internet-sourced code inside this devcontainer.
+  //   * Mount or manipulate sensitive host paths outside your user scope.
+  //   * Store long-lived secrets here beyond what is needed for local development.
+  //   Only use this devcontainer on a single-user, trusted machine and network,
+  //   and follow your organization’s security policies and local hardening
+  //   guidelines when working with privileged containers.
+  // - --network=host: Required for direct access to local services including:
+  //   * Kubernetes clusters (kubectl, k9s)
+  //   * Proxmox API
+  //   * Local development servers
+  //   This bypasses Docker network isolation.
+  //   DO NOT:
+  //   * Expose services from this devcontainer directly to untrusted networks
+  //     or the public internet.
+  //   * Use this configuration on shared, multi-tenant, or production hosts.
+  //   This setup is acceptable for local development on trusted networks only
+  //   and should be reviewed against any internal security or compliance
+  //   requirements before use.
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+}

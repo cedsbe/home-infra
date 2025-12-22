@@ -1,0 +1,3 @@
+# Ignore HEALTHCHECK requirement for development containers
+# HEALTHCHECK is not applicable for interactive development environments
+AVD-DS-0026

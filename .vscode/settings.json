@@ -24,7 +24,8 @@
     "**/ansible/**/*.yml": "ansible",
     "*.xml.pkrtpl": "xml",
     "*.yaml": "yaml",
-    "*.yml": "yaml"
+    "*.yml": "yaml",
+    "devcontainer*.json": "jsonc"
   },
   "xml.format.maxLineWidth": 250
 }
