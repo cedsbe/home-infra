@@ -1,0 +1,67 @@
+{
+  "build": {
+    "args": {
+      "NODE_VERSION": "24.x",
+      "USERNAME": "vscode"
+    },
+    "context": ".",
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "charliermarsh.ruff",
+        "eamodio.gitlens",
+        "esbenp.prettier-vscode",
+        "foxundermoon.shell-format",
+        "GitHub.copilot-chat",
+        "GitHub.copilot",
+        "hashicorp.terraform",
+        "ms-azuretools.vscode-docker",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-vscode-remote.remote-containers",
+        "redhat.ansible",
+        "redhat.vscode-yaml",
+        "streetsidesoftware.code-spell-checker",
+        "tamasfe.even-better-toml",
+        "task.vscode-task",
+        "timonwong.shellcheck"
+      ],
+      "settings": {
+        "files.associations": {
+          "*.hcl": "terraform",
+          "*.tfvars": "terraform",
+          "Taskfile.yml": "yaml"
+        },
+        "files.watcherExclude": {
+          "**/.terraform/**": true,
+          "**/node_modules/**": true,
+          "**/vendor/**": true
+        },
+        "terminal.integrated.defaultProfile.linux": "fish",
+        "terminal.integrated.profiles.linux": {
+          "fish": {
+            "path": "/usr/bin/fish"
+          }
+        }
+      }
+    }
+  },
+  "features": {},
+  "mounts": [
+    "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached"
+  ],
+  "name": "Home Infrastructure Dev Container",
+  "postCreateCommand": "fish -c 'echo Welcome to Home Infrastructure Dev Container!'",
+  "remoteUser": "vscode",
+  "runArgs": [
+    "--network=host",
+    "--privileged"
+  ],
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+}

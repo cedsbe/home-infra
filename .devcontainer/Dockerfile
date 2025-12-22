@@ -168,16 +168,9 @@ RUN <<EOF
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF
 
-# Install Python CLI tools via pipx (isolated environments)
+# Install Node.js global packages
 RUN <<EOF
-  # Ensure pipx path is available
-  pipx ensurepath
-
-  # Install Python development tools in isolated environments
-  pipx install pre-commit
-  pipx install poetry
-  pipx install black
-  pipx install ruff
+  npm install -g cspell
 EOF
 
 # Install Kubernetes ecosystem tools
@@ -252,6 +245,9 @@ RUN <<EOF
   LAZYGIT_VERSION=$(curl -s https://api.github.com/repos/jesseduffield/lazygit/releases/latest | grep tag_name | cut -d '"' -f 4)
   curl -fsSL "https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION#v}_Linux_x86_64.tar.gz" | tar -xz -C /usr/local/bin lazygit
 
+  # Install Task (taskfile.dev)
+  sh -c "$(curl -fsSL https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
   # Create symlinks for Ubuntu package names
   ln -sf /usr/bin/batcat /usr/local/bin/bat 2>/dev/null || true
   ln -sf /usr/bin/fdfind /usr/local/bin/fd 2>/dev/null || true
@@ -298,6 +294,15 @@ ENV TZ=Europe/Brussels
 WORKDIR /home/$USERNAME
 USER $USERNAME
 ENV HOME=/home/$USERNAME
+
+# Install Python CLI tools via pipx as vscode user
+RUN <<EOF
+  # Install Python development tools in isolated environments
+  pipx install pre-commit
+  pipx install poetry
+  pipx install black
+  pipx install ruff
+EOF
 
 # Configure Fish with useful aliases and settings
 RUN <<EOF
@@ -374,6 +379,10 @@ kubectl completion fish | source
 
 # terraform completion
 terraform -install-autocomplete 2>/dev/null || true
+
+# task completion
+task --completion fish | source
+
 CONFIG
 EOF
 
