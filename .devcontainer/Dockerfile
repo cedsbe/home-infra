@@ -9,24 +9,24 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG TZ=Europe/Brussels
 ENV TZ=$TZ
 
-# Tool versions - update these periodically or use Renovate
-ARG K9S_VERSION=v0.32.7
-ARG STERN_VERSION=v1.31.0
-ARG KUBECTX_VERSION=v0.9.5
-ARG KUSTOMIZE_VERSION=v5.5.0
-ARG KUBECOLOR_VERSION=v0.4.0
-ARG ARGOCD_VERSION=v2.13.2
-ARG KUBECONFORM_VERSION=v0.7.1
-ARG TALOS_VERSION=v1.9.2
-ARG TFLINT_VERSION=v0.54.0
-ARG TRIVY_VERSION=v0.58.1
-ARG HADOLINT_VERSION=v2.12.0
-ARG EZA_VERSION=v0.20.14
-ARG YQ_VERSION=v4.44.6
-ARG LAZYGIT_VERSION=v0.44.1
-ARG TASK_VERSION=v3.40.1
-ARG STARSHIP_VERSION=v1.21.1
-ARG CSPELL_VERSION=8.16.1
+# Tool versions - automatically updated by Renovate
+ARG K9S_VERSION=v0.32.7 # renovate: datasource=github-releases depName=derailed/k9s
+ARG STERN_VERSION=v1.31.0 # renovate: datasource=github-releases depName=stern/stern
+ARG KUBECTX_VERSION=v0.9.5 # renovate: datasource=github-releases depName=ahmetb/kubectx
+ARG KUSTOMIZE_VERSION=v5.5.0 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
+ARG KUBECOLOR_VERSION=v0.4.0 # renovate: datasource=github-releases depName=kubecolor/kubecolor
+ARG ARGOCD_VERSION=v2.13.2 # renovate: datasource=github-releases depName=argoproj/argo-cd
+ARG KUBECONFORM_VERSION=v0.7.1 # renovate: datasource=github-releases depName=yannh/kubeconform
+ARG TALOS_VERSION=v1.9.2 # renovate: datasource=github-releases depName=siderolabs/talos
+ARG TFLINT_VERSION=v0.54.0 # renovate: datasource=github-releases depName=terraform-linters/tflint
+ARG TRIVY_VERSION=v0.58.1 # renovate: datasource=github-releases depName=aquasecurity/trivy
+ARG HADOLINT_VERSION=v2.12.0 # renovate: datasource=github-releases depName=hadolint/hadolint
+ARG EZA_VERSION=v0.20.14 # renovate: datasource=github-releases depName=eza-community/eza
+ARG YQ_VERSION=v4.44.6 # renovate: datasource=github-releases depName=mikefarah/yq
+ARG LAZYGIT_VERSION=v0.44.1 # renovate: datasource=github-releases depName=jesseduffield/lazygit
+ARG TASK_VERSION=v3.40.1 # renovate: datasource=github-releases depName=go-task/task
+ARG STARSHIP_VERSION=v1.21.1 # renovate: datasource=github-releases depName=starship/starship
+ARG CSPELL_VERSION=8.16.1 # renovate: datasource=npm depName=cspell
 
 # Install system dependencies grouped by purpose
 RUN <<EOF
