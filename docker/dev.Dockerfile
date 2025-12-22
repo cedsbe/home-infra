@@ -61,6 +61,7 @@ RUN <<EOF
     netbase \
     openssh-client \
     pinentry-curses \
+    pipx \
     pkg-config \
     podman \
     procps \
@@ -162,7 +163,6 @@ RUN <<EOF
     kubectl \
     nodejs \
     packer \
-    pipx \
     postgresql-client \
     terraform \
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
