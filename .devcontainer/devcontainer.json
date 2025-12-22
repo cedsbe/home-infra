@@ -49,7 +49,6 @@
       }
     }
   },
-  "features": {},
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
@@ -62,8 +61,17 @@
     "--network=host",
     "--privileged"
   ],
-  // Note: --privileged required for podman container runtime within devcontainer
-  // Note: --network=host required for direct access to Kubernetes clusters and Proxmox API
+  // Security Notes:
+  // - --privileged: Required for podman container runtime within devcontainer.
+  //   This grants extended privileges but is necessary for nested containerization.
+  //   Alternative approaches (--cap-add, rootless podman) are not yet compatible
+  //   with all required workflows. Only use this devcontainer on trusted networks.
+  // - --network=host: Required for direct access to local services including:
+  //   * Kubernetes clusters (kubectl, k9s)
+  //   * Proxmox API
+  //   * Local development servers
+  //   This bypasses Docker network isolation. Acceptable for local development
+  //   on trusted networks but should not be used in shared/production environments.
   "workspaceFolder": "/workspace",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
 }
