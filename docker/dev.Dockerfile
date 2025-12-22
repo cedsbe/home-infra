@@ -197,6 +197,24 @@ RUN <<EOF
   # Install kustomize
   curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
   mv kustomize /usr/local/bin/
+
+  # Install kubecolor
+  KUBECOLOR_VERSION=$(curl -s https://api.github.com/repos/kubecolor/kubecolor/releases/latest | grep tag_name | cut -d '"' -f 4)
+  curl -fsSL "https://github.com/kubecolor/kubecolor/releases/download/${KUBECOLOR_VERSION}/kubecolor_${KUBECOLOR_VERSION#v}_linux_${ARCH}.tar.gz" | tar -xz -C /usr/local/bin kubecolor
+
+  # Install Argo CD CLI
+  ARGOCD_VERSION=$(curl -s https://api.github.com/repos/argoproj/argo-cd/releases/latest | grep tag_name | cut -d '"' -f 4)
+  curl -fsSL "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-${ARCH}" -o /usr/local/bin/argocd
+  chmod +x /usr/local/bin/argocd
+
+  # Install kubeconform
+  KUBECONFORM_VERSION=$(curl -s https://api.github.com/repos/yannh/kubeconform/releases/latest | grep tag_name | cut -d '"' -f 4)
+  curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-${ARCH}.tar.gz" | tar -xz -C /usr/local/bin kubeconform
+
+  # Install talosctl
+  TALOS_VERSION=$(curl -s https://api.github.com/repos/siderolabs/talos/releases/latest | grep tag_name | cut -d '"' -f 4)
+  curl -fsSL "https://github.com/siderolabs/talos/releases/download/${TALOS_VERSION}/talosctl-linux-${ARCH}" -o /usr/local/bin/talosctl
+  chmod +x /usr/local/bin/talosctl
 EOF
 
 # Install Infrastructure QA tools
@@ -299,13 +317,14 @@ alias gl 'git pull'
 alias gd 'git diff'
 alias lg 'lazygit'
 
-# Kubernetes aliases
-alias k 'kubectl'
+# Kubernetes aliases with kubecolor
+alias kubectl 'kubecolor'
+alias k 'kubecolor'
 alias kx 'kubectx'
 alias kns 'kubens'
-alias kgp 'kubectl get pods'
-alias kgs 'kubectl get svc'
-alias kgn 'kubectl get nodes'
+alias kgp 'kubecolor get pods'
+alias kgs 'kubecolor get svc'
+alias kgn 'kubecolor get nodes'
 
 # Infrastructure aliases
 alias tf 'terraform'
