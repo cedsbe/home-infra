@@ -365,7 +365,9 @@ RUN <<EOF
   task --completion fish > ~/.config/fish/completions/task.fish
 
   # Install terraform completions
-  terraform -install-autocomplete 2>/dev/null || true
+  if ! terraform -install-autocomplete >/dev/null 2>&1; then
+    echo "WARNING: terraform autocomplete installation failed; completions may be unavailable in this devcontainer." >&2
+  fi
 EOF
 
 # Start fish shell by default
