@@ -264,11 +264,23 @@ EOF
 
 # Create vscode user with sudo access for devcontainer
 RUN <<EOF
-  if ! id -u $USERNAME >/dev/null 2>&1; then
-    useradd -m -s /usr/bin/fish -G sudo $USERNAME
-    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
-    chmod 0440 /etc/sudoers.d/$USERNAME
+  # Remove any existing user with UID 1000 (if exists)
+  if getent passwd 1000 >/dev/null 2>&1; then
+    existing_user=$(getent passwd 1000 | cut -d: -f1)
+    userdel -r $existing_user 2>/dev/null || true
   fi
+
+  # Remove any existing group with GID 1000 (if exists)
+  if getent group 1000 >/dev/null 2>&1; then
+    existing_group=$(getent group 1000 | cut -d: -f1)
+    groupdel $existing_group 2>/dev/null || true
+  fi
+
+  # Create vscode user with explicit UID/GID 1000 for devcontainer compatibility
+  groupadd -g 1000 $USERNAME
+  useradd -m -u 1000 -g 1000 -s /usr/bin/fish -G sudo $USERNAME
+  echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME
+  chmod 0440 /etc/sudoers.d/$USERNAME
 EOF
 
 # Set locale
