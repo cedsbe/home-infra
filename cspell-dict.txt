@@ -37,6 +37,7 @@ cloudops
 clusterip
 CMP
 CNI
+cnpg
 commitizen
 containerd
 controlplane
@@ -62,8 +63,8 @@ eddsa
 editorconfig
 edns
 efi
-elif
 EFI
+elif
 emotion
 esbuild
 eslint
@@ -184,6 +185,7 @@ sarif
 scaleway
 scsi
 sdelete
+selectattr
 Sensr
 sergelogvinov
 servfail
@@ -199,7 +201,6 @@ sni
 srv
 SSDP
 SSDPSRV
-selectattr
 stisvc
 styled
 stylelint
