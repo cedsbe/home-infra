@@ -4,7 +4,7 @@ metadata:
   name: database
   namespace: argocd
 spec:
-  description: database infrastructure
+  description: Database infrastructure
   sourceRepos:
     - "https://github.com/cedsbe/home-infra"
   destinations:
