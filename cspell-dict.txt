@@ -159,6 +159,7 @@ pkr
 pkrtpl
 pkrvars
 Pnp
+pocketid
 poly
 ppk
 pprof

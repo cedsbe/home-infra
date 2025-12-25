@@ -28,7 +28,7 @@ spec:
     initdb:
       database: pocket-id
 
-      owner: user
+      owner: pocketid-user
       secret:
         name: pg-user-credentials
 
