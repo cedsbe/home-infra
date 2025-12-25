@@ -10,6 +10,7 @@ The following files are automatically encrypted with git-crypt:
 - `backend.config` - Terraform backend configuration (may contain storage keys)
 - `packer/**/.env` - Packer environment variables (Proxmox credentials, WinRM passwords)
 - `terraform/**/.env` - Terraform environment variables (Cloudflare API tokens)
+- `sensitive/*` - Sensitive files
 
 ## 📋 Available Tasks
 

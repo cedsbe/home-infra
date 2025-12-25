@@ -17,7 +17,6 @@ packer_cache/
 terraform/kubernetes/output/**/*
 
 # Sensitive data
-sensitive/**/*
 id_rsa
 *.pem
 *.key

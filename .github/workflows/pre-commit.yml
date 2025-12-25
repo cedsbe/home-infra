@@ -2,19 +2,21 @@ name: Pre-commit
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
   push:
-    branches: [ main ]
+    branches: [main]
 
-permissions:
-  contents: read
-  security-events: write
-  actions: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     name: Pre-commit checks
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -25,50 +27,57 @@ jobs:
       - name: Remove git-crypt encrypted files
         run: |
           echo "🔐 Removing git-crypt encrypted files (not unlocked in CI)..."
-          find . -name "*.secrets.*" -type f -delete
-          find . -name ".env" -type f -delete
+          # Remove files based on .gitattributes patterns
+          find . -name "*.secrets.auto.tfvars" -type f -delete
+          find . -name "*.secrets.auto.pkrvars.hcl" -type f -delete
           find . -name "backend.config" -type f -delete
-          # Remove git-crypt encrypted files (they appear as binary data when locked)
-          git ls-files | xargs file | grep -E ": data$" | cut -d: -f1 | xargs rm -f || true
-          echo "✅ Encrypted files removed to avoid CI processing issues"
-          git status --porcelain
+          find . -name ".vault_password" -type f -delete
+          find . -name ".env" -type f -delete
+          find . -name "kubeconfig" -type f -delete
+          find . -name "*.key" -type f -delete
+          find . -name "*.pem" -type f -delete
+          rm -rf ./sensitive/ 2>/dev/null || true
+          echo "✅ Encrypted files removed successfully"
 
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: "3.x"
 
       - name: Install CLI tools
         uses: alexellis/arkade-get@master
         with:
-          kubectl: latest
-          kustomize: latest
-          kubeconform: latest
-          task: latest
-          tflint: latest
-          terraform: latest
-          packer: latest
+          kubectl: v1.35.0 # renovate: datasource=github-releases depName=kubernetes/kubernetes
+          kustomize: v5.8.0 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
+          kubeconform: v0.7.0 # renovate: datasource=github-releases depName=yannh/kubeconform
+          task: v3.46.4 # renovate: datasource=github-releases depName=go-task/task
+          tflint: v0.60.0 # renovate: datasource=github-releases depName=terraform-linters/tflint
+          terraform: v1.14.3 # renovate: datasource=hashicorp-releases depName=terraform
+          packer: v1.14.3 # renovate: datasource=hashicorp-releases depName=packer
 
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: "24"
 
       - name: Install cspell
         run: |
+          echo "📝 Installing cspell for spell checking..."
           npm install -g cspell
           cspell --version
+          echo "✅ cspell installed successfully"
 
-      - name: Install additional tools
+      - name: Install yamllint
         run: |
-          # Install yamllint for YAML validation
+          echo "📋 Installing yamllint for YAML validation..."
           pip install yamllint
+          echo "✅ yamllint installed successfully"
 
       - name: Cache pre-commit
         uses: actions/cache@v5
         with:
           path: ~/.cache/pre-commit
-          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          key: pre-commit-${{ runner.os }}-py3.x-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('package*.json') }}
 
       - name: Cache Node.js dependencies
         uses: actions/cache@v5
@@ -79,8 +88,17 @@ jobs:
       - name: Run pre-commit
         uses: cloudposse/github-action-pre-commit@v4.0.0
 
+      - name: Upload pre-commit logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: pre-commit-logs
+          path: ~/.cache/pre-commit/
+          retention-days: 7
+
   security-scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     name: Security scan
     permissions:
       contents: read
@@ -93,20 +111,19 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'config'
+          scan-type: "config"
           hide-progress: false
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          trivy-config: '.github/trivy/trivy.yaml'
+          format: "sarif"
+          output: "trivy-results.sarif"
+          trivy-config: ".github/trivy/trivy.yaml"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
-        continue-on-error: true
+          sarif_file: "trivy-results.sarif"
 
-      - name: Upload Trivy results as artifact (fallback)
+      - name: Upload Trivy results as artifact
         uses: actions/upload-artifact@v6
         if: always()
         with:
@@ -121,8 +138,9 @@ jobs:
           echo "================================="
           if [ -f "trivy-results.sarif" ]; then
             echo "✅ SARIF results generated successfully"
-            echo "📊 Results available as workflow artifact"
-            echo "🔗 Enable Code Scanning in repository settings to view in Security tab"
+            echo "📊 Results uploaded to Security tab (if Code Scanning is enabled)"
+            echo "📦 Results also available as workflow artifact for 30 days"
           else
-            echo "❌ SARIF results not found"
+            echo "❌ SARIF results not found - scan may have failed"
+            echo "💡 Check previous steps for errors"
           fi

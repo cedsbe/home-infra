@@ -22,6 +22,7 @@
         "foxundermoon.shell-format",
         "GitHub.copilot-chat",
         "GitHub.copilot",
+        "GitHub.vscode-github-actions",
         "hashicorp.terraform",
         "ms-azuretools.vscode-docker",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
