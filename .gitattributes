@@ -19,3 +19,6 @@ kubeconfig filter=git-crypt diff=git-crypt
 
 # Keep template files unencrypted (they contain no secrets)
 *.template !filter !diff
+
+# All files in the 'sensitive' directory
+sensitive/** filter=git-crypt diff=git-crypt

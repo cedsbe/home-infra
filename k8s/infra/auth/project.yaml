@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: auth
+  namespace: argocd
+spec:
+  description: Auth infrastructure
+  sourceRepos:
+    - "https://github.com/cedsbe/home-infra"
+  destinations:
+    - namespace: "argocd"
+      server: "*"
+    - namespace: "pocket-id"
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
