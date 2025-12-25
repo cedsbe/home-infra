@@ -94,6 +94,7 @@ httproute
 iad
 ICS
 img
+initdb
 iothread
 iotop
 IPC
@@ -158,6 +159,7 @@ pkr
 pkrtpl
 pkrvars
 Pnp
+pocketid
 poly
 ppk
 pprof
@@ -222,6 +224,7 @@ timesyncd
 tlsroute
 tpm
 traefik
+trixie
 TrkWks
 ttl
 typescript

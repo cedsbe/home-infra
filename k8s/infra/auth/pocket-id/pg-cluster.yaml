@@ -1,0 +1,50 @@
+# cnpg/custom-cluster.yaml
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pocket-id-cluster
+  namespace: pocket-id
+spec:
+  instances: 3
+
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-standard-trixie
+    major: 18
+
+  storage:
+    storageClass: proxmox-csi
+    size: 2Gi
+
+  monitoring:
+    enablePodMonitor: true
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: pg-superuser-credentials
+
+  bootstrap:
+    initdb:
+      database: pocket-id
+
+      owner: pocketid-user
+      secret:
+        name: pg-user-credentials
+
+  postgresql:
+    parameters:
+      timezone: "Europe/Brussels"
+
+  managed:
+    services:
+      additional:
+        - selectorType: rw
+          updateStrategy: patch
+          serviceTemplate:
+            metadata:
+              name: custom-database-ext
+              annotations:
+                io.cilium/lb-ipam-ips: 192.168.65.159
+            spec:
+              type: LoadBalancer

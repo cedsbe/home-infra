@@ -8,7 +8,8 @@
         "/\\.tftpl$/",
         "/\\.yaml$/",
         "/\\.sh$/",
-        "/\\.tfvars/"
+        "/Dockerfile/",
+        "/\\.tfvars$/"
       ],
       "matchStrings": [
         "(?<currentValue>[\\w+\\.\\-]*)['\",;]*\\s*#\\s?renovate: (?<datasource>\\S+)=(?<depName>\\S+)\\s?(registry=(?<registryUrl>\\S+))?\\s?(versioning=(?<versioning>\\S+))?\\s?(extractVersion=(?<extractVersion>\\S+))?"

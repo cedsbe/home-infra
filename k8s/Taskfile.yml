@@ -78,3 +78,21 @@ tasks:
     dir: infra
     cmds:
       - kubectl kustomize --enable-helm . | kubectl apply -f -
+
+  seal:secret:
+    desc: "Seal a Kubernetes secret file using kubeseal"
+    dir: ../sensitive
+    vars:
+      FILE: '{{.FILE | default ""}}'
+      BASE_NAME:
+        sh: echo "{{.FILE}}" | sed 's/\.yaml$//'
+    requires:
+      vars: [FILE]
+    cmds:
+      - |
+        if [ ! -f "{{.FILE}}" ]; then
+          echo "Error: File '{{.FILE}}' not found in sensitive folder"
+          exit 1
+        fi
+      - kubeseal -v 3 -f "{{.FILE}}" -o yaml -w "{{.BASE_NAME}}_sealed.yaml"
+      - echo "Sealed secret written to {{.BASE_NAME}}_sealed.yaml"
