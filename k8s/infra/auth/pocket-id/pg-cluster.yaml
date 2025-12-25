@@ -30,7 +30,7 @@ spec:
 
       owner: user
       secret:
-        name: user-credentials
+        name: pg-user-credentials
 
   postgresql:
     parameters:
