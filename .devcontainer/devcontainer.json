@@ -58,10 +58,11 @@
   "mounts": [
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
-    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached"
+    "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
+    "source=home-infra-fish-history,target=/home/vscode/.local/share/fish,type=volume"
   ],
   "name": "Home Infrastructure Dev Container",
-  "postCreateCommand": "fish -c 'echo Welcome to Home Infrastructure Dev Container!'",
+  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local/share/fish && fish -c 'echo Welcome to Home Infrastructure Dev Container!'",
   "remoteUser": "vscode",
   "runArgs": [
     "--network=host",

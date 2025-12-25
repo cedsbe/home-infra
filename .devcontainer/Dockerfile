@@ -17,6 +17,7 @@ ARG K9S_VERSION=v0.32.7         # renovate: datasource=github-releases depName=d
 ARG KUBECOLOR_VERSION=v0.4.0    # renovate: datasource=github-releases depName=kubecolor/kubecolor
 ARG KUBECONFORM_VERSION=v0.7.0  # renovate: datasource=github-releases depName=yannh/kubeconform
 ARG KUBECTX_VERSION=v0.9.5      # renovate: datasource=github-releases depName=ahmetb/kubectx
+ARG KUBESEAL_VERSION=v0.27.2    # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
 ARG KUSTOMIZE_VERSION=v5.8.0    # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
 ARG LAZYGIT_VERSION=v0.44.1     # renovate: datasource=github-releases depName=jesseduffield/lazygit
 ARG GITLEAKS_VERSION=v8.30.0    # renovate: datasource=github-releases depName=gitleaks/gitleaks
@@ -240,6 +241,10 @@ RUN <<EOF
   # Install kubeconform
   curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-${ARCH}.tar.gz" | tar -xz -C /usr/local/bin kubeconform
   chmod +x /usr/local/bin/kubeconform
+
+  # Install kubeseal
+  curl -fsSL "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-linux-${ARCH}.tar.gz" | tar -xz -C /usr/local/bin kubeseal
+  chmod +x /usr/local/bin/kubeseal
 
   # Install talosctl
   curl -fsSL "https://github.com/siderolabs/talos/releases/download/${TALOS_VERSION}/talosctl-linux-${ARCH}" -o /usr/local/bin/talosctl

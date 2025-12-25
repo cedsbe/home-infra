@@ -94,6 +94,7 @@ httproute
 iad
 ICS
 img
+initdb
 iothread
 iotop
 IPC
@@ -222,6 +223,7 @@ timesyncd
 tlsroute
 tpm
 traefik
+trixie
 TrkWks
 ttl
 typescript

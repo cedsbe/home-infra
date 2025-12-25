@@ -34,6 +34,10 @@ includes:
     taskfile: ./terraform/cloudflare/Taskfile.yml
     dir: ./terraform/cloudflare
 
+  k8s:
+    taskfile: ./k8s/Taskfile.yml
+    dir: ./k8s
+
   windows:
     taskfile: ./terraform/windows/Taskfile.yml
     dir: ./terraform/windows
