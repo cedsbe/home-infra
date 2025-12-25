@@ -17,6 +17,7 @@
   ],
   "extends": [
     "config:recommended",
+    ":enablePreCommit",
     ":rebaseStalePrs"
   ]
 }
