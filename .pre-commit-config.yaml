@@ -2,56 +2,45 @@
 # Excludes git-crypt encrypted files to prevent CI/CD failures when keys are not available
 # Encrypted files: *.secrets.auto.tfvars, backend.config, packer/**/.env, terraform/**/.env
 
+# Global exclude for all git-crypt encrypted files
+exclude: |
+  (?x)^(
+    .*\.secrets\.auto\.tfvars$|
+    packer/.*/\.env$|
+    terraform/.*/\.env$|
+    backend\.config$|
+    sensitive/.*
+  )$
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: |
-          (?x)^(
-            .*\.secrets\.auto\.tfvars$|
-            packer/.*/\.env$|
-            terraform/.*/\.env$|
-            backend\.config$
-          )$
+
       - id: end-of-file-fixer
-        exclude: |
-          (?x)^(
-            .*\.secrets\.auto\.tfvars$|
-            packer/.*/\.env$|
-            terraform/.*/\.env$|
-            backend\.config$
-          )$
+
       - id: check-merge-conflict
+
       - id: check-added-large-files
+
       - id: check-yaml
         args: [--allow-multiple-documents]
-        exclude: |
-          (?x)^(
-            .*\.secrets\.auto\.tfvars$|
-            packer/.*/\.env$|
-            terraform/.*/\.env$|
-            backend\.config$
-          )$
+
       - id: check-json
         exclude: |
           (?x)^(
             .devcontainer\/devcontainer\.json$
           )$
+
       - id: pretty-format-json
         args: ["--autofix"]
         exclude: |
           (?x)^(
             .devcontainer\/devcontainer\.json$
           )$
+
       - id: mixed-line-ending
-        exclude: |
-          (?x)^(
-            .*\.secrets\.auto\.tfvars$|
-            packer/.*/\.env$|
-            terraform/.*/\.env$|
-            backend\.config$
-          )$
 
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v9.4.0
@@ -63,17 +52,12 @@ repos:
         files: \.(md|txt|yaml|yml|json|js|ts|tf|hcl|ps1|sh|py)$
         exclude: |
           (?x)^(
-            .*\.secrets\.auto\.tfvars$|
-            packer/.*/\.env$|
-            terraform/.*/\.env$|
-            backend\.config$|
             .*\.lock$|
             .*\.log$|
             node_modules/.*|
             .terraform/.*|
             terraform\.tfstate.*|
-            .task/.*|
-            sensitive/.*
+            .task/.*
           )$
 
   # - repo: https://github.com/terraform-docs/terraform-docs
@@ -87,33 +71,14 @@ repos:
     rev: v1.104.0
     hooks:
       - id: terraform_fmt
-        exclude: |
-          (?x)^(
-            .*\.secrets\.auto\.tfvars$|
-            packer/.*/\.env$|
-            terraform/.*/\.env$|
-            backend\.config$
-          )$
+
       - id: terraform_validate
         args:
           - --hook-config=--retry-once-with-cleanup=true
-        exclude: |
-          (?x)^(
-            .*\.secrets\.auto\.tfvars$|
-            packer/.*/\.env$|
-            terraform/.*/\.env$|
-            backend\.config$
-          )$
+
       - id: terraform_tflint
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
-        exclude: |
-          (?x)^(
-            .*\.secrets\.auto\.tfvars$|
-            packer/.*/\.env$|
-            terraform/.*/\.env$|
-            backend\.config$
-          )$
 
   # YAML linting (excluding k8s manifests which may have templating)
   - repo: https://github.com/adrienverge/yamllint
