@@ -24,4 +24,5 @@ resources:
   - pi-secrets.yaml
   - pi-deployment.yaml
   - pi-svc.yaml
+  - pi-servicemonitor.yaml
   - pi-http-route.yaml
