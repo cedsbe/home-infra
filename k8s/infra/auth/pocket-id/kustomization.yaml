@@ -10,7 +10,7 @@ configMapGenerator:
       - PUID="12501"
       - PGID="12501"
       - DB_PROVIDER="postgres"
-      - DB_HOST="postgres://pocket-id-cluster-rw.auth.svc.cluster.local/pocket-id"
+      - DB_CONNECTION_STRING="postgres://pocket-id-cluster-rw.auth.svc.cluster.local/pocket-id"
 
 resources:
   # ClusterImageCatalog for CloudNativePG. See https://github.com/cloudnative-pg/artifacts/blob/main/image-catalogs/README.md
