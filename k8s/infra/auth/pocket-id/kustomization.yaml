@@ -10,7 +10,10 @@ configMapGenerator:
       - DB_PROVIDER="postgres"
       - ENCRYPTION_KEY_FILE="/app/secrets/encryption_key.txt"
       - MAXMIND_LICENSE_KEY_FILE="/app/secrets/maxmind_api_key.txt"
-      - OTEL_METRICS_EXPORTER=prometheus
+      - METRICS_ENABLED="true"
+      - OTEL_METRICS_EXPORTER="prometheus"
+      - OTEL_EXPORTER_PROMETHEUS_HOST="0.0.0.0"
+      - OTEL_EXPORTER_PROMETHEUS_PORT="9464"
       - PGID="12501"
       - PUID="12501"
 
