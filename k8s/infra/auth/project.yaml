@@ -10,7 +10,7 @@ spec:
   destinations:
     - namespace: "argocd"
       server: "*"
-    - namespace: "pocket-id"
+    - namespace: "auth"
       server: "*"
   clusterResourceWhitelist:
     - group: "*"
