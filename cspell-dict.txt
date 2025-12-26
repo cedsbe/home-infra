@@ -52,6 +52,7 @@ dchp
 devops
 dhcpv
 digitalocean
+distroless
 dmwappushservice
 dnf
 dnscrypt
@@ -153,6 +154,8 @@ openshift
 ovmf
 passphrase
 pci
+PGID
+PGUSER
 Pim
 pixabay
 pkr
@@ -167,6 +170,7 @@ prettier
 protobuf
 proxmox
 ptr
+PUID
 pulsar
 pvscsi
 qbittorrent

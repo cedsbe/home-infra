@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pocket-id
+  namespace: auth
+  labels:
+    app: pocket-id
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pocket-id
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pocket-id
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: hsp-proxmox0
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 12501
+        runAsGroup: 12501
+        fsGroup: 12501
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      dnsConfig:
+        options:
+          # Lower ndots to avoid search-domain expansion issues (musl/glibc resolver short-circuit)
+          # and ensure external and cluster FQDNs resolve correctly.
+          # Use this on other Alpine based containers if I face similar issues.
+          - name: ndots
+            value: "1"
+      containers:
+        - name: pocket-id
+          # TODO: switch to distroless (ghcr.io/pocket-id/pocket-id:v1.16-distroless) image when the deployment is stable.
+          image: ghcr.io/pocket-id/pocket-id:v1.16 # renovate: docker=ghcr.io/pocket-id/pocket-id
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: http
+              containerPort: 1411
+            - name: metrics
+              containerPort: 9464
+          env:
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: pg-user-credentials
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg-user-credentials
+                  key: password
+          envFrom:
+            - configMapRef:
+                name: pocket-id-config
+                optional: false
+          volumeMounts:
+            - name: pocket-id-data
+              mountPath: /app/data
+            - name: pocket-id-secrets
+              mountPath: /app/secrets
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 256Mi
+          livenessProbe:
+            exec:
+              command:
+                - /app/pocket-id
+                - healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 90
+            timeoutSeconds: 5
+            failureThreshold: 2
+          readinessProbe:
+            exec:
+              command:
+                - /app/pocket-id
+                - healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 90
+            timeoutSeconds: 5
+            failureThreshold: 2
+      volumes:
+        - name: pocket-id-secrets
+          secret:
+            secretName: pocket-id-secrets
+        - name: pocket-id-data
+          persistentVolumeClaim:
+            claimName: pocket-id-data
+        - name: tmp
+          emptyDir: {}
