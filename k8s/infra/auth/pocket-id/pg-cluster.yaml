@@ -3,7 +3,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: pocket-id-cluster
-  namespace: pocket-id
+  namespace: auth
 spec:
   instances: 3
 
@@ -43,7 +43,7 @@ spec:
           updateStrategy: patch
           serviceTemplate:
             metadata:
-              name: custom-database-ext
+              name: pocket-id-ext
               annotations:
                 io.cilium/lb-ipam-ips: 192.168.65.159
             spec:

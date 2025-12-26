@@ -1,10 +1,26 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+configMapGenerator:
+  - name: pocket-id-config
+    namespace: auth
+    literals:
+      - APP_URL="https://pocket-id.k8s.ghiot.be/"
+      - ENCRYPTION_KEY_FILE="/app/secrets/encryption_key.txt"
+      - MAXMIND_LICENSE_KEY_FILE="/app/secrets/maxmind_api_key.txt"
+      - PUID="2501"
+      - PGID="2501"
+      - DB_PROVIDER="postgres"
+      - DB_HOST="postgres://pocket-id-cluster-rw.auth.svc.cluster.local/pocket-id"
+
 resources:
   # ClusterImageCatalog for CloudNativePG. See https://github.com/cloudnative-pg/artifacts/blob/main/image-catalogs/README.md
   - https://github.com/cloudnative-pg/artifacts/image-catalogs?ref=main
-  - ns.yaml
   - pg-superuser-credentials.yaml
   - pg-user-credentials.yaml
   - pg-cluster.yaml
+  - pi-pvc.yaml
+  - pi-secrets.yaml
+  - pi-deployment.yaml
+  - pi-svc.yaml
+  - pi-http-route.yaml
