@@ -76,6 +76,24 @@ spec:
             limits:
               cpu: 1000m
               memory: 256Mi
+          livenessProbe:
+            exec:
+              command:
+                - /app/pocket-id
+                - healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 90
+            timeoutSeconds: 5
+            failureThreshold: 2
+          readinessProbe:
+            exec:
+              command:
+                - /app/pocket-id
+                - healthcheck
+            initialDelaySeconds: 10
+            periodSeconds: 90
+            timeoutSeconds: 5
+            failureThreshold: 2
       volumes:
         - name: pocket-id-secrets
           secret:

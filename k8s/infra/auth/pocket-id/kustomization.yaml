@@ -6,12 +6,13 @@ configMapGenerator:
     namespace: auth
     literals:
       - APP_URL="https://pocket-id.k8s.ghiot.be/"
+      - DB_CONNECTION_STRING="postgres://pocket-id-cluster-rw.auth.svc.cluster.local/pocket-id"
+      - DB_PROVIDER="postgres"
       - ENCRYPTION_KEY_FILE="/app/secrets/encryption_key.txt"
       - MAXMIND_LICENSE_KEY_FILE="/app/secrets/maxmind_api_key.txt"
-      - PUID="12501"
+      - OTEL_METRICS_EXPORTER=prometheus
       - PGID="12501"
-      - DB_PROVIDER="postgres"
-      - DB_CONNECTION_STRING="postgres://pocket-id-cluster-rw.auth.svc.cluster.local/pocket-id"
+      - PUID="12501"
 
 resources:
   # ClusterImageCatalog for CloudNativePG. See https://github.com/cloudnative-pg/artifacts/blob/main/image-catalogs/README.md
