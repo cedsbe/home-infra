@@ -6,8 +6,7 @@ configMapGenerator:
     namespace: auth
     literals:
       - APP_URL="https://pocket-id.k8s.ghiot.be/"
-      - ENCRYPTION_KEY_FILE="/app/secrets/encryption_key.txt"
-      - MAXMIND_LICENSE_KEY_FILE="/app/secrets/maxmind_api_key.txt"
+      - ENCRYPTION_KEY_FILE="/app/secrets/encryption_key"
       - PUID="12501"
       - PGID="12501"
       - DB_PROVIDER="postgres"
