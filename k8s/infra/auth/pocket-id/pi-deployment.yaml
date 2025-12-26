@@ -60,7 +60,7 @@ spec:
                   key: password
           envFrom:
             - configMapRef:
-                name: pocket-id-env
+                name: pocket-id-config
                 optional: false
           volumeMounts:
             - name: pocket-id-data
