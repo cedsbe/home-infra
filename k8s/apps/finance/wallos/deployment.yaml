@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wallos
+  namespace: finance
+  labels:
+    app: wallos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wallos
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wallos
+        app.kubernetes.io/name: wallos
+        app.kubernetes.io/version: 4.6.0 # renovate: docker=docker.io/bellamy/wallos
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: hsp-proxmox0
+      securityContext:
+        runAsNonRoot: false # wallos requires to start as root. See https://github.com/ellite/Wallos/issues/955
+        fsGroup: 12501
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      dnsConfig:
+        options:
+          # Lower ndots to avoid search-domain expansion issues (musl/glibc resolver short-circuit)
+          # and ensure external and cluster FQDNs resolve correctly.
+          # Use this on other Alpine based containers if I face similar issues.
+          - name: ndots
+            value: "1"
+      containers:
+        - name: wallos
+          # TODO: switch to distroless (ghcr.io/wallos/wallos:v1.16-distroless) image when the deployment is stable.
+          image: docker.io/bellamy/wallos:4.6.0 # renovate: docker=docker.io/bellamy/wallos
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+              add: ["CHOWN", "SETUID", "SETGID", "NET_BIND_SERVICE"]
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: PUID
+              value: "12501"
+            - name: PGID
+              value: "12501"
+            - name: TZ
+              value: "Europe/Brussels"
+          volumeMounts:
+            - name: wallos-data
+              mountPath: /var/www/html/db
+              subPath: db
+            - name: wallos-data
+              mountPath: /var/www/html/images/uploads/logos
+              subPath: logos
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 256Mi
+          startupProbe:
+            httpGet:
+              path: /health.php
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /health.php
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health.php
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: wallos-data
+          persistentVolumeClaim:
+            claimName: wallos-data
+        - name: tmp
+          emptyDir: {}
