@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: finance
+  namespace: argocd
+spec:
+  sourceRepos:
+    - "https://github.com/cedsbe/home-infra"
+  destinations:
+    - namespace: "argocd"
+      server: "*"
+    - namespace: "finance"
+      server: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
