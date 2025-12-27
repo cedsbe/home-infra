@@ -4,6 +4,7 @@ metadata:
   name: finance
   namespace: argocd
 spec:
+  description: Finance applications
   sourceRepos:
     - "https://github.com/cedsbe/home-infra"
   destinations:
