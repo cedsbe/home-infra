@@ -62,6 +62,9 @@ spec:
             - name: wallos-data
               mountPath: /var/www/html/images/uploads/logos
               subPath: logos
+            - name: wallos-data
+              mountPath: /var/log
+              subPath: log
             - name: tmp
               mountPath: /tmp
           resources:
