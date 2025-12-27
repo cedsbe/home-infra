@@ -40,7 +40,7 @@ spec:
           image: docker.io/bellamy/wallos:4.6.0 # renovate: docker=docker.io/bellamy/wallos
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false # wallos needs to write to some folders in the container itself for permissions updates
             capabilities:
               drop: ["ALL"]
               add: ["CHOWN", "SETUID", "SETGID", "NET_BIND_SERVICE"]
