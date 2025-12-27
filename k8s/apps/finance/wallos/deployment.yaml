@@ -14,7 +14,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      namespace: finance
       labels:
         app: wallos
         app.kubernetes.io/name: wallos
