@@ -17,7 +17,7 @@ spec:
       labels:
         app: wallos
         app.kubernetes.io/name: wallos
-        app.kubernetes.io/version: 4.6.0 # renovate: docker=docker.io/bellamy/wallos
+        app.kubernetes.io/version: 4.6.0 # renovate: datasource=docker depName=docker.io/bellamy/wallos
     spec:
       nodeSelector:
         topology.kubernetes.io/zone: hsp-proxmox0
@@ -37,7 +37,7 @@ spec:
       containers:
         - name: wallos
           # TODO: switch to distroless (ghcr.io/wallos/wallos:v1.16-distroless) image when the deployment is stable.
-          image: docker.io/bellamy/wallos:4.6.0 # renovate: docker=docker.io/bellamy/wallos
+          image: docker.io/bellamy/wallos:4.6.0 # renovate: datasource=docker depName=docker.io/bellamy/wallos
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false # wallos needs to write to some folders in the container itself for permissions updates

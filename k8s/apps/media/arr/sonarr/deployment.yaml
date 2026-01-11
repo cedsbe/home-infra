@@ -37,7 +37,7 @@ spec:
             value: "1"
       containers:
         - name: sonarr
-          image: ghcr.io/home-operations/sonarr:4.0.16 # renovate: docker=ghcr.io/home-operations/sonarr
+          image: ghcr.io/home-operations/sonarr:4.0.16 # renovate: datasource=docker depName=ghcr.io/home-operations/sonarr
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

@@ -10,25 +10,44 @@ ARG TZ=Europe/Brussels
 ENV TZ=$TZ
 
 # Tool versions - automatically updated by Renovate
-ARG ARGOCD_VERSION=v2.13.2      # renovate: datasource=github-releases depName=argoproj/argo-cd
-ARG EZA_VERSION=v0.20.14        # renovate: datasource=github-releases depName=eza-community/eza
-ARG HADOLINT_VERSION=v2.12.0    # renovate: datasource=github-releases depName=hadolint/hadolint
-ARG K9S_VERSION=v0.32.7         # renovate: datasource=github-releases depName=derailed/k9s
-ARG KUBECOLOR_VERSION=v0.4.0    # renovate: datasource=github-releases depName=kubecolor/kubecolor
-ARG KUBECONFORM_VERSION=v0.7.0  # renovate: datasource=github-releases depName=yannh/kubeconform
-ARG KUBECTX_VERSION=v0.9.5      # renovate: datasource=github-releases depName=ahmetb/kubectx
-ARG KUBESEAL_VERSION=v0.27.2    # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
-ARG KUSTOMIZE_VERSION=v5.8.0    # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
-ARG LAZYGIT_VERSION=v0.44.1     # renovate: datasource=github-releases depName=jesseduffield/lazygit
-ARG GITLEAKS_VERSION=v8.30.0    # renovate: datasource=github-releases depName=gitleaks/gitleaks
-ARG STARSHIP_VERSION=v1.21.1    # renovate: datasource=github-releases depName=starship/starship
-ARG STERN_VERSION=v1.31.0       # renovate: datasource=github-releases depName=stern/stern
-ARG TALOS_VERSION=v1.9.2        # renovate: datasource=github-releases depName=siderolabs/talos
-ARG TASK_VERSION=v3.46.4        # renovate: datasource=github-releases depName=go-task/task
-ARG TFLINT_VERSION=v0.60.0      # renovate: datasource=github-releases depName=terraform-linters/tflint
-ARG TRIVY_VERSION=v0.58.1       # renovate: datasource=github-releases depName=aquasecurity/trivy
-ARG YQ_VERSION=v4.44.6          # renovate: datasource=github-releases depName=mikefarah/yq
-ARG CSPELL_VERSION=8.16.1       # renovate: datasource=npm depName=cspell
+# renovate: datasource=github-releases depName=argoproj/argo-cd
+ARG ARGOCD_VERSION=v2.13.2
+# renovate: datasource=github-releases depName=eza-community/eza
+ARG EZA_VERSION=v0.20.14
+# renovate: datasource=github-releases depName=hadolint/hadolint
+ARG HADOLINT_VERSION=v2.12.0
+# renovate: datasource=github-releases depName=derailed/k9s
+ARG K9S_VERSION=v0.32.7
+# renovate: datasource=github-releases depName=kubecolor/kubecolor
+ARG KUBECOLOR_VERSION=v0.4.0
+# renovate: datasource=github-releases depName=yannh/kubeconform
+ARG KUBECONFORM_VERSION=v0.7.0
+# renovate: datasource=github-releases depName=ahmetb/kubectx
+ARG KUBECTX_VERSION=v0.9.5
+# renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
+ARG KUBESEAL_VERSION=v0.27.2
+# renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
+ARG KUSTOMIZE_VERSION=v5.8.0
+# renovate: datasource=github-releases depName=jesseduffield/lazygit
+ARG LAZYGIT_VERSION=v0.44.1
+# renovate: datasource=github-releases depName=gitleaks/gitleaks
+ARG GITLEAKS_VERSION=v8.30.0
+# renovate: datasource=github-releases depName=starship/starship
+ARG STARSHIP_VERSION=v1.21.1
+# renovate: datasource=github-releases depName=stern/stern
+ARG STERN_VERSION=v1.31.0
+# renovate: datasource=github-releases depName=siderolabs/talos
+ARG TALOS_VERSION=v1.9.2
+# renovate: datasource=github-releases depName=go-task/task
+ARG TASK_VERSION=v3.46.4
+# renovate: datasource=github-releases depName=terraform-linters/tflint
+ARG TFLINT_VERSION=v0.60.0
+# renovate: datasource=github-releases depName=aquasecurity/trivy
+ARG TRIVY_VERSION=v0.58.1
+# renovate: datasource=github-releases depName=mikefarah/yq
+ARG YQ_VERSION=v4.44.6
+# renovate: datasource=npm depName=cspell
+ARG CSPELL_VERSION=8.16.1
 
 # Install system dependencies grouped by purpose
 RUN <<EOF

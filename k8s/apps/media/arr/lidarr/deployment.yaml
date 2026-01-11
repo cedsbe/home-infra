@@ -37,7 +37,7 @@ spec:
             value: "1"
       containers:
         - name: lidarr
-          image: ghcr.io/home-operations/lidarr:3.1.2 # renovate: docker=ghcr.io/home-operations/lidarr
+          image: ghcr.io/home-operations/lidarr:3.1.2 # renovate: datasource=docker depName=ghcr.io/home-operations/lidarr
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
