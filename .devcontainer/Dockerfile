@@ -15,7 +15,7 @@ ARG ARGOCD_VERSION=v2.14.21
 # renovate: datasource=github-releases depName=eza-community/eza
 ARG EZA_VERSION=v0.20.14
 # renovate: datasource=github-releases depName=hadolint/hadolint
-ARG HADOLINT_VERSION=v2.12.0
+ARG HADOLINT_VERSION=v2.14.0
 # renovate: datasource=github-releases depName=derailed/k9s
 ARG K9S_VERSION=v0.32.7
 # renovate: datasource=github-releases depName=kubecolor/kubecolor
