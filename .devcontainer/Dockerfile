@@ -33,7 +33,7 @@ ARG LAZYGIT_VERSION=v0.44.1
 # renovate: datasource=github-releases depName=gitleaks/gitleaks
 ARG GITLEAKS_VERSION=v8.30.0
 # renovate: datasource=github-releases depName=starship/starship
-ARG STARSHIP_VERSION=v1.21.1
+ARG STARSHIP_VERSION=v1.24.2
 # renovate: datasource=github-releases depName=stern/stern
 ARG STERN_VERSION=v1.31.0
 # renovate: datasource=github-releases depName=siderolabs/talos
