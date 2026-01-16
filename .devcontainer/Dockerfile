@@ -19,7 +19,7 @@ ARG HADOLINT_VERSION=v2.12.0
 # renovate: datasource=github-releases depName=derailed/k9s
 ARG K9S_VERSION=v0.32.7
 # renovate: datasource=github-releases depName=kubecolor/kubecolor
-ARG KUBECOLOR_VERSION=v0.4.0
+ARG KUBECOLOR_VERSION=v0.5.3
 # renovate: datasource=github-releases depName=yannh/kubeconform
 ARG KUBECONFORM_VERSION=v0.7.0
 # renovate: datasource=github-releases depName=ahmetb/kubectx
