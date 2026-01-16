@@ -35,7 +35,7 @@ ARG GITLEAKS_VERSION=v8.30.0
 # renovate: datasource=github-releases depName=starship/starship
 ARG STARSHIP_VERSION=v1.24.2
 # renovate: datasource=github-releases depName=stern/stern
-ARG STERN_VERSION=v1.31.0
+ARG STERN_VERSION=v1.33.1
 # renovate: datasource=github-releases depName=siderolabs/talos
 ARG TALOS_VERSION=v1.12.1
 # renovate: datasource=github-releases depName=go-task/task
