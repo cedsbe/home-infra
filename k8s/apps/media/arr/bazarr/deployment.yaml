@@ -37,7 +37,7 @@ spec:
             value: "1"
       containers:
         - name: bazarr
-          image: ghcr.io/home-operations/bazarr:1.5.4 # renovate: datasource=docker depName=ghcr.io/home-operations/bazarr
+          image: ghcr.io/home-operations/bazarr:1.5.4@sha256:7ff11ddc4bec111ef8f4b58e95d1df8b980835f78c5087c0a95c6e74908a1d29 # renovate: datasource=docker depName=ghcr.io/home-operations/bazarr packageName=ghcr.io/home-operations/bazarr versioning=docker registryUrl=https://ghcr.io
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

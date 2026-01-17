@@ -37,7 +37,7 @@ spec:
             value: "1"
       containers:
         - name: radarr
-          image: ghcr.io/home-operations/radarr:6.1.1 # renovate: datasource=docker depName=ghcr.io/home-operations/radarr
+          image: ghcr.io/home-operations/radarr:6.1.1@sha256:5e08c0eefd2770d1d29395c4f84fe5bf7dfc3a986598021306a5d8ac017a3989 # renovate: datasource=docker depName=ghcr.io/home-operations/radarr packageName=ghcr.io/home-operations/radarr versioning=docker registryUrl=https://ghcr.io
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           fetch-depth: 0
 
@@ -41,7 +41,7 @@ jobs:
           echo "✅ Encrypted files removed successfully"
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
         with:
           python-version: "3.x"
 
@@ -57,7 +57,7 @@ jobs:
           packer: v1.14.3 # renovate: datasource=github-releases depName=hashicorp/terraform
 
       - name: Install Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
         with:
           node-version: "24"
 
@@ -75,23 +75,23 @@ jobs:
           echo "✅ yamllint installed successfully"
 
       - name: Cache pre-commit
-        uses: actions/cache@v5
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5
         with:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ runner.os }}-py3.x-${{ hashFiles('.pre-commit-config.yaml') }}-${{ hashFiles('package*.json') }}
 
       - name: Cache Node.js dependencies
-        uses: actions/cache@v5
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5
         with:
           path: ~/.npm
           key: node-${{ runner.os }}-${{ hashFiles('package*.json') }}
 
       - name: Run pre-commit
-        uses: cloudposse/github-action-pre-commit@v4.0.0
+        uses: cloudposse/github-action-pre-commit@828247764461bc41b2bd267e24d76e91a279b093 # v4.0.0
 
       - name: Upload pre-commit logs on failure
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: pre-commit-logs
           path: ~/.cache/pre-commit/
@@ -107,7 +107,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
@@ -119,13 +119,13 @@ jobs:
           trivy-config: ".github/trivy/trivy.yaml"
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@cdefb33c0f6224e58673d9004f47f7cb3e328b89 # v4
         if: always()
         with:
           sarif_file: "trivy-results.sarif"
 
       - name: Upload Trivy results as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
         with:
           name: trivy-results

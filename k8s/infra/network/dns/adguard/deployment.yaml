@@ -56,7 +56,7 @@ spec:
               mountPath: /opt/adguardhome/conf
       containers:
         - name: adguard
-          image: docker.io/adguard/adguardhome:v0.107.71 # renovate: datasource=docker depName=docker.io/adguard/adguardhome
+          image: docker.io/adguard/adguardhome:v0.107.71@sha256:92929135ced2554aaf94706f766a98ad348f211df61b0704e2db7e8498cc00b7 # renovate: datasource=docker depName=docker.io/adguard/adguardhome packageName=docker.io/adguard/adguardhome versioning=docker registryUrl=https://index.docker.io
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
