@@ -20,5 +20,17 @@
     "customManagers:tfvarsVersions",
     ":enablePreCommit",
     ":rebaseStalePrs"
+  ],
+  "packageRules": [
+    {
+      "description": "Disable digest pinning for kustomize manager with docker datasource",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchManagers": [
+        "kustomize"
+      ],
+      "pinDigests": false
+    }
   ]
 }
