@@ -6,4 +6,4 @@ gateway_api_version = "v1.3.0"
 kubernetes_version = "v1.35.0"
 talos_version      = "v1.12.0"
 # renovate: datasource=github-releases depName=siderolabs/talos
-talos_update_version = "v1.12.1"
+talos_update_version = "v1.12.2"
