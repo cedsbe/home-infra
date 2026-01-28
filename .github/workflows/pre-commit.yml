@@ -51,7 +51,7 @@ jobs:
           kubectl: v1.35.0 # renovate: datasource=github-releases depName=kubernetes/kubernetes
           kustomize: v5.8.0 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
           kubeconform: v0.7.0 # renovate: datasource=github-releases depName=yannh/kubeconform
-          task: v3.46.4 # renovate: datasource=github-releases depName=go-task/task
+          task: v3.48.0 # renovate: datasource=github-releases depName=go-task/task packageName=go-task/task versioning=semver-coerced registryUrl=https://github.com
           tflint: v0.60.0 # renovate: datasource=github-releases depName=terraform-linters/tflint
           terraform: v1.14.3 # renovate: datasource=github-releases depName=hashicorp/packer
           packer: v1.14.3 # renovate: datasource=github-releases depName=hashicorp/terraform
