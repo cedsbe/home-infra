@@ -39,7 +39,7 @@ ARG STERN_VERSION=v1.33.1
 # renovate: datasource=github-releases depName=siderolabs/talos
 ARG TALOS_VERSION=v1.12.2
 # renovate: datasource=github-releases depName=go-task/task
-ARG TASK_VERSION=v3.46.4
+ARG TASK_VERSION=v3.48.0
 # renovate: datasource=github-releases depName=terraform-linters/tflint
 ARG TFLINT_VERSION=v0.60.0
 # renovate: datasource=github-releases depName=aquasecurity/trivy
