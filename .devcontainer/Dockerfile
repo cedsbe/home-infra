@@ -11,7 +11,7 @@ ENV TZ=$TZ
 
 # Tool versions - automatically updated by Renovate
 # renovate: datasource=github-releases depName=argoproj/argo-cd
-ARG ARGOCD_VERSION=v3.2.5
+ARG ARGOCD_VERSION=v3.2.6
 # renovate: datasource=github-releases depName=eza-community/eza
 ARG EZA_VERSION=v0.23.4
 # renovate: datasource=github-releases depName=hadolint/hadolint
