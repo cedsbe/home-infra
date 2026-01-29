@@ -170,6 +170,29 @@ provider "registry.terraform.io/mastercard/restapi" {
   ]
 }
 
+provider "registry.terraform.io/netascode/utils" {
+  version     = "1.1.0-beta3"
+  constraints = ">= 1.1.0-beta3, 1.1.0-beta3"
+  hashes = [
+    "h1:GyKDIRvn+UmzPLHKW62PY7hqbGvUTMzoezhmz4DuXCw=",
+    "zh:18ef54becffa707347e4a93dd26b7923e1b22f9bc4a052d8fba7343ad93861d5",
+    "zh:1e345955ec2ce606ef7e9d101f4f61ee32477c7df4224649cb0a8121fd19c79f",
+    "zh:1f11dee739295ae170799c3c70488d1d2556b3f05e38b2ee8708521bc328920c",
+    "zh:391bc034aa0c0307e93b172d531e39dbb0e3561f2d3d83c8a4a0cb945a49467e",
+    "zh:43890a8bdb8d5adbfc914bab71d36e11907bd1c06f18c5bd0dc73864d356e690",
+    "zh:64c48b4137166cb75c37f4202a7a8eec20e756901848ead685adce1156dd60b3",
+    "zh:7779fda0bd6f9a2e855302553c2e06926ba5c23da96b287a5e5db78951be7549",
+    "zh:84573aafeca0789825ae3e4f897c4c966199de51047d975de7070b4e327ce248",
+    "zh:890df766e9b839623b1f0437355032a3c006226a6c200cd911e15ee1a9014e9f",
+    "zh:a657e81c13e561b88da1a13c75ca0a3126f53a37e34d67590f562895b5276455",
+    "zh:bd8c61c5b42cb5000ecf91524046eeb7e6cd7fc499a7ee7bbf3fb010091d82e1",
+    "zh:c2c7bd0c6d4d80eff31cfb3a64da1a0956ccdf25da70108acc8aff5da1e2de67",
+    "zh:e36b86e9bcbd465b1f1bec0a53c28d94bb11eb1b86e3c1ee89083f384868fda9",
+    "zh:ef753a07c840b68519de3c3ee4990fade38991d8002276d5ca6dc1c63cce7ad0",
+    "zh:fa8c1dd2b1ead738a83f0de2831a4feb1d134999471034d199ff07ebdb040101",
+  ]
+}
+
 provider "registry.terraform.io/siderolabs/talos" {
   version     = "0.10.1"
   constraints = ">= 0.7.0, 0.10.1"

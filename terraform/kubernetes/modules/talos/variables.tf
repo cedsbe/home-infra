@@ -62,6 +62,9 @@ variable "talos_nodes" {
     ram_dedicated    = number
     update           = bool
     primary_endpoint = optional(bool, false)
+    interface_name   = optional(string, "ens18")
+    cidr_mask        = optional(number, null)
+    gateway          = optional(string, null)
   }))
 
   description = <<-EOT
@@ -80,6 +83,9 @@ variable "talos_nodes" {
     OPTIONAL FIELDS:
     - datastore_id: (Optional) Proxmox datastore ID for VM storage (default: "local-lvm").
     - primary_endpoint: (Optional) Set to true for exactly one controlplane node - used as etcd bootstrap node (default: false).
+    - interface_name: (Optional) Network interface name (default: "eth0"). Used for Talos 1.12 EthernetConfig.
+    - cidr_mask: (Optional) CIDR notation mask for the IP (default: 24 for /24). Used for Talos 1.12 EthernetConfig.
+    - gateway: (Optional) Default gateway IP address (default: "192.168.65.1"). Used for Talos 1.12 EthernetConfig.
 
     ============================================================================
     UPDATE MECHANISM - Manual Rolling Updates
