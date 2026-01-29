@@ -1,6 +1,6 @@
 output "pv_name" {
   description = "Name of the created Kubernetes PersistentVolume"
-  value       = kubernetes_persistent_volume.pv.metadata[0].name
+  value       = kubernetes_persistent_volume_v1.pv.metadata[0].name
 }
 
 output "storage_class" {
