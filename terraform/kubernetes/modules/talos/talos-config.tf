@@ -75,7 +75,10 @@ data "talos_machine_configuration" "this" {
     data.utils_yaml_merge.talos_config_v1alpha1[each.key].output,
 
     # Resolver configuration (common to all nodes)
-    templatefile("${path.module}/talos_machine_config_templates/resolver-config.yaml.tftpl", {}),
+    templatefile("${path.module}/talos_machine_config_templates/resolver-config.yaml.tftpl", {
+      dns_servers    = local.talos_cluster_enriched.dns_servers
+      search_domains = local.talos_cluster_enriched.search_domains
+    }),
 
     # Ethernet/Network interface configuration (per-node)
     templatefile("${path.module}/talos_machine_config_templates/link-config.yaml.tftpl", {
@@ -101,7 +104,7 @@ resource "talos_machine_configuration_apply" "this" {
   node                        = each.value.ip
   client_configuration        = talos_machine_secrets.this.client_configuration
   machine_configuration_input = data.talos_machine_configuration.this[each.key].machine_configuration
-  apply_mode                  = "auto"
+  apply_mode                  = "staged_if_needing_reboot"
 
   lifecycle {
     # re-run config apply if vm changes

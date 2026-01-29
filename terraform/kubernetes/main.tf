@@ -88,8 +88,6 @@ module "talos" {
       host_node        = "hsp-proxmox0"
       machine_type     = "controlplane"
       ip               = "192.168.65.110"
-      cidr_mask        = 24
-      gateway          = local.network_gateway
       mac_address      = "BC:24:11:00:00:00"
       vm_id            = "10000"
       cpu              = 4
@@ -101,8 +99,6 @@ module "talos" {
       host_node     = "hsp-proxmox0"
       machine_type  = "controlplane"
       ip            = "192.168.65.111"
-      cidr_mask     = 24
-      gateway       = local.network_gateway
       mac_address   = "BC:24:11:00:00:01"
       vm_id         = "11000"
       cpu           = 4
@@ -113,8 +109,6 @@ module "talos" {
       host_node     = "hsp-proxmox0"
       machine_type  = "controlplane"
       ip            = "192.168.65.112"
-      cidr_mask     = 24
-      gateway       = local.network_gateway
       mac_address   = "BC:24:11:00:00:02"
       vm_id         = "12000"
       cpu           = 4
@@ -125,8 +119,6 @@ module "talos" {
       host_node     = "hsp-proxmox0"
       machine_type  = "worker"
       ip            = "192.168.65.120"
-      cidr_mask     = 24
-      gateway       = local.network_gateway
       mac_address   = "BC:24:11:08:00:00"
       vm_id         = "20000"
       cpu           = 8
@@ -137,8 +129,6 @@ module "talos" {
       host_node     = "hsp-proxmox0"
       machine_type  = "worker"
       ip            = "192.168.65.121"
-      cidr_mask     = 24
-      gateway       = local.network_gateway
       mac_address   = "BC:24:11:08:00:01"
       vm_id         = "21000"
       cpu           = 8
@@ -149,8 +139,6 @@ module "talos" {
       host_node     = "hsp-proxmox0"
       machine_type  = "worker"
       ip            = "192.168.65.122"
-      cidr_mask     = 24
-      gateway       = local.network_gateway
       mac_address   = "BC:24:11:08:00:02"
       vm_id         = "22000"
       cpu           = 8
