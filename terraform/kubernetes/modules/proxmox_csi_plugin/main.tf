@@ -44,7 +44,7 @@ locals {
 }
 
 # Kubernetes namespace for Proxmox CSI plugin with privileged Pod Security Policy
-resource "kubernetes_namespace" "csi_proxmox" {
+resource "kubernetes_namespace_v1" "csi_proxmox" {
   metadata {
     name = "csi-proxmox"
     # Pod Security Policy labels allowing privileged containers required by CSI plugin
@@ -57,10 +57,10 @@ resource "kubernetes_namespace" "csi_proxmox" {
 }
 
 # Kubernetes secret containing Proxmox credentials for CSI plugin authentication
-resource "kubernetes_secret" "proxmox_csi_plugin" {
+resource "kubernetes_secret_v1" "proxmox_csi_plugin" {
   metadata {
     name      = "proxmox-csi-plugin"
-    namespace = kubernetes_namespace.csi_proxmox.id
+    namespace = kubernetes_namespace_v1.csi_proxmox.id
   }
 
   data = {
