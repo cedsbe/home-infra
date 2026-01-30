@@ -34,6 +34,8 @@ variable "talos_cluster" {
     extra_manifests     = optional(list(string))
     kubelet_extra_args  = optional(string, "")
     api_server          = optional(string)
+    dns_servers         = optional(list(string), ["192.168.65.30", "192.168.65.40"])
+    search_domains      = optional(list(string), ["ad.ghiot.be", "ghiot.be"])
   })
   description = <<-EOT
     Talos cluster configuration:
@@ -47,6 +49,8 @@ variable "talos_cluster" {
     - extra_manifests: (Optional) Additional Kubernetes manifests (URLs or paths) to apply after cluster bootstrap.
     - kubelet_extra_args: (Optional) Custom kubelet extra arguments as a JSON string.
     - api_server: (Optional) Custom Kubernetes API server configuration as a JSON string.
+    - dns_servers: (Optional) List of DNS server IP addresses (default: ["192.168.65.30", "192.168.65.40"]).
+    - search_domains: (Optional) List of DNS search domains (default: ["ad.ghiot.be", "ghiot.be"]).
     EOT
 }
 
@@ -62,6 +66,9 @@ variable "talos_nodes" {
     ram_dedicated    = number
     update           = bool
     primary_endpoint = optional(bool, false)
+    interface_name   = optional(string, "ens18")
+    cidr_mask        = optional(number, null)
+    gateway          = optional(string, null)
   }))
 
   description = <<-EOT
@@ -80,6 +87,9 @@ variable "talos_nodes" {
     OPTIONAL FIELDS:
     - datastore_id: (Optional) Proxmox datastore ID for VM storage (default: "local-lvm").
     - primary_endpoint: (Optional) Set to true for exactly one controlplane node - used as etcd bootstrap node (default: false).
+    - interface_name: (Optional) Network interface name (default: "ens18"). Used for Talos 1.12 LinkConfig.
+    - cidr_mask: (Optional) CIDR notation mask for the IP (default: 24 for /24). Used for Talos 1.12 LinkConfig.
+    - gateway: (Optional) Default gateway IP address. Falls back to talos_cluster.gateway if not set. Used for Talos 1.12 LinkConfig.
 
     ============================================================================
     UPDATE MECHANISM - Manual Rolling Updates

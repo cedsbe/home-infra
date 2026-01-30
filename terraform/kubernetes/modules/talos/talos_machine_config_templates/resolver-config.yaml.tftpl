@@ -1,0 +1,11 @@
+apiVersion: v1alpha1
+kind: ResolverConfig
+nameservers:
+%{ for server in dns_servers ~}
+  - address: ${server}
+%{ endfor ~}
+searchDomains:
+  domains:
+%{ for domain in search_domains ~}
+    - ${domain}
+%{ endfor ~}

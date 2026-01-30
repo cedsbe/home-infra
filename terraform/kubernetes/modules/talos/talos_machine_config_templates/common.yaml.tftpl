@@ -1,17 +1,10 @@
+version: v1alpha1
 machine:
   kubelet:
     image: ghcr.io/siderolabs/kubelet:${kubernetes_version}
     extraArgs:
       rotate-server-certificates: true
       ${indent(6, kubelet_extra_args)}
-  network:
-    hostname: ${hostname}
-    nameservers:
-      - 192.168.65.30
-      - 192.168.65.40
-    searchDomains:
-      - ad.ghiot.be
-      - ghiot.be
   nodeLabels:
     topology.kubernetes.io/region: ${cluster_name}
     topology.kubernetes.io/zone: ${node_name}

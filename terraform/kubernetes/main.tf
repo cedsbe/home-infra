@@ -56,6 +56,10 @@ resource "terraform_data" "cilium_helm_template_bootstrap" {
 # - Kubernetes bootstrap with embedded Cilium CNI
 # - TLS certificate management and kubeconfig generation
 
+locals {
+  network_gateway = "192.168.65.1"
+}
+
 module "talos" {
   source = "./modules/talos"
 
@@ -66,7 +70,7 @@ module "talos" {
   }
 
   talos_cluster = {
-    gateway             = "192.168.65.1"
+    gateway             = local.network_gateway
     name                = "talos0"
     proxmox_cluster     = "homelab"
     talos_version       = var.talos_version

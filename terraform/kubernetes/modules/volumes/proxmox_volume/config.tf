@@ -6,6 +6,8 @@ resource "restapi_object" "proxmox_volume" {
   path         = "/api2/json/nodes/${var.volume.node}/storage/${var.volume.storage}/content"
   id_attribute = "data"
 
+  force_new = [var.volume.size]
+
   data = jsonencode({
     vmid     = var.volume.vmid
     filename = local.filename

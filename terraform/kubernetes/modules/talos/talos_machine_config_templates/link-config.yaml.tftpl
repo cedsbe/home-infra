@@ -1,0 +1,8 @@
+apiVersion: v1alpha1
+kind: LinkConfig
+name: ${interface_name}
+addresses:
+  - address: ${ip}/${cidr_mask}
+routes:
+  - gateway: ${gateway}
+    metric: 1024
