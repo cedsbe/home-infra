@@ -35,7 +35,7 @@
     {
       "dependencyDashboardApproval": true,
       "description": "Gateway API 1.4.x requires Cilium 1.20.0+ - require approval",
-      "matchNewValue": ">=1.4.0",
+      "matchNewValue": "/^1\\.(4|[5-9]|[1-9]\\d+)\\.|^[2-9]\\.|^\\d{2,}\\./",
       "matchPackageNames": [
         "kubernetes-sigs/gateway-api"
       ],
