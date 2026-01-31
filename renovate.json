@@ -34,13 +34,13 @@
     },
     {
       "dependencyDashboardApproval": true,
-      "description": "Gateway API 1.4.x requires Cilium 1.20.0+ - require approval",
-      "matchNewValue": "/^1\\.(4|[5-9]|[1-9]\\d+)\\.|^[2-9]\\.|^\\d{2,}\\./",
+      "description": "Gateway API updates require Cilium compatibility verification",
+      "matchNewValue": "/^v?1\\.(4|[5-9]|[1-9]\\d+)\\.|^v?[2-9]\\.|^v?\\d{2,}\\./",
       "matchPackageNames": [
         "kubernetes-sigs/gateway-api"
       ],
       "prBodyNotes": [
-        "\u26a0\ufe0f **Dependency Constraint**: Gateway API 1.4.x requires Cilium 1.20.0+. Ensure Cilium is updated first."
+        "\u26a0\ufe0f **Dependency Constraint**: Ensure the Gateway API version is supported by Cilium before merging. Check [Cilium Gateway API documentation](https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/) for compatibility."
       ]
     }
   ]
