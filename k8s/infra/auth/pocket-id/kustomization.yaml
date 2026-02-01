@@ -18,8 +18,6 @@ configMapGenerator:
       - PUID="12501"
 
 resources:
-  # ClusterImageCatalog for CloudNativePG. See https://github.com/cloudnative-pg/artifacts/blob/main/image-catalogs/README.md
-  - https://github.com/cloudnative-pg/artifacts/image-catalogs?ref=main
   - pg-superuser-credentials.yaml
   - pg-user-credentials.yaml
   - pg-cluster.yaml
