@@ -4,9 +4,6 @@ kind: Kustomization
 namespace: n8n
 
 resources:
-  # ClusterImageCatalog for CloudNativePG
-  # See https://github.com/cloudnative-pg/artifacts/blob/main/image-catalogs/README.md
-  - https://github.com/cloudnative-pg/artifacts/image-catalogs?ref=main
   # Namespace
   - ns.yaml
   # PostgreSQL secrets and cluster

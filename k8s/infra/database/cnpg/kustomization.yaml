@@ -4,6 +4,9 @@ namespace: cnpg-system
 
 resources:
   - ns.yaml
+  # ClusterImageCatalog for CloudNativePG
+  # See https://github.com/cloudnative-pg/artifacts/blob/main/image-catalogs/README.md
+  - https://github.com/cloudnative-pg/artifacts/image-catalogs?ref=main
 
 helmCharts:
   - name: cloudnative-pg
