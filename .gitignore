@@ -24,6 +24,7 @@ id_rsa
 
 # Kubernetes downloads
 k8s/infra/*/*/charts/*
+k8s/apps/*/*/charts/*
 
 # Node.js dependencies for spell checking
 node_modules/
