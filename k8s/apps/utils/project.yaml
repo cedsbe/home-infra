@@ -13,6 +13,8 @@ spec:
       server: "*"
     - namespace: "flaresolverr"
       server: "*"
+    - namespace: "n8n"
+      server: "*"
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
