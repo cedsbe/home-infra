@@ -9,6 +9,8 @@ configMapGenerator:
 
 resources:
   - ns.yaml
+  - network-policies.yaml
+  - bazarr
   - lidarr
   - prowlarr
   - radarr
