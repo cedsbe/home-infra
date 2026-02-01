@@ -5,6 +5,3 @@ namespace: argocd
 resources:
   - project.yaml
   - application-set.yaml
-  - flaresolverr
-  - torrent
-  - n8n
