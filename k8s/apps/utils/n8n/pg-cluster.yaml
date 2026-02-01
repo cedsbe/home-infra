@@ -1,0 +1,39 @@
+# CloudNativePG Cluster for n8n
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: n8n-cluster
+  namespace: n8n
+spec:
+  instances: 3
+
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql-standard-trixie
+    major: 18
+
+  storage:
+    storageClass: proxmox-csi
+    size: 5Gi
+
+  monitoring:
+    enablePodMonitor: true
+
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: pg-superuser-credentials
+
+  bootstrap:
+    initdb:
+      database: n8n
+      owner: n8n
+      secret:
+        name: pg-user-credentials
+
+  postgresql:
+    parameters:
+      timezone: "Europe/Brussels"
+      # n8n recommended settings
+      max_connections: "100"
+      shared_buffers: "256MB"

@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: n8n
+
+resources:
+  # ClusterImageCatalog for CloudNativePG
+  # See https://github.com/cloudnative-pg/artifacts/blob/main/image-catalogs/README.md
+  - https://github.com/cloudnative-pg/artifacts/image-catalogs?ref=main
+  # Namespace
+  - ns.yaml
+  # PostgreSQL secrets and cluster
+  - pg-superuser-credentials.yaml
+  - pg-user-credentials.yaml
+  - pg-cluster.yaml
+  # n8n secrets
+  - n8n-secrets.yaml
+  # Gateway API route
+  - http-route.yaml
+
+# Helm chart deployment
+helmCharts:
+  - name: n8n
+    releaseName: n8n
+    namespace: n8n
+    valuesFile: values.yaml
+    repo: oci://8gears.container-registry.com/library
+    version: "2.0.1"
