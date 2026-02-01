@@ -32,6 +32,10 @@ spec:
               protocol: TCP
 ---
 # Allow ingress from the gateway namespace (for HTTPRoutes)
+# Note: Traffic through Gateway API/Ingress controllers arrives with the special
+# Cilium identity "reserved:ingress" (identity 8), not the gateway pod's identity.
+# We must allow both: fromEndpoints for direct pod traffic, and fromEntities for
+# ingress-proxied traffic.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -43,6 +47,8 @@ spec:
     - fromEndpoints:
         - matchLabels:
             io.kubernetes.pod.namespace: gateway
+    - fromEntities:
+        - ingress
 ---
 # Allow arr apps to communicate with each other
 # (e.g., Sonarr talks to Prowlarr for indexers)
