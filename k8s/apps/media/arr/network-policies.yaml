@@ -1,0 +1,136 @@
+# Default deny all ingress and egress traffic in the arr namespace.
+# Each app must explicitly allow the traffic it needs.
+# Note: Empty arrays [] deny all traffic, while [{}] would allow all traffic.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: arr
+spec:
+  endpointSelector: {}
+  ingress: []
+  egress: []
+---
+# Allow DNS resolution for all pods (required for most apps)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: arr
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+---
+# Allow ingress from the gateway namespace (for HTTPRoutes)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-gateway-ingress
+  namespace: arr
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: gateway
+---
+# Allow arr apps to communicate with each other
+# (e.g., Sonarr talks to Prowlarr for indexers)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-internal
+  namespace: arr
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: arr
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: arr
+---
+# Allow egress to NFS server (Synology NAS)
+# Synology DSM uses fixed ports for NFSv3 auxiliary services
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-nfs-egress
+  namespace: arr
+spec:
+  endpointSelector: {}
+  egress:
+    - toCIDR:
+        - 192.168.65.250/32
+      toPorts:
+        - ports:
+            # NFS
+            - port: "2049"
+              protocol: TCP
+            - port: "2049"
+              protocol: UDP
+            # Portmapper/rpcbind
+            - port: "111"
+              protocol: TCP
+            - port: "111"
+              protocol: UDP
+            # Synology NFSv3 auxiliary services (DSM defaults)
+            # mountd
+            - port: "892"
+              protocol: TCP
+            - port: "892"
+              protocol: UDP
+            # statd - Statically assigned ports in DSM
+            - port: "662"
+              protocol: TCP
+            - port: "662"
+              protocol: UDP
+            # nlm/lockd - Statically assigned ports in DSM
+            - port: "32803"
+              protocol: TCP
+            - port: "32803"
+              protocol: UDP
+---
+# Allow arr apps to communicate with torrent clients in the torrent namespace
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-torrent-egress
+  namespace: arr
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: torrent
+---
+# Allow egress to external services (indexers, download APIs)
+# Note: This is permissive. Consider using toFQDNs for stricter control.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-external-egress
+  namespace: arr
+spec:
+  endpointSelector: {}
+  egress:
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
