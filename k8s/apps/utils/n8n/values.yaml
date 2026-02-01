@@ -58,9 +58,9 @@ main:
   # Security context matching project patterns
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: 10000
-    runAsGroup: 10000
-    fsGroup: 10000
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
     fsGroupChangePolicy: Always
     seccompProfile:
       type: RuntimeDefault
