@@ -1,5 +1,6 @@
 # Default deny all ingress and egress traffic in the arr namespace.
 # Each app must explicitly allow the traffic it needs.
+# Note: Empty arrays [] deny all traffic, while [{}] would allow all traffic.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -7,10 +8,8 @@ metadata:
   namespace: arr
 spec:
   endpointSelector: {}
-  ingress:
-    - {}
-  egress:
-    - {}
+  ingress: []
+  egress: []
 ---
 # Allow DNS resolution for all pods (required for most apps)
 apiVersion: cilium.io/v2
@@ -85,8 +84,21 @@ spec:
             - port: "111"
               protocol: UDP
 ---
+# Allow arr apps to communicate with torrent clients in the torrent namespace
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-torrent-egress
+  namespace: arr
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: torrent
+---
 # Allow egress to external services (indexers, download APIs)
-# Uses FQDN selectors for better security when possible
+# Note: This is permissive. Consider using toFQDNs for stricter control.
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
