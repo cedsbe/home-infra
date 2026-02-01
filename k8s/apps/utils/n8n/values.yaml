@@ -61,6 +61,9 @@ main:
     runAsUser: 10000
     runAsGroup: 10000
     fsGroup: 10000
+    fsGroupChangePolicy: Always
+    seccompProfile:
+      type: RuntimeDefault
 
   securityContext:
     allowPrivilegeEscalation: false
