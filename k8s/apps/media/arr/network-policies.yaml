@@ -62,7 +62,8 @@ spec:
         - matchLabels:
             io.kubernetes.pod.namespace: arr
 ---
-# Allow egress to NFS server
+# Allow egress to NFS server (Synology NAS)
+# Synology DSM uses fixed ports for NFSv3 auxiliary services
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
@@ -75,13 +76,31 @@ spec:
         - 192.168.65.250/32
       toPorts:
         - ports:
+            # NFS
             - port: "2049"
               protocol: TCP
             - port: "2049"
               protocol: UDP
+            # Portmapper/rpcbind
             - port: "111"
               protocol: TCP
             - port: "111"
+              protocol: UDP
+            # Synology NFSv3 auxiliary services (DSM defaults)
+            # mountd
+            - port: "892"
+              protocol: TCP
+            - port: "892"
+              protocol: UDP
+            # statd - Statically assigned ports in DSM
+            - port: "662"
+              protocol: TCP
+            - port: "662"
+              protocol: UDP
+            # nlm/lockd - Statically assigned ports in DSM
+            - port: "32803"
+              protocol: TCP
+            - port: "32803"
               protocol: UDP
 ---
 # Allow arr apps to communicate with torrent clients in the torrent namespace

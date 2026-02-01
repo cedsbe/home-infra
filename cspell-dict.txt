@@ -195,6 +195,7 @@ downgrade
 downtime
 dry
 dsa
+DSM
 duckduckgo
 dynamodb
 eax
@@ -381,6 +382,7 @@ load
 loadbalancer
 local
 lock
+lockd
 log
 loki
 LRS
@@ -413,6 +415,7 @@ mongodb
 monitor
 more
 mount
+mountd
 move
 mqtt
 msgpack
@@ -427,6 +430,7 @@ mysql
 namespace
 namespaces
 nano
+NAS
 nats
 Ncb
 ndots
@@ -437,6 +441,7 @@ netops
 netsh
 next
 nixos
+nlm
 nmcli
 noatime
 nocloudservice
@@ -658,6 +663,7 @@ staging
 start
 stash
 stat
+statd
 status
 stisvc
 stomp
