@@ -13,6 +13,11 @@ resources:
   # Gateway API route
   - http-route.yaml
 
+# Patches applied to Helm-rendered resources
+patches:
+  # Fix Alpine DNS resolution (ndots issue with musl resolver)
+  - path: deployment-dns-patch.yaml
+
 # Helm chart deployment
 helmCharts:
   - name: n8n
