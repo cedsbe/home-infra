@@ -11,6 +11,20 @@
       "matchStrings": [
         "(?<currentValue>[\\w.+-]+)(@(?<currentDigest>sha256:[a-fA-F0-9]{64}))?['\",;]*\\s+# renovate: datasource=(?<datasource>[a-zA-Z0-9._-]+) depName=(?<depName>\\S+)(?: (?:lookupName|packageName)=(?<packageName>\\S+))?(?: versioning=(?<versioning>\\S+))?(?: extractVersion=(?<extractVersion>\\S+))?(?: registryUrl=(?<registryUrl>\\S+))?"
       ]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "n8nio/n8n",
+      "description": "Track n8n releases from GitHub for Kubernetes Helm values",
+      "extractVersionTemplate": "n8n@(?<version>.*)",
+      "managerFilePatterns": [
+        "/^k8s\\/apps\\/utils\\/n8n\\/values\\.yaml$/"
+      ],
+      "matchStrings": [
+        "tag:\\s*(?<currentValue>[^\\s]+)"
+      ],
+      "versioningTemplate": "semver-coerced"
     }
   ],
   "extends": [
@@ -31,6 +45,16 @@
         "kustomize"
       ],
       "pinDigests": false
+    },
+    {
+      "enabled": false,
+      "matchManagers": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "n8n",
+        "n8nio/n8n"
+      ]
     },
     {
       "dependencyDashboardApproval": true,
