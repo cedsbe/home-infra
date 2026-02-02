@@ -22,7 +22,7 @@
         "/^k8s\\/apps\\/utils\\/n8n\\/values\\.yaml$/"
       ],
       "matchStrings": [
-        "tag:\\s*n8nio\\/n8n:(?<currentValue>[^\\s]+)"
+        "tag:\\s*(?<currentValue>[^\\s]+)"
       ],
       "versioningTemplate": "semver-coerced"
     }
