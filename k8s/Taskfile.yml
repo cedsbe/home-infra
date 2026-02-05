@@ -79,6 +79,32 @@ tasks:
     cmds:
       - kubectl kustomize --enable-helm . | kubectl apply -f -
 
+  argocd:pause:
+    desc: "Pause ArgoCD syncing (stops all automated syncs)"
+    silent: true
+    cmds:
+      - kubectl scale statefulset argocd-application-controller -n argocd --replicas=0
+      - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas=0
+      - echo "ArgoCD syncing paused - run 'task argocd:resume' to re-enable"
+
+  argocd:status:
+    desc: "Check ArgoCD controller status"
+    silent: true
+    cmds:
+      - echo "=== Application Controller (StatefulSet) ==="
+      - kubectl get statefulset argocd-application-controller -n argocd
+      - echo ""
+      - echo "=== ApplicationSet Controller (Deployment) ==="
+      - kubectl get deployment argocd-applicationset-controller -n argocd
+
+  argocd:resume:
+    desc: "Resume ArgoCD syncing (re-enables automated syncs)"
+    silent: true
+    cmds:
+      - kubectl scale statefulset argocd-application-controller -n argocd --replicas=1
+      - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas=1
+      - echo "ArgoCD syncing resumed"
+
   seal:secret:
     desc: "Seal a Kubernetes secret file using kubeseal"
     dir: ../sensitive
