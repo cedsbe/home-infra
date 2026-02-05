@@ -15,7 +15,7 @@
     {
       "customType": "regex",
       "datasourceTemplate": "github-releases",
-      "depNameTemplate": "n8nio/n8n",
+      "depNameTemplate": "n8n-io/n8n",
       "description": "Track n8n releases from GitHub for Kubernetes Helm values",
       "extractVersionTemplate": "n8n@(?<version>.*)",
       "managerFilePatterns": [
@@ -53,7 +53,7 @@
       ],
       "matchPackageNames": [
         "n8n",
-        "n8nio/n8n"
+        "n8n-io/n8n"
       ]
     },
     {
@@ -67,5 +67,17 @@
         "\u26a0\ufe0f **Dependency Constraint**: Ensure the Gateway API version is supported by Cilium before merging. Check [Cilium Gateway API documentation](https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/) for compatibility."
       ]
     }
-  ]
+  ],
+  "prBodyColumns": [
+    "Package",
+    "Type",
+    "Datasource",
+    "Update",
+    "Change",
+    "Pending"
+  ],
+  "prBodyDefinitions": {
+    "Datasource": "`{{{datasource}}}`"
+  },
+  "rebaseWhen": "behind-base-branch"
 }
