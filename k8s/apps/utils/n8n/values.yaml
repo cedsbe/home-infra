@@ -16,7 +16,7 @@ main:
   config:
     n8n:
       host: n8n.k8s.ghiot.be
-      port: 5678
+      port: 80
     generic:
       timezone: "Europe/Brussels"
     db:
