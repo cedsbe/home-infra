@@ -82,6 +82,8 @@ tasks:
   argocd:pause:
     desc: "Pause ArgoCD syncing (stops all automated syncs)"
     silent: true
+    deps:
+      - argocd:status
     cmds:
       - kubectl scale statefulset argocd-application-controller -n argocd --replicas=0
       - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas=0
@@ -100,9 +102,12 @@ tasks:
   argocd:resume:
     desc: "Resume ArgoCD syncing (re-enables automated syncs)"
     silent: true
+    vars:
+      ARGOCD_APP_CONTROLLER_REPLICAS: '{{.ARGOCD_APP_CONTROLLER_REPLICAS | default "1"}}'
+      ARGOCD_APPSET_CONTROLLER_REPLICAS: '{{.ARGOCD_APPSET_CONTROLLER_REPLICAS | default "1"}}'
     cmds:
-      - kubectl scale statefulset argocd-application-controller -n argocd --replicas=1
-      - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas=1
+      - kubectl scale statefulset argocd-application-controller -n argocd --replicas={{.ARGOCD_APP_CONTROLLER_REPLICAS}}
+      - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas={{.ARGOCD_APPSET_CONTROLLER_REPLICAS}}
       - echo "ArgoCD syncing resumed"
 
   seal:secret:
