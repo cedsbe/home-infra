@@ -47,13 +47,15 @@
       "pinDigests": false
     },
     {
+      "description": "Disable updates for n8n Docker images. These updates will be tracked separately using a custom manager that extracts versions from GitHub releases.",
       "enabled": false,
       "matchManagers": [
         "docker"
       ],
       "matchPackageNames": [
+        "n8n-io/n8n",
         "n8n",
-        "n8n-io/n8n"
+        "n8nio/n8n"
       ]
     },
     {
