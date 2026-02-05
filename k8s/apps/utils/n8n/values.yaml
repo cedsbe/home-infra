@@ -3,7 +3,7 @@
 
 image:
   repository: n8nio/n8n
-  tag: 2.4.8
+  tag: 2.6.3
   pullPolicy: IfNotPresent
 
 # Ingress disabled - using Gateway API HTTPRoute instead
@@ -15,6 +15,7 @@ main:
   # n8n configuration (converted to environment variables)
   config:
     n8n:
+      host: n8n.k8s.ghiot.be
       port: 5678
     generic:
       timezone: "Europe/Brussels"
