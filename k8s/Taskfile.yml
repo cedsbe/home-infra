@@ -82,17 +82,22 @@ tasks:
   argocd:pause:
     desc: "Pause ArgoCD syncing (stops all automated syncs)"
     silent: true
-    deps:
-      - argocd:status
     cmds:
+      - task: argocd:status
+      - echo "Pausing ArgoCD syncing..."
       - kubectl scale statefulset argocd-application-controller -n argocd --replicas=0
       - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas=0
       - echo "ArgoCD syncing paused - run 'task argocd:resume' to re-enable"
+      - echo ""
+      - sleep 5
+      - task: argocd:status
 
   argocd:status:
     desc: "Check ArgoCD controller status"
     silent: true
     cmds:
+      - echo "=== Current ArgoCD Application Controller Replicas ==="
+      - echo ""
       - echo "=== Application Controller (StatefulSet) ==="
       - kubectl get statefulset argocd-application-controller -n argocd
       - echo ""
@@ -106,9 +111,14 @@ tasks:
       ARGOCD_APP_CONTROLLER_REPLICAS: '{{.ARGOCD_APP_CONTROLLER_REPLICAS | default "1"}}'
       ARGOCD_APPSET_CONTROLLER_REPLICAS: '{{.ARGOCD_APPSET_CONTROLLER_REPLICAS | default "1"}}'
     cmds:
+      - task: argocd:status
+      - echo "Resuming ArgoCD syncing..."
       - kubectl scale statefulset argocd-application-controller -n argocd --replicas={{.ARGOCD_APP_CONTROLLER_REPLICAS}}
       - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas={{.ARGOCD_APPSET_CONTROLLER_REPLICAS}}
       - echo "ArgoCD syncing resumed"
+      - echo ""
+      - sleep 5
+      - task: argocd:status
 
   seal:secret:
     desc: "Seal a Kubernetes secret file using kubeseal"
