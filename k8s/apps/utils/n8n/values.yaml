@@ -15,8 +15,8 @@ main:
   # n8n configuration (converted to environment variables)
   config:
     n8n:
-      host: n8n.k8s.ghiot.be
       port: 5678
+      proxy_hops: 1
     generic:
       timezone: "Europe/Brussels"
     db:
@@ -25,6 +25,8 @@ main:
         host: n8n-cluster-rw.n8n.svc.cluster.local
         port: 5432
         database: n8n
+    webhook:
+      url: "https://n8n.k8s.ghiot.be/"
 
   # Secrets referenced from external sealed secrets
   # The encryption key and db password are injected via extraEnv
