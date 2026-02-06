@@ -54,7 +54,7 @@ This configuration creates an Azure AD application registration and service prin
 
    # Retrieve client secret from Azure Key Vault
    az keyvault secret show \
-     --vault-name $(terraform output -raw resource_group_name | sed 's/-rg$/-kv/') \
+     --vault-name $(terraform output -raw key_vault_name) \
      --name n8n-outlook-client-secret \
      --query value -o tsv
    ```
