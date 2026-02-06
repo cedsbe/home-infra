@@ -3,7 +3,7 @@
 
 image:
   repository: n8nio/n8n
-  tag: 2.6.4
+  tag: 2.6.4@sha256:b962d7f8ba9e990a0c530256d841fdc52312dce32173f29808e29a9430811ad3
   pullPolicy: IfNotPresent
 
 # Ingress disabled - using Gateway API HTTPRoute instead
