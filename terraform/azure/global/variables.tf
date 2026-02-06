@@ -57,3 +57,16 @@ variable "dynamic_dns_home_fqdn" {
     error_message = "Dynamic DNS FQDN must be a valid domain name or null."
   }
 }
+
+variable "n8n_outlook_redirect_uris" {
+  description = "OAuth2 redirect URIs for n8n Outlook integration (format: https://<n8n-instance>/rest/oauth2-credential/callback)"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for uri in var.n8n_outlook_redirect_uris : can(regex("^https://[a-zA-Z0-9._-]+(/.*)?$", uri))
+    ])
+    error_message = "All redirect URIs must be valid HTTPS URLs."
+  }
+}
