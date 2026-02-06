@@ -10,8 +10,67 @@ This configuration sets up global Azure infrastructure, including:
 - **Storage Account**: Centralized backend state storage for all Terraform projects
 - **Key Vault**: Shared secrets management for use across multiple projects, with network restrictions
 - **Dynamic DNS Resolution**: Resolves home network FQDN for security rules
+- **n8n Outlook Integration**: Azure AD app registration for n8n to access Microsoft Outlook via OAuth2
 
 These resources are intended to be reused by other infrastructure modules and projects. The configuration uses Azure CAF (Cloud Adoption Framework) naming conventions and includes remote state management.
+
+## n8n Outlook Integration
+
+This configuration creates an Azure AD application registration and service principal to enable n8n to access Microsoft Outlook via OAuth2. This follows the [n8n Microsoft OAuth2 documentation](https://docs.n8n.io/integrations/builtin/credentials/microsoft/#using-oauth2).
+
+### Features
+
+- **Multi-tenant Support**: Configured for Azure AD and personal Microsoft accounts
+- **Graph API Scopes**: Pre-configured with necessary permissions (Mail.Read, Mail.ReadWrite, Mail.Send, User.Read, offline_access)
+- **Secure Storage**: Client ID and secret stored in Azure Key Vault
+- **Service Principal**: Automated service principal creation
+
+### Setup Instructions
+
+1. **Configure Redirect URI**:
+   In `azure.secrets.auto.tfvars`, add your n8n OAuth callback URL:
+
+   ```hcl
+   n8n_outlook_redirect_uris = [
+     "https://your-n8n-instance.com/rest/oauth2-credential/callback"
+   ]
+   ```
+
+2. **Deploy the App Registration**:
+
+   ```bash
+   task azure:apply
+   ```
+
+3. **Get Credentials**:
+
+   ```bash
+   # Display setup instructions with all required values
+   task azure:output
+
+   # Or retrieve specific outputs
+   terraform output n8n_outlook_application_id
+   terraform output n8n_outlook_setup_instructions
+   ```
+
+4. **Configure n8n**:
+   - Create a new Microsoft OAuth2 credential in n8n
+   - Use the Application (Client) ID from the output
+   - Retrieve the Client Secret from Azure Key Vault
+   - Complete the OAuth flow in n8n
+
+5. **Admin Consent** (if required):
+   For organizational Microsoft accounts, an admin may need to grant consent. See [Microsoft Entra documentation](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent).
+
+### API Permissions
+
+The app registration includes the following Microsoft Graph API delegated permissions:
+
+- **Mail.Read**: Read user mailboxes
+- **Mail.ReadWrite**: Read and write user mailboxes
+- **Mail.Send**: Send mail as a user
+- **User.Read**: Sign in and read user profile
+- **offline_access**: Maintain access to data
 
 ## Key Features
 

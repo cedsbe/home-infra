@@ -87,9 +87,11 @@ tasks:
       - echo "Pausing ArgoCD syncing..."
       - kubectl scale statefulset argocd-application-controller -n argocd --replicas=0
       - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas=0
+      - echo "Waiting for controllers to scale down..."
+      - kubectl rollout status statefulset argocd-application-controller -n argocd --timeout=60s
+      - kubectl rollout status deployment argocd-applicationset-controller -n argocd --timeout=60s
       - echo "ArgoCD syncing paused - run 'task argocd:resume' to re-enable"
       - echo ""
-      - sleep 5
       - task: argocd:status
 
   argocd:status:
@@ -115,9 +117,11 @@ tasks:
       - echo "Resuming ArgoCD syncing..."
       - kubectl scale statefulset argocd-application-controller -n argocd --replicas={{.ARGOCD_APP_CONTROLLER_REPLICAS}}
       - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas={{.ARGOCD_APPSET_CONTROLLER_REPLICAS}}
+      - echo "Waiting for controllers to be ready..."
+      - kubectl rollout status statefulset argocd-application-controller -n argocd --timeout=120s
+      - kubectl rollout status deployment argocd-applicationset-controller -n argocd --timeout=120s
       - echo "ArgoCD syncing resumed"
       - echo ""
-      - sleep 5
       - task: argocd:status
 
   seal:secret:
