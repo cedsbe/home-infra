@@ -43,7 +43,7 @@ ARG TASK_VERSION=v3.48.0
 # renovate: datasource=github-releases depName=terraform-linters/tflint
 ARG TFLINT_VERSION=v0.60.0
 # renovate: datasource=github-releases depName=aquasecurity/trivy
-ARG TRIVY_VERSION=v0.69.0
+ARG TRIVY_VERSION=v0.69.1
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.52.2
 # renovate: datasource=npm depName=cspell
