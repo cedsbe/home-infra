@@ -45,18 +45,25 @@ This configuration creates an Azure AD application registration and service prin
 3. **Get Credentials**:
 
    ```bash
-   # Display setup instructions with all required values
-   task azure:output
+   # Display all outputs including n8n configuration
+   terraform output
 
-   # Or retrieve specific outputs
+   # Or retrieve specific values
    terraform output n8n_outlook_application_id
-   terraform output n8n_outlook_setup_instructions
+   terraform output n8n_outlook_tenant_id
+
+   # Retrieve client secret from Azure Key Vault
+   az keyvault secret show \
+     --vault-name $(terraform output -raw resource_group_name | sed 's/-rg$/-kv/') \
+     --name n8n-outlook-client-secret \
+     --query value -o tsv
    ```
 
 4. **Configure n8n**:
    - Create a new Microsoft OAuth2 credential in n8n
-   - Use the Application (Client) ID from the output
-   - Retrieve the Client Secret from Azure Key Vault
+   - Use the Application (Client) ID from terraform output
+   - Use the Tenant ID from terraform output
+   - Retrieve the Client Secret from Azure Key Vault (command above)
    - Complete the OAuth flow in n8n
 
 5. **Admin Consent** (if required):

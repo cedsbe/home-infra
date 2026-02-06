@@ -4,6 +4,8 @@
 
 #region Azure AD Application
 resource "azuread_application" "n8n_outlook" {
+  for_each = length(var.n8n_outlook_redirect_uris) > 0 ? { "main" = true } : {}
+
   display_name = "n8n Outlook Integration"
   description  = "OAuth2 application for n8n to access Microsoft Outlook via Graph API"
 
@@ -68,7 +70,9 @@ resource "azuread_application" "n8n_outlook" {
 #region Service Principal
 # Create service principal for the application
 resource "azuread_service_principal" "n8n_outlook" {
-  client_id = azuread_application.n8n_outlook.client_id
+  for_each = length(var.n8n_outlook_redirect_uris) > 0 ? { "main" = true } : {}
+
+  client_id = azuread_application.n8n_outlook["main"].client_id
 
   # Use the application's identifier URI as the preferred single sign-on mode
   preferred_single_sign_on_mode = "oidc"
@@ -84,7 +88,9 @@ resource "azuread_service_principal" "n8n_outlook" {
 #region Application Password (Client Secret)
 # Generate client secret for OAuth2 authentication
 resource "azuread_application_password" "n8n_outlook" {
-  application_id = azuread_application.n8n_outlook.id
+  for_each = length(var.n8n_outlook_redirect_uris) > 0 ? { "main" = true } : {}
+
+  application_id = azuread_application.n8n_outlook["main"].id
   display_name   = "n8n Outlook OAuth2 Secret"
 
   # Rotate the password when this map changes
@@ -103,20 +109,36 @@ resource "azuread_application_password" "n8n_outlook" {
 #region Key Vault Secrets
 # Store Application (Client) ID in Key Vault
 resource "azurerm_key_vault_secret" "n8n_outlook_client_id" {
-  name         = "n8n-outlook-client-id"
-  value        = azuread_application.n8n_outlook.client_id
-  key_vault_id = azurerm_key_vault.main.id
+  for_each = length(var.n8n_outlook_redirect_uris) > 0 ? { "main" = true } : {}
+
+  name            = "n8n-outlook-client-id"
+  value           = azuread_application.n8n_outlook["main"].client_id
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "Azure AD Application (Client) ID for n8n Outlook integration"
+  expiration_date = timeadd(timestamp(), "8760h") # 365 days
 
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
 }
 
 # Store Client Secret in Key Vault
 resource "azurerm_key_vault_secret" "n8n_outlook_client_secret" {
-  name         = "n8n-outlook-client-secret"
-  value        = azuread_application_password.n8n_outlook.value
-  key_vault_id = azurerm_key_vault.main.id
+  for_each = length(var.n8n_outlook_redirect_uris) > 0 ? { "main" = true } : {}
+
+  name            = "n8n-outlook-client-secret"
+  value           = azuread_application_password.n8n_outlook["main"].value
+  key_vault_id    = azurerm_key_vault.main.id
+  content_type    = "Azure AD Application Client Secret for n8n Outlook integration"
+  expiration_date = timeadd(timestamp(), "8760h") # 365 days
 
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [expiration_date]
+  }
 }
 
 #endregion Key Vault Secrets

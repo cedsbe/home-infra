@@ -88,8 +88,8 @@ tasks:
       - kubectl scale statefulset argocd-application-controller -n argocd --replicas=0
       - kubectl scale deployment argocd-applicationset-controller -n argocd --replicas=0
       - echo "Waiting for controllers to scale down..."
-      - kubectl rollout status statefulset argocd-application-controller -n argocd --timeout=60s
-      - kubectl rollout status deployment argocd-applicationset-controller -n argocd --timeout=60s
+      - kubectl wait --for=delete pod -l app.kubernetes.io/name=argocd-application-controller -n argocd --timeout=60s || echo "No ArgoCD Application Controller pods found"
+      - kubectl wait --for=delete pod -l app.kubernetes.io/name=argocd-applicationset-controller -n argocd --timeout=60s || echo "No ArgoCD ApplicationSet Controller pods found"
       - echo "ArgoCD syncing paused - run 'task argocd:resume' to re-enable"
       - echo ""
       - task: argocd:status

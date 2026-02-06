@@ -65,7 +65,7 @@ variable "n8n_outlook_redirect_uris" {
 
   validation {
     condition = alltrue([
-      for uri in var.n8n_outlook_redirect_uris : can(regex("^https://[a-z0-9.-]+(/.*)?$", uri))
+      for uri in var.n8n_outlook_redirect_uris : can(regex("^https://[a-zA-Z0-9._-]+(/.*)?$", uri))
     ])
     error_message = "All redirect URIs must be valid HTTPS URLs."
   }
