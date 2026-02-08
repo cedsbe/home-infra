@@ -53,6 +53,13 @@ spec:
             - --metrics
             - 0.0.0.0:2000
             - run
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           ports:
             - name: active-con-stat
               containerPort: 2000
