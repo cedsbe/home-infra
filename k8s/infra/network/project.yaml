@@ -10,6 +10,8 @@ spec:
   destinations:
     - namespace: "argocd"
       server: "*"
+    - namespace: "cloudflared"
+      server: "*"
     - namespace: "cilium-secrets"
       server: "*"
     - namespace: "dns"
