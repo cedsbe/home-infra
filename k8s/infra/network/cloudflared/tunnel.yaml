@@ -64,12 +64,28 @@ spec:
             - name: active-con-stat
               containerPort: 2000
               protocol: TCP
+          # Liveness: check that the process/metrics port is up, independent of tunnel state.
           livenessProbe:
+            tcpSocket:
+              port: 2000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          # Readiness: only report ready once there is an active tunnel connection.
+          readinessProbe:
             httpGet:
               # Cloudflared has a /ready endpoint which returns 200 if and only if
               # it has an active connection to Cloudflare's network.
               path: /ready
               port: 2000
-            failureThreshold: 1
-            initialDelaySeconds: 10
+            initialDelaySeconds: 5
             periodSeconds: 10
+            failureThreshold: 3
+          # Startup: give the tunnel ample time to establish before enforcing liveness.
+          startupProbe:
+            httpGet:
+              path: /ready
+              port: 2000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 30
