@@ -20,7 +20,7 @@ spec:
             value: "65532 65532"
       containers:
         - name: cloudflared
-          image: cloudflare/cloudflared:2026.2.0 # renovate: datasource=docker depName=docker.io/cloudflare/cloudflared packageName=docker.io/cloudflare/cloudflared versioning=docker registryUrl=https://index.docker.io
+          image: docker.io/cloudflare/cloudflared:2026.2.0 # renovate: datasource=docker depName=docker.io/cloudflare/cloudflared packageName=docker.io/cloudflare/cloudflared versioning=docker registryUrl=https://index.docker.io
           env:
             # Defines an environment variable for the tunnel token.
             - name: TUNNEL_TOKEN
