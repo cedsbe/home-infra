@@ -61,7 +61,7 @@ spec:
               cpu: 500m
               memory: 256Mi
           ports:
-            - name: active-con-stat
+            - name: http-metrics
               containerPort: 2000
               protocol: TCP
           # Liveness: check that the process/metrics port is up, independent of tunnel state.
