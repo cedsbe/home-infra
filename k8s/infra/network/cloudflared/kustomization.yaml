@@ -3,5 +3,5 @@ kind: Kustomization
 
 resources:
   - ns.yaml
-  - k8s_infra_network_cloudflared_home_token_sealed.yaml
+  - tunnel-token.yaml
   - tunnel.yaml
