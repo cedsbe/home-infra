@@ -30,7 +30,6 @@ spec:
             capabilities:
               drop:
                 - ALL
-              add: []
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             privileged: false
