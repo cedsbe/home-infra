@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cloudflared-deployment
+  name: cloudflared
   namespace: cloudflared
 spec:
   replicas: 2
