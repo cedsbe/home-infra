@@ -22,6 +22,7 @@ tasks:
           echo "  5. Uncomment backend.tf and run: terraform init -backend-config=./backend.config -migrate-state"
           exit 1
         fi
+    silent: true
 
   validate:
     desc: "Validate Terraform configuration"
@@ -43,7 +44,7 @@ tasks:
 
   apply:
     desc: "Apply Terraform configuration"
-    deps: [plan]
+    deps: [validate]
     cmds:
       - terraform apply
 
@@ -94,6 +95,7 @@ tasks:
         fi
         echo "Listing resources in resource group: $RG_NAME"
         az resource list --resource-group "$RG_NAME" -o table
+    silent: true
 
   setup:
     desc: "Setup Azure configuration from template"
@@ -106,6 +108,7 @@ tasks:
         else
           echo "azure.secrets.auto.tfvars already exists"
         fi
+    silent: true
 
   check:
     desc: "Check Azure CLI authentication and Terraform setup"
@@ -114,3 +117,4 @@ tasks:
       - az account show --query "name" -o tsv
       - echo "Checking Terraform configuration..."
       - task: validate
+    silent: true
