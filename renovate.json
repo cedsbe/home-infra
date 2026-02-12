@@ -74,12 +74,14 @@
     "Package",
     "Type",
     "Datasource",
+    "Manager",
     "Update",
     "Change",
     "Pending"
   ],
   "prBodyDefinitions": {
-    "Datasource": "`{{{datasource}}}`"
+    "Datasource": "`{{{datasource}}}`",
+    "Manager": "`{{{manager}}}`"
   },
   "rebaseWhen": "behind-base-branch"
 }
