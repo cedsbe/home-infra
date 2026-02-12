@@ -47,7 +47,7 @@ ARG TRIVY_VERSION=v0.69.1
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.52.2
 # renovate: datasource=npm depName=cspell
-ARG CSPELL_VERSION=9.6.3
+ARG CSPELL_VERSION=9.6.4
 
 # Install system dependencies grouped by purpose
 RUN <<EOF
