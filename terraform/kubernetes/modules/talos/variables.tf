@@ -36,8 +36,8 @@ variable "talos_cluster" {
     api_server          = optional(string)
     dns_servers         = optional(list(string), ["192.168.65.30", "192.168.65.40"])
     search_domains      = optional(list(string), ["ad.ghiot.be", "ghiot.be"])
-    oidc_issuer_url     = string
-    oidc_client_id      = string
+    oidc_issuer_url     = optional(string, null)
+    oidc_client_id      = optional(string, null)
   })
   description = <<-EOT
     Talos cluster configuration:
