@@ -74,3 +74,18 @@ variable "talos_update_version" {
     error_message = "The talos_update_version must be a valid semantic version starting with 'v' (e.g., v1.11.3)."
   }
 }
+
+variable "oidc_issuer_url" {
+  type        = string
+  description = "OIDC issuer URL for Kubernetes API server authentication (e.g., 'https://auth.example.com'). This URL must be HTTPS and point to the OIDC provider's issuer endpoint."
+
+  validation {
+    condition     = can(regex("^https://", var.oidc_issuer_url))
+    error_message = "The oidc_issuer_url must be a valid HTTPS URL."
+  }
+}
+
+variable "oidc_client_id" {
+  type        = string
+  description = "OIDC client ID for Kubernetes API server authentication. This is the client identifier registered with the OIDC provider for authenticating users to the Kubernetes API."
+}

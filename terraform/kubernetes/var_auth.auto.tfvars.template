@@ -1,0 +1,9 @@
+# OIDC authentication configuration for Kubernetes API server
+# Copy this file to var_auth.secrets.auto.tfvars and update with your OIDC provider details
+
+# OIDC issuer URL - must be HTTPS
+# Example: https://auth.example.com/application/o/kubernetes/
+oidc_issuer_url = "https://your-oidc-provider.example.com/"
+
+# OIDC client ID registered with your OIDC provider
+oidc_client_id = "kubernetes"
