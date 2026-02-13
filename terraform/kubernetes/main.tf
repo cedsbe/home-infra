@@ -76,7 +76,8 @@ module "talos" {
     talos_version       = var.talos_version
     kubernetes_version  = var.kubernetes_version
     gateway_api_version = var.gateway_api_version
-
+    oidc_issuer_url     = var.oidc_issuer_url
+    oidc_client_id      = var.oidc_client_id
   }
 
   cilium = {

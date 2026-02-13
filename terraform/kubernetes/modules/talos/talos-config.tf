@@ -41,6 +41,8 @@ data "utils_yaml_merge" "talos_config_v1alpha1" {
       cluster_name       = local.talos_cluster_enriched.proxmox_cluster
       kubernetes_version = local.talos_cluster_enriched.kubernetes_version
       kubelet_extra_args = local.talos_cluster_enriched.kubelet_extra_args
+      oidc_client_id     = local.talos_cluster_enriched.oidc_client_id
+      oidc_issuer_url    = local.talos_cluster_enriched.oidc_issuer_url
     }),
 
     # Apply control plane specific configuration (Cilium CNI injection)

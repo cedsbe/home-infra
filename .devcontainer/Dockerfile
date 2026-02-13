@@ -24,6 +24,8 @@ ARG KUBECOLOR_VERSION=v0.5.3
 ARG KUBECONFORM_VERSION=v0.7.0
 # renovate: datasource=github-releases depName=ahmetb/kubectx
 ARG KUBECTX_VERSION=v0.9.5
+# renovate: datasource=github-releases depName=int128/kubelogin
+ARG KUBELOGIN_VERSION=v1.35.2
 # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
 ARG KUBESEAL_VERSION=v0.35.0
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
@@ -264,6 +266,11 @@ RUN <<EOF
   # Install kubeseal
   curl -fsSL "https://github.com/bitnami-labs/sealed-secrets/releases/download/${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION#v}-linux-${ARCH}.tar.gz" | tar -xz -C /usr/local/bin kubeseal
   chmod +x /usr/local/bin/kubeseal
+
+  # Install kubelogin (OIDC authentication) as kubectl plugin
+  curl -fsSL "https://github.com/int128/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin_linux_${ARCH}.zip" -o kubelogin.zip
+  unzip -q kubelogin.zip && mv kubelogin /usr/local/bin/kubectl-oidc_login && rm -f kubelogin.zip LICENSE README.md
+  chmod +x /usr/local/bin/kubectl-oidc_login
 
   # Install talosctl
   curl -fsSL "https://github.com/siderolabs/talos/releases/download/${TALOS_VERSION}/talosctl-linux-${ARCH}" -o /usr/local/bin/talosctl
