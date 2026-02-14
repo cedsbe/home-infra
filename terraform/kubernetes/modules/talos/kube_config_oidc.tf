@@ -43,9 +43,11 @@ locals {
 
 data "utils_yaml_merge" "kube_config_oidc" {
 
-  input = [
+  input = local.oidc_enabled ? [
     talos_cluster_kubeconfig.this.kubeconfig_raw,
     yamlencode(local.kube_config_oidc_user),
     yamlencode(local.kube_config_oidc_context)
+    ] : [
+    talos_cluster_kubeconfig.this.kubeconfig_raw
   ]
 }
