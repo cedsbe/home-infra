@@ -34,7 +34,7 @@ variable "talos_cluster" {
     extra_manifests     = optional(list(string))
     kubelet_extra_args  = optional(string, "")
     api_server          = optional(string)
-    dns_servers         = optional(list(string), ["192.168.65.150", "192.168.65.30", "192.168.65.40"]) # Adding 192.168.65.150 (Adguard DNS) as primary DNS server allows Talos nodes to resolve the running container in the cluster, like Pocket-Id, which is required for the OIDC.
+    dns_servers         = optional(list(string), ["192.168.65.150", "192.168.65.30", "192.168.65.40"])
     search_domains      = optional(list(string), ["ad.ghiot.be", "ghiot.be"])
     oidc_issuer_url     = optional(string, null)
     oidc_client_id      = optional(string, null)
