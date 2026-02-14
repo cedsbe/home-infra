@@ -349,6 +349,7 @@ KICS
 kod
 kops
 kotlin
+krew
 ksv
 kube
 kubeadm
@@ -356,6 +357,7 @@ kubeconfig
 kubeconform
 kubectl
 kubelet
+kubelogin
 kubernetes
 kubeseal
 kustomization

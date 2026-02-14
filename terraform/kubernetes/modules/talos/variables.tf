@@ -34,7 +34,7 @@ variable "talos_cluster" {
     extra_manifests     = optional(list(string))
     kubelet_extra_args  = optional(string, "")
     api_server          = optional(string)
-    dns_servers         = optional(list(string), ["192.168.65.30", "192.168.65.40"])
+    dns_servers         = optional(list(string), ["192.168.65.150", "192.168.65.30", "192.168.65.40"])
     search_domains      = optional(list(string), ["ad.ghiot.be", "ghiot.be"])
     oidc_issuer_url     = optional(string, null)
     oidc_client_id      = optional(string, null)
@@ -51,11 +51,28 @@ variable "talos_cluster" {
     - extra_manifests: (Optional) Additional Kubernetes manifests (URLs or paths) to apply after cluster bootstrap.
     - kubelet_extra_args: (Optional) Custom kubelet extra arguments as a JSON string.
     - api_server: (Optional) Custom Kubernetes API server configuration as a JSON string.
-    - dns_servers: (Optional) List of DNS server IP addresses (default: ["192.168.65.30", "192.168.65.40"]).
+    - dns_servers: (Optional) List of DNS server IP addresses (default: ["192.168.65.150", "192.168.65.30", "192.168.65.40"]).
     - search_domains: (Optional) List of DNS search domains (default: ["ad.ghiot.be", "ghiot.be"]).
     - oidc_issuer_url: OIDC issuer URL for Kubernetes API server authentication.
     - oidc_client_id: OIDC client ID for Kubernetes API server authentication.
+
+    Note:
+    - If OIDC fields are set, the module will generate a kubeconfig with an exec credential plugin for OIDC authentication. Ensure that the OIDC provider is properly configured and accessible by cluster users.
+    - To use the generated OIDC kubeconfig, users must have the kubectl oidc-login (kubelogin) plugin installed (for example, via krew: 'kubectl krew install oidc-login'; see https://github.com/int128/kubelogin for other installation options).
+    - Adding 192.168.65.150 (Adguard DNS) as primary DNS server allows Talos nodes to resolve the running container in the cluster, like Pocket-Id, which is required for the OIDC.
+
+    OIDC Context Behavior:
+    - When OIDC is enabled, the generated kubeconfig sets the current-context to "oidc-context", making OIDC the default authentication method.
+    - The original Talos admin context remains available in the kubeconfig for emergency access or initial RBAC setup, but is not the default.
+    - To view all available contexts (including the admin context), use: kubectl config get-contexts
+    - To switch to the admin context, use: kubectl config use-context <context-name> (where <context-name> is the admin context name from the list, typically named "admin@<cluster-name>")
+    - To switch back to OIDC context, use: kubectl config use-context oidc-context
     EOT
+
+  validation {
+    condition     = var.talos_cluster.oidc_issuer_url == null || can(regex("^https://", var.talos_cluster.oidc_issuer_url))
+    error_message = "OIDC issuer URL must use HTTPS for secure token exchange. Use null to disable OIDC."
+  }
 }
 
 variable "talos_nodes" {
