@@ -13,7 +13,7 @@ resource "local_file" "talos_config" {
 }
 
 resource "local_file" "kube_config" {
-  content         = module.talos.oidc_enabled ? module.talos.kube_config_oidc_raw : module.talos.kube_config.kubeconfig_raw
+  content         = module.talos.kube_config_raw
   filename        = "output/kube-config.yaml"
   file_permission = "0600"
 }

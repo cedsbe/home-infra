@@ -1,12 +1,12 @@
 locals {
-  oidc_enabled = coalesce(local.talos_cluster_enriched.oidc_issuer_url, "not_set") != "not_set" && coalesce(local.talos_cluster_enriched.oidc_client_id, "not_set") != "not_set"
+  oidc_enabled = coalesce(local.talos_cluster_enriched.oidc_issuer_url, "") != "" && coalesce(local.talos_cluster_enriched.oidc_client_id, "") != ""
   kube_config_oidc_user = local.oidc_enabled ? {
     users = [
       {
         name = "oidc-user"
         user = {
           exec = {
-            apiVersion      = "client.authentication.k8s.io/v1beta1"
+            apiVersion      = "client.authentication.k8s.io/v1"
             command         = "kubectl"
             interactiveMode = "Never"
             args = [
@@ -42,7 +42,6 @@ locals {
 }
 
 data "utils_yaml_merge" "kube_config_oidc" {
-  for_each = local.oidc_enabled ? { oidc_enabled = true } : {}
 
   input = [
     talos_cluster_kubeconfig.this.kubeconfig_raw,

@@ -15,9 +15,9 @@ output "kube_config" {
   sensitive   = true
 }
 
-output "kube_config_oidc_raw" {
-  description = "The kubeconfig for the Talos nodes with OIDC"
-  value       = local.oidc_enabled ? data.utils_yaml_merge.kube_config_oidc["oidc_enabled"].output : "oidc_disabled"
+output "kube_config_raw" {
+  description = "The kubeconfig for the Talos nodes with or without OIDC"
+  value       = data.utils_yaml_merge.kube_config_oidc.output
   sensitive   = true
 }
 
