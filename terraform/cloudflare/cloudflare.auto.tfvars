@@ -18,69 +18,6 @@ records_public = {
     proxied   = false
   }
 
-  "calendar.ghiot.be" = {
-    zone_name = "ghiot.be"
-    name      = "calendar.ghiot.be"
-    type      = "CNAME"
-    comment   = "Google Calendar integration"
-    content   = "ghs.google.com"
-    proxied   = false
-  }
-
-  "docs.ghiot.be" = {
-    zone_name = "ghiot.be"
-    name      = "docs.ghiot.be"
-    type      = "CNAME"
-    comment   = "Google Docs integration"
-    content   = "ghs.google.com"
-    proxied   = false
-  }
-
-  "ftp.ghiot.be" = {
-    zone_name = "ghiot.be"
-    name      = "ftp.ghiot.be"
-    type      = "CNAME"
-    comment   = "FTP service hosted on OVH"
-    content   = "ftp.1000gp.ovh.net"
-    proxied   = false
-  }
-
-  "ftp2.ghiot.be" = {
-    zone_name = "ghiot.be"
-    name      = "ftp2.ghiot.be"
-    type      = "CNAME"
-    comment   = "Anonymous FTP service on OVH"
-    content   = "anonymous.ftp.ovh.net"
-    proxied   = false
-  }
-
-  "mail.ghiot.be" = {
-    zone_name = "ghiot.be"
-    name      = "mail.ghiot.be"
-    type      = "CNAME"
-    comment   = "Mail subdomain for Google services"
-    content   = "ghs.google.com"
-    proxied   = false
-  }
-
-  "ovhmo166055-selector1._domainkey.ghiot.be" = {
-    zone_name = "ghiot.be"
-    name      = "ovhmo166055-selector1._domainkey.ghiot.be"
-    type      = "CNAME"
-    comment   = "OVH DKIM selector 1 for email authentication"
-    content   = "ovhmo166055-selector1._domainkey.1639548.pq.dkim.mail.ovh.net"
-    proxied   = false
-  }
-
-  "ovhmo166055-selector2._domainkey.ghiot.be" = {
-    zone_name = "ghiot.be"
-    name      = "ovhmo166055-selector2._domainkey.ghiot.be"
-    type      = "CNAME"
-    comment   = "OVH DKIM selector 2 for email authentication"
-    content   = "ovhmo166055-selector2._domainkey.1639547.pq.dkim.mail.ovh.net"
-    proxied   = false
-  }
-
   "selector1._domainkey.ghiot.be" = {
     zone_name = "ghiot.be"
     name      = "selector1._domainkey.ghiot.be"
@@ -104,7 +41,7 @@ records_public = {
     name      = "ghiot.be"
     type      = "TXT"
     comment   = "SPF record for ghiot.be"
-    content   = "\"v=spf1 include:mx.ovh.com include:_spf.google.com include:spf.mailjet.com include:spf.protection.outlook.com ~all\""
+    content   = "\"v=spf1 include:spf.mailjet.com include:spf.protection.outlook.com ~all\""
     proxied   = false
   }
 
@@ -152,7 +89,7 @@ records_public = {
     name      = "ghiot.net"
     type      = "TXT"
     comment   = "SPF record for ghiot.net"
-    content   = "\"v=spf1 include:_spf.mx.cloudflare.net ~all\""
+    content   = "\"v=spf1 include:spf.mailjet.com include:_spf.mx.cloudflare.net ~all\""
     proxied   = false
   }
 
