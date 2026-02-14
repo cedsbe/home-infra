@@ -47,7 +47,7 @@ ARG TFLINT_VERSION=v0.61.0
 # renovate: datasource=github-releases depName=aquasecurity/trivy
 ARG TRIVY_VERSION=v0.69.1
 # renovate: datasource=github-releases depName=mikefarah/yq
-ARG YQ_VERSION=v4.52.2
+ARG YQ_VERSION=v4.52.4
 # renovate: datasource=npm depName=cspell
 ARG CSPELL_VERSION=9.6.4
 
