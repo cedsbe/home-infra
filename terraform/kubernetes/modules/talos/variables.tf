@@ -64,8 +64,8 @@ variable "talos_cluster" {
     OIDC Context Behavior:
     - When OIDC is enabled, the generated kubeconfig sets the current-context to "oidc-context", making OIDC the default authentication method.
     - The original Talos admin context remains available in the kubeconfig for emergency access or initial RBAC setup, but is not the default.
-    - To switch to the admin context, use: kubectl config use-context <admin-context-name>
-    - To view available contexts, use: kubectl config get-contexts
+    - To view all available contexts (including the admin context), use: kubectl config get-contexts
+    - To switch to the admin context, use: kubectl config use-context <context-name> (where <context-name> is the admin context name from the list, typically named "admin@<cluster-name>")
     - To switch back to OIDC context, use: kubectl config use-context oidc-context
     EOT
 }
