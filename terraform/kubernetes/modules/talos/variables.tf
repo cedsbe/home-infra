@@ -58,6 +58,7 @@ variable "talos_cluster" {
 
     Note:
     - If OIDC fields are set, the module will generate a kubeconfig with an exec credential plugin for OIDC authentication. Ensure that the OIDC provider is properly configured and accessible by cluster users.
+    - To use the generated OIDC kubeconfig, users must have the kubectl oidc-login (kubelogin) plugin installed (for example, via krew: 'kubectl krew install oidc-login'; see https://github.com/int128/kubelogin for other installation options).
     - Adding 192.168.65.150 (Adguard DNS) as primary DNS server allows Talos nodes to resolve the running container in the cluster, like Pocket-Id, which is required for the OIDC.
     EOT
 }
