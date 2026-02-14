@@ -13,25 +13,9 @@ resource "local_file" "talos_config" {
 }
 
 resource "local_file" "kube_config" {
-  content         = module.talos.kube_config.kubeconfig_raw
+  content         = module.talos.oidc_enabled ? module.talos.kube_config_oidc_raw : module.talos.kube_config.kubeconfig_raw
   filename        = "output/kube-config.yaml"
   file_permission = "0600"
-}
-
-# ============================================================================
-# Cluster Credentials (Sensitive)
-# ============================================================================
-
-output "kube_config" {
-  description = "Kubeconfig for accessing the Kubernetes cluster API"
-  value       = module.talos.kube_config.kubeconfig_raw
-  sensitive   = true
-}
-
-output "talos_config" {
-  description = "Talos client configuration for node management"
-  value       = module.talos.client_configuration.talos_config
-  sensitive   = true
 }
 
 # ============================================================================
