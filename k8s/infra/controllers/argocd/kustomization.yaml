@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - argocd-github-secret_sealed.yaml
+  - argocd-custom-secrets_sealed.yaml
   - http-route.yaml
   - ns.yaml
   - repositories.yaml
