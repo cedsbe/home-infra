@@ -14,11 +14,23 @@ configs:
     # https://github.com/argoproj/argo-helm/issues/2462
     kustomize.buildOptions: --enable-helm
 
+    oidc.config: |
+      name: PocketID
+      issuer: https://pocket-id.k8s.ghiot.be
+      clientID: df577d23-f953-4302-beeb-87ca8b68ca7b
+      clientSecret: $argocd-custom-secrets:oidc.pocket-id.client-secret
+      requestedScopes: 
+        - "openid"
+        - "profile"
+        - "email"
+        - "groups"
+
   params:
     server.insecure: true
   rbac:
     policy.csv: |
       g, argocd:admin, role:admin
+      g, argocd_admins, role:admin
       g, argocd:read_all, role:readonly
 
 crds:
