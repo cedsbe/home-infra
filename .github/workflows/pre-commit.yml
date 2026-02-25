@@ -53,7 +53,7 @@ jobs:
           kubeconform: v0.7.0 # renovate: datasource=github-releases depName=yannh/kubeconform
           task: v3.48.0 # renovate: datasource=github-releases depName=go-task/task packageName=go-task/task versioning=semver-coerced registryUrl=https://github.com
           tflint: v0.61.0 # renovate: datasource=github-releases depName=terraform-linters/tflint packageName=terraform-linters/tflint versioning=semver-coerced registryUrl=https://github.com
-          terraform: v1.14.5 # renovate: datasource=github-releases depName=hashicorp/terraform packageName=hashicorp/terraform versioning=semver-coerced registryUrl=https://github.com
+          terraform: v1.14.6 # renovate: datasource=github-releases depName=hashicorp/terraform packageName=hashicorp/terraform versioning=semver-coerced registryUrl=https://github.com
           packer: v1.15.0 # renovate: datasource=github-releases depName=hashicorp/packer packageName=hashicorp/packer versioning=semver-coerced registryUrl=https://github.com
 
       - name: Install Node.js
