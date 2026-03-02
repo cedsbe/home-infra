@@ -1,0 +1,68 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": ".claude/hooks/post-edit-validate.sh",
+            "timeout": 30,
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write"
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(task *)",
+      "Bash(terraform fmt *)",
+      "Bash(terraform validate *)",
+      "Bash(terraform plan *)",
+      "Bash(terraform output *)",
+      "Bash(terraform init *)",
+      "Bash(terraform workspace *)",
+      "Bash(kubectl get *)",
+      "Bash(kubectl describe *)",
+      "Bash(kubectl logs *)",
+      "Bash(kubectl diff *)",
+      "Bash(kubectl kustomize *)",
+      "Bash(talosctl health *)",
+      "Bash(talosctl get *)",
+      "Bash(talosctl read *)",
+      "Bash(talosctl version *)",
+      "Bash(argocd app get *)",
+      "Bash(argocd app list *)",
+      "Bash(argocd app diff *)",
+      "Bash(helm template *)",
+      "Bash(helm list *)",
+      "Bash(packer validate *)",
+      "Bash(packer inspect *)",
+      "Bash(packer init *)",
+      "Bash(pre-commit run *)",
+      "Bash(kubeconform *)",
+      "Bash(kustomize build *)",
+      "Bash(tflint *)",
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)"
+    ],
+    "deny": [
+      "Bash(terraform apply *)",
+      "Bash(terraform destroy *)",
+      "Bash(kubectl apply *)",
+      "Bash(kubectl delete *)",
+      "Bash(kubectl exec *)",
+      "Bash(talosctl apply-config *)",
+      "Bash(talosctl reset *)",
+      "Bash(talosctl upgrade *)",
+      "Bash(argocd app sync *)",
+      "Bash(argocd app delete *)",
+      "Bash(packer build *)",
+      "Bash(git push *)",
+      "Bash(git-crypt *)",
+      "Bash(rm -rf *)"
+    ]
+  }
+}
