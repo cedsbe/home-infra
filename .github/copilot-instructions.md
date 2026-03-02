@@ -359,8 +359,13 @@ The GitHub MCP requires a `GITHUB_TOKEN` on your host machine. The devcontainer 
 automatically via `remoteEnv`. Set it once in your shell profile:
 
 ```bash
-# ~/.profile or ~/.zshrc or ~/.config/fish/conf.d/tokens.fish
+# ~/.profile or ~/.zshrc
 export GITHUB_TOKEN=$(gh auth token)
+```
+
+```fish
+# ~/.config/fish/conf.d/tokens.fish
+set -x GITHUB_TOKEN (gh auth token)
 ```
 
 Then verify inside the devcontainer: `echo $GITHUB_TOKEN`
