@@ -341,6 +341,72 @@ Claude Code automatically loads additional context when working in:
 - `k8s/**` → `.claude/rules/kubernetes.md` (GitOps model, sealed secrets workflow, namespaces)
 - `packer/**` → `.claude/rules/packer.md` (build modes, credential pattern, known past mistakes)
 
+### MCP Servers
+
+MCP servers are configured in `.mcp.json` at the project root. The `enableAllProjectMcpServers: true`
+setting in `.claude/settings.json` auto-approves them on startup.
+
+#### Configured Servers (Tier 1 — active)
+
+| Server | Transport | Capabilities |
+|--------|-----------|--------------|
+| `github` | `npx -y @github/github-mcp-server` | List/create PRs and issues, search code, read files, trigger and monitor GitHub Actions workflows, manage releases |
+| `terraform` | `podman run --rm -i hashicorp/terraform-mcp-server:0.4.0` | Look up Terraform provider documentation, resource schemas, module metadata, and data source info from the public registry |
+
+#### One-Time Host Setup (GitHub MCP)
+
+The GitHub MCP requires a `GITHUB_TOKEN` on your host machine. The devcontainer passes it through
+automatically via `remoteEnv`. Set it once in your shell profile:
+
+```bash
+# ~/.profile or ~/.zshrc or ~/.config/fish/conf.d/tokens.fish
+export GITHUB_TOKEN=$(gh auth token)
+```
+
+Then verify inside the devcontainer: `echo $GITHUB_TOKEN`
+
+If the token is not set the GitHub MCP will fail to authenticate, but all other tools remain unaffected.
+
+#### ~/.claude.json Persistence
+
+`~/.claude.json` (Claude Code auth and user settings) is bind-mounted from your host home directory
+so `claude login` persists across devcontainer rebuilds. If the file does not exist on your host yet,
+create it before starting the container:
+
+```bash
+touch ~/.claude.json
+```
+
+#### Optional Servers (Tier 2 — add to `settings.local.json` when needed)
+
+**Azure MCP** — useful for querying the Azure backend and global infra resources. Uses ambient
+`az login` auth; no credentials in config:
+
+```json
+{
+  "mcpServers": {
+    "azure": {
+      "command": "npx",
+      "args": ["-y", "@azure/mcp"]
+    }
+  }
+}
+```
+
+**Kubernetes MCP** — structured cluster data queries. Marginal additional value since kubectl/talosctl
+bash permissions are already pre-approved, but useful for complex multi-resource queries:
+
+```json
+{
+  "mcpServers": {
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "kubernetes-mcp-server"]
+    }
+  }
+}
+```
+
 ## Best Practices for AI Assistance
 
 - **Context Awareness**: Always consider the modular structure when suggesting changes

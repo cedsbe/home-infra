@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "github": {
+      "args": [
+        "-y",
+        "@github/github-mcp-server"
+      ],
+      "command": "npx",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "terraform": {
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "hashicorp/terraform-mcp-server:0.4.0"
+      ],
+      "command": "podman"
+    }
+  }
+}

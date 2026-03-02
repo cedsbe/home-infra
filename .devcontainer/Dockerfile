@@ -48,6 +48,8 @@ ARG TFLINT_VERSION=v0.61.0
 ARG TRIVY_VERSION=v0.69.1
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.52.4
+# renovate: datasource=npm depName=@anthropic-ai/claude-code
+ARG CLAUDE_CODE_VERSION=2.1.63
 # renovate: datasource=npm depName=cspell
 ARG CSPELL_VERSION=9.6.4
 
@@ -225,9 +227,11 @@ RUN <<EOF
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF
 
-# Install cspell globally via npm with pinned version
+# Install npm global tools with pinned versions
 RUN <<EOF
-  npm install -g cspell@${CSPELL_VERSION}
+  npm install -g \
+    @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} \
+    cspell@${CSPELL_VERSION}
 EOF
 
 # Install Kubernetes ecosystem tools with pinned versions
