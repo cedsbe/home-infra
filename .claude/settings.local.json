@@ -1,0 +1,13 @@
+{
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "github",
+    "terraform"
+  ],
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:github.com)"
+    ]
+  }
+}

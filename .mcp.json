@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "github": {
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_TOKEN}"
+      },
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp"
+    },
+    "terraform": {
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "--network=host",
+        "docker.io/hashicorp/terraform-mcp-server:0.4.0"
+      ],
+      "command": "podman"
+    }
+  }
+}

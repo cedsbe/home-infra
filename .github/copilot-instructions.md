@@ -281,6 +281,137 @@ The repository uses pre-commit hooks and GitHub Actions for code quality:
   pre-commit run --all-files  # Run all hooks
   ```
 
+## Claude Code Workflow Hints
+
+This section applies specifically to Claude Code (claude.ai/claude-code) sessions in this repository.
+
+### Tool Preferences
+
+- **Always prefer `task` over raw tool invocations**: Use `task <namespace>:<command>` instead of calling `terraform`, `kubectl`, or `packer` directly. Task handles environment setup, working directories, and secrets loading automatically.
+- **Fish shell** is used inside the devcontainer — assume Fish syntax when writing shell snippets unless a `.sh` file context indicates Bash.
+
+### Environment Variables (Auto-set in Devcontainer)
+
+- `KUBECONFIG` — points to the cluster kubeconfig; `kubectl` works without extra flags.
+- `TALOSCONFIG` — points to the Talos client config; `talosctl` works without extra flags.
+- `KUBE_CONFIG_PATH` — same as `KUBECONFIG`, used by some Terraform providers.
+
+### Per-Tool Response Format
+
+| Context | Preferred Claude Response Format |
+|---------|----------------------------------|
+| Terraform changes | Show `terraform plan` summary; highlight destroys/replaces; never auto-apply |
+| Kubernetes changes | Show `kubectl diff` or ArgoCD diff; note GitOps sync delay |
+| Packer templates | Always validate first (`task packer:validate`); warn about 1-3h build time |
+| Pre-commit failures | Group by hook type; suggest specific fix per hook |
+
+### Key Constraints
+
+- **Talos = no SSH**: All node management via `talosctl`. Never suggest `ssh` to cluster nodes.
+- **ArgoCD = no `kubectl apply` for apps**: Commit to `main` and let ArgoCD sync. Only use `kubectl apply` for non-ArgoCD-managed resources.
+- **git-crypt**: If a file appears as binary gibberish, it is git-crypt locked. Do NOT attempt to modify it. The user must run `git-crypt unlock` first. `git-crypt` commands are in the Claude Code deny list — the user must run them manually.
+
+### Pre-approved vs. Confirmation-Required Commands
+
+| Pre-approved (Claude runs automatically) | Requires human confirmation |
+|------------------------------------------|----------------------------|
+| `terraform plan`, `validate`, `fmt` | `terraform apply`, `destroy` |
+| `kubectl get`, `describe`, `logs`, `diff` | `kubectl apply`, `delete`, `exec` |
+| `talosctl health`, `get`, `version` | `talosctl apply-config`, `reset`, `upgrade` |
+| `argocd app get`, `list`, `diff` | `argocd app sync`, `delete` |
+| `packer validate`, `inspect`, `init` | `packer build` |
+| `git status`, `diff`, `log`, `show` | `git push` |
+| `task *` (all task commands) | — |
+
+### Custom Slash Commands
+
+The following custom commands are available in Claude Code sessions:
+
+- `/tf-plan <workspace>` — Run and summarize a Terraform plan (never applies)
+- `/validate-all [path]` — Run pre-commit hooks and group failures by type
+- `/k8s-status` — Read-only cluster health report (nodes, Talos, ArgoCD, pods)
+- `/argocd-sync <app>` — Show ArgoCD app state and diff (never syncs)
+- `/seal-secret <path>` — Seal a secret from `sensitive/` using Sealed Secrets
+
+### Path-Scoped Context Rules
+
+Claude Code automatically loads additional context when working in:
+
+- `terraform/**` → `.claude/rules/terraform.md` (workspace inventory, provider notes, git-crypt context)
+- `k8s/**` → `.claude/rules/kubernetes.md` (GitOps model, sealed secrets workflow, namespaces)
+- `packer/**` → `.claude/rules/packer.md` (build modes, credential pattern, known past mistakes)
+
+### MCP Servers
+
+MCP servers are configured in `.mcp.json` at the project root. The `enableAllProjectMcpServers: true`
+setting in `.claude/settings.json` auto-approves them on startup.
+
+#### Configured Servers (Tier 1 — active)
+
+| Server | Transport | Capabilities |
+|--------|-----------|--------------|
+| `github` | Streamable HTTP — `https://api.githubcopilot.com/mcp` (auth via `GITHUB_TOKEN`) | List/create PRs and issues, search code, read files, trigger and monitor GitHub Actions workflows, manage releases |
+| `terraform` | `podman run --rm -i hashicorp/terraform-mcp-server:0.4.0` | Look up Terraform provider documentation, resource schemas, module metadata, and data source info from the public registry |
+
+#### One-Time Host Setup (GitHub MCP)
+
+The GitHub MCP requires a `GITHUB_TOKEN` on your host machine. The devcontainer passes it through
+automatically via `remoteEnv`. Set it once in your shell profile:
+
+```bash
+# ~/.profile or ~/.zshrc
+export GITHUB_TOKEN=$(gh auth token)
+```
+
+```fish
+# ~/.config/fish/conf.d/tokens.fish
+set -x GITHUB_TOKEN (gh auth token)
+```
+
+Then verify inside the devcontainer: `echo $GITHUB_TOKEN`
+
+If the token is not set the GitHub MCP will fail to authenticate, but all other tools remain unaffected.
+
+#### ~/.claude.json Persistence
+
+`~/.claude.json` (Claude Code auth and user settings) is bind-mounted from your host home directory
+so `claude login` persists across devcontainer rebuilds. If the file does not exist on your host yet,
+create it before starting the container:
+
+```bash
+touch ~/.claude.json
+```
+
+#### Optional Servers (Tier 2 — add to `settings.local.json` when needed)
+
+**Azure MCP** — useful for querying the Azure backend and global infra resources. Uses ambient
+`az login` auth; no credentials in config:
+
+```json
+{
+  "mcpServers": {
+    "azure": {
+      "command": "npx",
+      "args": ["-y", "@azure/mcp"]
+    }
+  }
+}
+```
+
+**Kubernetes MCP** — structured cluster data queries. Marginal additional value since kubectl/talosctl
+bash permissions are already pre-approved, but useful for complex multi-resource queries:
+
+```json
+{
+  "mcpServers": {
+    "kubernetes": {
+      "command": "npx",
+      "args": ["-y", "kubernetes-mcp-server"]
+    }
+  }
+}
+```
+
 ## Best Practices for AI Assistance
 
 - **Context Awareness**: Always consider the modular structure when suggesting changes
@@ -291,6 +422,9 @@ The repository uses pre-commit hooks and GitHub Actions for code quality:
 - **Documentation**: Update relevant documentation when making significant changes
 - **Environment Consistency**: Maintain consistency between dev/prod environments
 - **Gitleaks Configuration**: Never modify `.gitleaks.toml` without explicit validation and user approval. This file is critical for preventing secrets from being committed to the repository. Any changes to gitleaks rules or allowlists must be carefully reviewed to ensure they don't weaken security protections.
+- **Use Custom Commands**: For common workflows, prefer the slash commands (e.g., `/tf-plan`, `/k8s-status`) over ad-hoc tool calls — they encode project-specific safety checks.
+- **Check Path-Scoped Rules**: When working in `terraform/`, `k8s/`, or `packer/` directories, the workspace-specific rules in `.claude/rules/` are automatically loaded and contain critical context (known past mistakes, workflow requirements).
+- **Respect the Deny List**: Commands in the Claude Code deny list (apply, destroy, sync, push, packer build) require explicit human confirmation. Never attempt to bypass this by rephrasing the command.
 
 ## Learning from Mistakes and Continuous Improvement
 
