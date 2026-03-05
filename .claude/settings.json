@@ -49,7 +49,7 @@
       "Bash(git log *)",
       "Bash(git show *)"
     ],
-    "deny": [
+    "ask": [
       "Bash(terraform apply *)",
       "Bash(terraform destroy *)",
       "Bash(kubectl apply *)",

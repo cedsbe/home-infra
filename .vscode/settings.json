@@ -27,5 +27,6 @@
     "*.yml": "yaml",
     "devcontainer*.json": "jsonc"
   },
+  "files.insertFinalNewline": true,
   "xml.format.maxLineWidth": 250
 }
