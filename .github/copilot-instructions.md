@@ -350,7 +350,7 @@ setting in `.claude/settings.json` auto-approves them on startup.
 
 | Server | Transport | Capabilities |
 |--------|-----------|--------------|
-| `github` | `npx -y @github/github-mcp-server` | List/create PRs and issues, search code, read files, trigger and monitor GitHub Actions workflows, manage releases |
+| `github` | Streamable HTTP — `https://api.githubcopilot.com/mcp` (auth via `GITHUB_TOKEN`) | List/create PRs and issues, search code, read files, trigger and monitor GitHub Actions workflows, manage releases |
 | `terraform` | `podman run --rm -i hashicorp/terraform-mcp-server:0.4.0` | Look up Terraform provider documentation, resource schemas, module metadata, and data source info from the public registry |
 
 #### One-Time Host Setup (GitHub MCP)

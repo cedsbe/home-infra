@@ -45,7 +45,7 @@ ARG TASK_VERSION=v3.48.0
 # renovate: datasource=github-releases depName=terraform-linters/tflint
 ARG TFLINT_VERSION=v0.61.0
 # renovate: datasource=github-releases depName=aquasecurity/trivy
-ARG TRIVY_VERSION=v0.69.1
+ARG TRIVY_VERSION=v0.69.2
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.52.4
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
@@ -110,6 +110,8 @@ RUN <<EOF
     zip \
     fuse-overlayfs \
     podman \
+    slirp4netns \
+    uidmap \
     pipx \
     python3 python3-cffi python3-pip python3-venv python3-yaml python3-wheel \
     ansible \
