@@ -27,7 +27,7 @@ ARG KUBECTX_VERSION=v0.9.5
 # renovate: datasource=github-releases depName=int128/kubelogin
 ARG KUBELOGIN_VERSION=v1.35.2
 # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
-ARG KUBESEAL_VERSION=v0.35.0
+ARG KUBESEAL_VERSION=v0.36.0
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
 ARG KUSTOMIZE_VERSION=v5.8.0
 # renovate: datasource=github-releases depName=jesseduffield/lazygit
