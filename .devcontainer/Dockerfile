@@ -51,7 +51,7 @@ ARG YQ_VERSION=v4.52.4
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
 ARG CLAUDE_CODE_VERSION=2.1.63
 # renovate: datasource=npm depName=cspell
-ARG CSPELL_VERSION=9.6.4
+ARG CSPELL_VERSION=9.7.0
 
 # Install system dependencies grouped by purpose
 RUN <<EOF
