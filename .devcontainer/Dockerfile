@@ -25,7 +25,7 @@ ARG KUBECONFORM_VERSION=v0.7.0
 # renovate: datasource=github-releases depName=ahmetb/kubectx
 ARG KUBECTX_VERSION=v0.9.5
 # renovate: datasource=github-releases depName=int128/kubelogin
-ARG KUBELOGIN_VERSION=v1.35.2
+ARG KUBELOGIN_VERSION=v1.36.0
 # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
 ARG KUBESEAL_VERSION=v0.36.0
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
