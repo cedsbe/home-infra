@@ -57,7 +57,7 @@ jobs:
           packer: v1.15.0 # renovate: datasource=github-releases depName=hashicorp/packer packageName=hashicorp/packer versioning=semver-coerced registryUrl=https://github.com
 
       - name: Install Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: "24"
 
