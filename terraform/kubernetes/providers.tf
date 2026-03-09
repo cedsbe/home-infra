@@ -13,7 +13,7 @@ terraform {
 
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.98.0"
+      version = "0.98.1"
     }
 
     kubernetes = {
