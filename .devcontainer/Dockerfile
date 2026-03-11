@@ -31,7 +31,7 @@ ARG KUBESEAL_VERSION=v0.36.0
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
 ARG KUSTOMIZE_VERSION=v5.8.0
 # renovate: datasource=github-releases depName=jesseduffield/lazygit
-ARG LAZYGIT_VERSION=v0.59.0
+ARG LAZYGIT_VERSION=v0.60.0
 # renovate: datasource=github-releases depName=gitleaks/gitleaks
 ARG GITLEAKS_VERSION=v8.30.0
 # renovate: datasource=github-releases depName=starship/starship
