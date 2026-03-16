@@ -221,5 +221,10 @@ module "volumes" {
       node = "hsp-proxmox0"
       size = "4G"
     }
+
+    pv-plex = {
+      node = "hsp-proxmox0"
+      size = "50G"
+    }
   }
 }
