@@ -33,10 +33,10 @@ spec:
             value: "1"
       containers:
         - name: plex
-          image: ghcr.io/home-operations/plex:1.43.0.10492@sha256:8cb062f2b0660bd7811387e6c799da0ce5f18112078fe21485c11adcc83a9c1c
+          image: ghcr.io/home-operations/plex:1.43.0.10492@sha256:8cb062f2b0660bd7811387e6c799da0ce5f18112078fe21485c11adcc83a9c1c # renovate: datasource=docker depName=ghcr.io/home-operations/plex packageName=ghcr.io/home-operations/plex versioning=docker registryUrl=https://ghcr.io
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop: ["ALL"]
           ports:
