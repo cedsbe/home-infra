@@ -1,0 +1,124 @@
+# Default deny all ingress and egress traffic in the plex namespace.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: plex
+spec:
+  endpointSelector: {}
+  ingress: []
+  egress: []
+---
+# Allow DNS resolution for all pods (required for most apps)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: plex
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+---
+# Allow ingress from the gateway namespace (for HTTPRoutes)
+# Note: Traffic through Gateway API/Ingress controllers arrives with the special
+# Cilium identity "reserved:ingress" (identity 8), not the gateway pod's identity.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-gateway-ingress
+  namespace: plex
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: gateway
+    - fromEntities:
+        - ingress
+---
+# Allow ingress on Plex port (LoadBalancer access)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-plex-ingress
+  namespace: plex
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "32400"
+              protocol: TCP
+            - port: "32400"
+              protocol: UDP
+---
+# Allow egress to NFS server (Synology NAS) for media library access
+# Synology DSM uses fixed ports for NFSv3 auxiliary services
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-nfs-egress
+  namespace: plex
+spec:
+  endpointSelector: {}
+  egress:
+    - toCIDR:
+        - 192.168.65.250/32
+      toPorts:
+        - ports:
+            # NFS
+            - port: "2049"
+              protocol: TCP
+            - port: "2049"
+              protocol: UDP
+            # Portmapper/rpcbind
+            - port: "111"
+              protocol: TCP
+            - port: "111"
+              protocol: UDP
+            # Synology NFSv3 auxiliary services (DSM defaults)
+            # mountd
+            - port: "892"
+              protocol: TCP
+            - port: "892"
+              protocol: UDP
+            # statd
+            - port: "662"
+              protocol: TCP
+            - port: "662"
+              protocol: UDP
+            # nlm/lockd
+            - port: "32803"
+              protocol: TCP
+            - port: "32803"
+              protocol: UDP
+---
+# Allow egress to external services (Plex relay, metadata, authentication)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-external-egress
+  namespace: plex
+spec:
+  endpointSelector: {}
+  egress:
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
