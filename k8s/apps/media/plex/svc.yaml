@@ -11,3 +11,4 @@ spec:
     - name: http
       port: 32400
       targetPort: plex-tcp
+      protocol: TCP
