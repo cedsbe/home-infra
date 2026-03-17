@@ -11,6 +11,8 @@ spec:
       server: "*"
     - namespace: "arr"
       server: "*"
+    - namespace: "plex"
+      server: "*"
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
