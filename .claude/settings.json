@@ -49,7 +49,9 @@
       "Bash(git log *)",
       "Bash(git show *)",
       "mcp__github__create_pull_request",
-      "mcp__github__pull_request_read"
+      "mcp__github__pull_request_read",
+      "Bash(git fetch:*)",
+      "Bash(git rebase:*)"
     ],
     "ask": [
       "Bash(terraform apply *)",
