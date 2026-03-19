@@ -10,7 +10,7 @@ env:
   TALOSCONFIG: terraform/kubernetes/output/talos-config.yaml
 
 dotenv:
-  - "packer/windows_server_2025/.env"
+  - "packer/.env"
   - "terraform/cloudflare/.env"
 
 includes:
@@ -19,8 +19,8 @@ includes:
     dir: ./ansible
 
   packer:
-    taskfile: ./packer/windows_server_2025/Taskfile.yml
-    dir: ./packer/windows_server_2025
+    taskfile: ./packer/Taskfile.yml
+    dir: ./packer
 
   azure-global:
     taskfile: ./terraform/azure/global/Taskfile.yml

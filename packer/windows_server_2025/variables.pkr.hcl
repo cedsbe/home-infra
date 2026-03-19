@@ -23,12 +23,12 @@ variable "cdrom_drive_virtio_winre" {
   type        = string
 }
 
-variable "clone_vm_id" {
-  description = "The VM ID for the clone operation."
+variable "ws2025_clone_vm_id" {
+  description = "The VM ID of the Windows Server 2025 base template to clone."
   type        = number
 
   validation {
-    condition     = var.clone_vm_id >= 100 && var.clone_vm_id <= 999999999
+    condition     = var.ws2025_clone_vm_id >= 100 && var.ws2025_clone_vm_id <= 999999999
     error_message = "VM ID must be a number between 100 and 999999999."
   }
 }

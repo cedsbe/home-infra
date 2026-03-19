@@ -41,14 +41,14 @@ tasks:
         echo "Checking required environment variables..."
 
         # Check if .env file exists
-        if [ ! -f ".env" ]; then
-          echo "WARNING: .env file not found"
+        if [ ! -f "../.env" ]; then
+          echo "WARNING: packer/.env file not found"
           echo "Create one from template:"
-          echo "   cp .env.template .env"
-          echo "   # Then edit .env with your actual credentials"
+          echo "   cp packer/.env.template packer/.env"
+          echo "   # Then edit packer/.env with your actual credentials"
           echo ""
         else
-          echo ".env file found"
+          echo "packer/.env file found"
         fi
 
         missing_vars=()
@@ -91,14 +91,14 @@ tasks:
         echo "Checking required environment variables for clone build..."
 
         # Check if .env file exists
-        if [ ! -f ".env" ]; then
-          echo "WARNING: .env file not found"
+        if [ ! -f "../.env" ]; then
+          echo "WARNING: packer/.env file not found"
           echo "Create one from template:"
-          echo "   cp .env.template .env"
-          echo "   # Then edit .env with your actual credentials"
+          echo "   cp packer/.env.template packer/.env"
+          echo "   # Then edit packer/.env with your actual credentials"
           echo ""
         else
-          echo ".env file found"
+          echo "packer/.env file found"
         fi
 
         missing_vars=()
@@ -115,8 +115,8 @@ tasks:
           missing_vars+=("PKR_VAR_winrm_password")
         fi
 
-        if [ -z "$PKR_VAR_clone_vm_id" ]; then
-          missing_vars+=("PKR_VAR_clone_vm_id")
+        if [ -z "$PKR_VAR_win11_clone_vm_id" ]; then
+          missing_vars+=("PKR_VAR_win11_clone_vm_id")
         fi
 
         if [ ${#missing_vars[@]} -eq 0 ]; then
@@ -126,20 +126,20 @@ tasks:
           printf '  %s\n' "${missing_vars[@]}"
           echo ""
           echo "Options to set them:"
-          echo "   1. Create/update .env file (recommended):"
-          echo "      cp .env.template .env"
-          echo "      # Edit .env with your credentials"
+          echo "   1. Create/update packer/.env file (recommended):"
+          echo "      cp packer/.env.template packer/.env"
+          echo "      # Edit packer/.env with your credentials"
           echo ""
           echo "   2. Export manually:"
           echo "      export PKR_VAR_proxmox_api_token=\"your-token\""
           echo "      export PKR_VAR_proxmox_username=\"terraform@pve!terra\""
           echo "      export PKR_VAR_winrm_password=\"your-password\""
-          echo "      export PKR_VAR_clone_vm_id=\"vm-id-to-clone\""
+          echo "      export PKR_VAR_win11_clone_vm_id=\"vm-id-to-clone\""
           echo ""
           echo "   3. Pass as task variable:"
-          echo "      task build-clone PKR_VAR_clone_vm_id=12345"
+          echo "      task build-clone PKR_VAR_win11_clone_vm_id=12345"
           echo ""
-          echo "NOTE: PKR_VAR_clone_vm_id should be the ID of an existing Windows 11 VM template"
+          echo "NOTE: PKR_VAR_win11_clone_vm_id should be the ID of an existing Windows 11 base template"
           exit 1
         fi
 
@@ -324,9 +324,9 @@ tasks:
         echo "  task build-iso TEMPLATE=Education     # Windows 11 Education"
         echo ""
         echo "Clone Build Requirements:"
-        echo "  task env-check-clone                           # Check clone-specific env vars"
-        echo "  task build-clone PKR_VAR_clone_vm_id=12345    # Specify source VM ID"
-        echo "  # Note: PKR_VAR_clone_vm_id must be set to an existing Windows 11 template ID"
+        echo "  task env-check-clone                                # Check clone-specific env vars"
+        echo "  task build-clone PKR_VAR_win11_clone_vm_id=12345   # Specify source VM ID"
+        echo "  # Note: PKR_VAR_win11_clone_vm_id must be set to an existing Windows 11 base template ID"
         echo ""
         echo "Debug Options:"
         echo "  task build-iso DEBUG=true          # Enable breakpoints for ISO build"
@@ -337,8 +337,8 @@ tasks:
         echo "Important:"
         echo "  - Create .env file from template: cp .env.template .env"
         echo "  - Edit windows_iso in variables.auto.pkrvars.hcl with your ISO filename"
-        echo "  - Edit .env with your actual credentials"
-        echo "  - For clone builds, set PKR_VAR_clone_vm_id to an existing VM template ID"
+        echo "  - Edit packer/.env with your actual credentials"
+        echo "  - For clone builds, set PKR_VAR_win11_clone_vm_id to an existing Windows 11 base template ID"
         echo "  - Never commit .env to version control"
         echo "  - Test builds in non-production environment first"
         echo ""

@@ -8,7 +8,7 @@ locals {
 
 source "proxmox-clone" "windows11" {
 
-  clone_vm_id = var.clone_vm_id
+  clone_vm_id = var.win11_clone_vm_id
   full_clone  = var.full_clone
 
   # Proxmox Host Connection

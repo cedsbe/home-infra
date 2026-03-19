@@ -46,17 +46,16 @@ This directory contains Packer configurations for building Windows 11 templates 
 
 ### 1. Environment Configuration
 ```bash
-cd packer/windows_11
-cp .env.template .env
-# Edit .env with your actual Proxmox credentials
+cp packer/.env.template packer/.env
+# Edit packer/.env with your actual Proxmox credentials
 ```
 
-Required environment variables:
+Required environment variables (in `packer/.env`):
 ```bash
 PKR_VAR_proxmox_api_token=your-proxmox-api-token
 PKR_VAR_proxmox_username=your-username@pve!your-token-name
 PKR_VAR_winrm_password=your-secure-windows-password
-PKR_VAR_clone_vm_id=123  # Only needed for clone builds
+PKR_VAR_win11_clone_vm_id=123  # Only needed for clone builds
 ```
 
 ### 2. Update ISO Filename
@@ -71,7 +70,7 @@ task env-check    # Check environment variables
 task validate     # Validate Packer configuration
 ```
 
-> **Note**: The `.env` file is automatically ignored by git (see `.gitignore`) to prevent credential leaks.
+> **Note**: The `packer/.env` file is automatically ignored by git to prevent credential leaks.
 
 ## Build Instructions
 
@@ -79,13 +78,16 @@ task validate     # Validate Packer configuration
 
 #### From Project Root
 ```bash
-task packer:setup              # Check prerequisites and environment
-task packer:build-iso          # Build default template (Pro ISO) - ~60-120 min
-task packer:build-clone        # Build clone template with cloudbase-init - ~20-45 min
+task packer:win11:setup              # Check prerequisites and environment
+task packer:win11:build-iso          # Build default template (Pro ISO) - ~60-120 min
+task packer:win11:build-clone        # Build clone template with cloudbase-init - ~20-45 min
 
 # Build specific editions
-task packer:build-iso TEMPLATE=Enterprise    # Enterprise - ~60-120 min
-task packer:build-iso TEMPLATE=Education     # Education - ~60-120 min
+task packer:win11:build-iso TEMPLATE=Enterprise    # Enterprise - ~60-120 min
+task packer:win11:build-iso TEMPLATE=Education     # Education - ~60-120 min
+
+# Clone build with explicit VM ID
+task packer:win11:build-clone PKR_VAR_win11_clone_vm_id=200
 ```
 
 #### From Packer Directory
