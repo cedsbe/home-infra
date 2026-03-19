@@ -32,17 +32,16 @@ This directory contains Packer configurations for building Windows Server 2025 t
 
 ### 1. Environment Configuration
 ```bash
-cd packer/windows_server_2025
-cp .env.template .env
-# Edit .env with your actual Proxmox credentials
+cp packer/.env.template packer/.env
+# Edit packer/.env with your actual Proxmox credentials
 ```
 
-Required environment variables:
+Required environment variables (in `packer/.env`):
 ```bash
 PKR_VAR_proxmox_api_token=your-proxmox-api-token
 PKR_VAR_proxmox_username=your-username@pve!your-token-name
 PKR_VAR_winrm_password=your-secure-windows-password
-PKR_VAR_clone_vm_id=123  # Only needed for clone builds
+PKR_VAR_ws2025_clone_vm_id=123  # Only needed for clone builds
 ```
 
 ### 2. Validate Setup
@@ -51,7 +50,7 @@ task env-check    # Check environment variables
 task validate     # Validate Packer configuration
 ```
 
-> **Note**: The `.env` file is automatically ignored by git (see `.gitignore`) to prevent credential leaks.
+> **Note**: The `packer/.env` file is automatically ignored by git to prevent credential leaks.
 
 > **⚠️ First-time setup**: If you get "permission denied" errors, ensure your Proxmox API token has sufficient permissions. See [Troubleshooting](#troubleshooting) for details.
 
@@ -61,16 +60,19 @@ task validate     # Validate Packer configuration
 
 #### From Project Root
 ```bash
-task packer:setup              # Check prerequisites and environment
-task packer:build-iso          # Build default template (DcDesktop ISO) - ~45-90 min
-task packer:build-clone        # Build clone template with cloudbase-init - ~15-30 min
+task packer:ws2025:setup              # Check prerequisites and environment
+task packer:ws2025:build-iso          # Build default template (DcDesktop ISO) - ~45-90 min
+task packer:ws2025:build-clone        # Build clone template with cloudbase-init - ~15-30 min
 
 # Build specific editions
-task packer:build-iso TEMPLATE=DcCore      # Datacenter Core - ~45-90 min
-task packer:build-iso TEMPLATE=StdDesktop  # Standard Desktop - ~45-90 min
-task packer:build-iso TEMPLATE=StdCore     # Standard Core - ~45-90 min
+task packer:ws2025:build-iso TEMPLATE=DcCore      # Datacenter Core - ~45-90 min
+task packer:ws2025:build-iso TEMPLATE=StdDesktop  # Standard Desktop - ~45-90 min
+task packer:ws2025:build-iso TEMPLATE=StdCore     # Standard Core - ~45-90 min
 
-task packer:help               # Show all available commands
+# Clone build with explicit VM ID
+task packer:ws2025:build-clone PKR_VAR_ws2025_clone_vm_id=200
+
+task packer:ws2025:help               # Show all available commands
 ```
 
 #### From Packer Directory

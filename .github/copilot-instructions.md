@@ -225,7 +225,8 @@ resource "azurerm_resource" "from_set" {
 - **Storage Issues**: Validate CSI plugin configuration and Proxmox permissions
 
 ### Debugging Tools
-- `task packer:setup` - Validate Packer environment
+- `task packer:ws2025:setup` - Validate Windows Server 2025 Packer environment
+- `task packer:win11:setup` - Validate Windows 11 Packer environment
 - `talosctl health` - Check cluster health
 - `kubectl get nodes -o wide` - Verify node status
 - `argocd app get <app-name>` - Check application sync status
@@ -251,7 +252,7 @@ resource "azurerm_resource" "from_set" {
 
 1. **Infrastructure Changes**: Modify Terraform configurations, validate with `terraform plan`
 2. **Application Deployment**: Update K8s manifests, let ArgoCD sync automatically
-3. **Template Updates**: Use `task packer:validate` and `task packer:build` for Packer changes
+3. **Template Updates**: Use `task packer:validate` (all) or `task packer:ws2025:validate` / `task packer:win11:validate` for Packer changes
 4. **Testing**: Validate changes in dev environment before production
 5. **CI/CD Validation**: All pull requests run pre-commit hooks and infrastructure validation
 
