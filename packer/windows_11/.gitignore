@@ -1,0 +1,30 @@
+# Packer sensitive files
+variables.secrets.auto.pkrvars.hcl
+*.secrets.*
+.env
+
+# Packer build artifacts
+packer_cache/
+*.box
+*.ova
+*.ovf
+
+# Logs
+packer.log
+*.log
+
+# Temporary files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.directory
+desktop.ini

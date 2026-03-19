@@ -1,0 +1,345 @@
+# Taskfile for Windows 11 Packer Template
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  DEFAULT_TEMPLATE: Pro
+  PACKER_LOG_LEVEL: ""
+
+env:
+  PACKER_LOG: "{{.PACKER_LOG_LEVEL}}"
+
+tasks:
+  default:
+    desc: "Show available tasks"
+    silent: true
+    cmds:
+      - task --list
+
+  validate:
+    desc: "Validate Packer template configuration"
+    silent: true
+    cmds:
+      - echo "Validating Packer configuration..."
+      - packer validate .
+      - echo "Configuration is valid"
+
+  init:
+    desc: "Initialize Packer plugins"
+    silent: true
+    cmds:
+      - echo "Initializing Packer plugins..."
+      - packer init .
+      - echo "Plugins initialized"
+
+  env-check:
+    desc: "Check if required environment variables are set"
+    silent: true
+    cmds:
+      - |
+        echo "Checking required environment variables..."
+
+        # Check if .env file exists
+        if [ ! -f ".env" ]; then
+          echo "WARNING: .env file not found"
+          echo "Create one from template:"
+          echo "   cp .env.template .env"
+          echo "   # Then edit .env with your actual credentials"
+          echo ""
+        else
+          echo ".env file found"
+        fi
+
+        missing_vars=()
+
+        if [ -z "$PKR_VAR_proxmox_api_token" ]; then
+          missing_vars+=("PKR_VAR_proxmox_api_token")
+        fi
+
+        if [ -z "$PKR_VAR_proxmox_username" ]; then
+          missing_vars+=("PKR_VAR_proxmox_username")
+        fi
+
+        if [ -z "$PKR_VAR_winrm_password" ]; then
+          missing_vars+=("PKR_VAR_winrm_password")
+        fi
+
+        if [ ${#missing_vars[@]} -eq 0 ]; then
+          echo "All required environment variables are set"
+        else
+          echo "ERROR: Missing required environment variables:"
+          printf '  %s\n' "${missing_vars[@]}"
+          echo ""
+          echo "Options to set them:"
+          echo "   1. Create/update .env file (recommended):"
+          echo "      cp .env.template .env"
+          echo "      # Edit .env with your credentials"
+          echo ""
+          echo "   2. Export manually:"
+          echo "      export PKR_VAR_proxmox_api_token=\"your-token\""
+          echo "      export PKR_VAR_proxmox_username=\"terraform@pve!terra\""
+          echo "      export PKR_VAR_winrm_password=\"your-password\""
+          exit 1
+        fi
+
+  env-check-clone:
+    desc: "Check if required environment variables are set for clone build"
+    silent: true
+    cmds:
+      - |
+        echo "Checking required environment variables for clone build..."
+
+        # Check if .env file exists
+        if [ ! -f ".env" ]; then
+          echo "WARNING: .env file not found"
+          echo "Create one from template:"
+          echo "   cp .env.template .env"
+          echo "   # Then edit .env with your actual credentials"
+          echo ""
+        else
+          echo ".env file found"
+        fi
+
+        missing_vars=()
+
+        if [ -z "$PKR_VAR_proxmox_api_token" ]; then
+          missing_vars+=("PKR_VAR_proxmox_api_token")
+        fi
+
+        if [ -z "$PKR_VAR_proxmox_username" ]; then
+          missing_vars+=("PKR_VAR_proxmox_username")
+        fi
+
+        if [ -z "$PKR_VAR_winrm_password" ]; then
+          missing_vars+=("PKR_VAR_winrm_password")
+        fi
+
+        if [ -z "$PKR_VAR_clone_vm_id" ]; then
+          missing_vars+=("PKR_VAR_clone_vm_id")
+        fi
+
+        if [ ${#missing_vars[@]} -eq 0 ]; then
+          echo "All required environment variables are set for clone build"
+        else
+          echo "ERROR: Missing required environment variables for clone build:"
+          printf '  %s\n' "${missing_vars[@]}"
+          echo ""
+          echo "Options to set them:"
+          echo "   1. Create/update .env file (recommended):"
+          echo "      cp .env.template .env"
+          echo "      # Edit .env with your credentials"
+          echo ""
+          echo "   2. Export manually:"
+          echo "      export PKR_VAR_proxmox_api_token=\"your-token\""
+          echo "      export PKR_VAR_proxmox_username=\"terraform@pve!terra\""
+          echo "      export PKR_VAR_winrm_password=\"your-password\""
+          echo "      export PKR_VAR_clone_vm_id=\"vm-id-to-clone\""
+          echo ""
+          echo "   3. Pass as task variable:"
+          echo "      task build-clone PKR_VAR_clone_vm_id=12345"
+          echo ""
+          echo "NOTE: PKR_VAR_clone_vm_id should be the ID of an existing Windows 11 VM template"
+          exit 1
+        fi
+
+  setup:
+    desc: "Setup environment and check prerequisites"
+    silent: true
+    deps: [env-check]
+    cmds:
+      - |
+        echo "Checking Packer installation..."
+        if ! command -v packer &> /dev/null; then
+          echo "ERROR: Packer is not installed. Please install Packer first."
+          echo "   Visit: https://www.packer.io/downloads"
+          exit 1
+        fi
+        echo "Packer is installed: $(packer version)"
+
+        echo ""
+        echo "Environment is ready for building Windows 11 templates!"
+
+  setup-clone:
+    desc: "Setup environment and check prerequisites for clone build"
+    silent: true
+    deps: [env-check-clone]
+    cmds:
+      - |
+        echo "Checking Packer installation..."
+        if ! command -v packer &> /dev/null; then
+          echo "ERROR: Packer is not installed. Please install Packer first."
+          echo "   Visit: https://www.packer.io/downloads"
+          exit 1
+        fi
+        echo "Packer is installed: $(packer version)"
+
+        echo ""
+        echo "Environment is ready for building Windows 11 clone templates!"
+
+  build-iso:
+    desc: "Build Windows 11 template - Use DEBUG=true to enable breakpoints"
+    silent: true
+    deps: [setup, validate]
+    cmds:
+      - |
+        echo "Building Windows 11 template: {{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
+
+        {{if eq .DEBUG "true"}}
+        echo "Debug mode enabled - build will pause at breakpoints"
+        echo "Use VNC to connect to the VM during breakpoints"
+        {{else}}
+        echo "This process typically takes 60 - 120 minutes, depending on Windows Updates..."
+        {{end}}
+
+        echo ""
+
+        {{if eq .DEBUG "true"}}
+        packer build \
+          -var 'disable_debug_breakpoints=false' \
+          -var 'disable_pre_sysprep_breakpoints=false' \
+          -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' \
+          -only="iso_build.proxmox-iso.windows11" \
+          .
+        {{else}}
+        packer build -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' -only="iso_build.proxmox-iso.windows11" .
+        {{end}}
+
+        echo ""
+        echo "Template build completed successfully!"
+        echo "Template available in Proxmox as: template-win11-{{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
+
+  build-clone:
+    desc: "Build Windows 11 clone template - Use DEBUG=true to enable breakpoints"
+    silent: true
+    deps: [setup-clone, validate]
+    cmds:
+      - |
+        echo "Building Windows 11 clone template"
+
+        {{if eq .DEBUG "true"}}
+        echo "Debug mode enabled - build will pause at breakpoints"
+        echo "Use VNC to connect to the VM during breakpoints"
+        {{else}}
+        echo "This process typically takes 20 - 45 minutes, depending on Windows Updates..."
+        {{end}}
+
+        echo ""
+
+        {{if eq .DEBUG "true"}}
+        packer build \
+          -var 'disable_debug_breakpoints=false' \
+          -var 'disable_pre_sysprep_breakpoints=false' \
+          -only="clone_build.proxmox-clone.windows11" \
+          .
+        {{else}}
+        packer build -only="clone_build.proxmox-clone.windows11" .
+        {{end}}
+
+        echo ""
+        echo "Template build completed successfully!"
+        echo "Template available in Proxmox as: template-win11-cloudbase-{{.TEMPLATE | default "custom"}}"
+
+  clean:
+    desc: "Clean up Packer cache and temporary files"
+    silent: true
+    cmds:
+      - |
+        echo "Cleaning up Packer cache and temporary files..."
+        if [ -d "packer_cache" ]; then
+          rm -rf packer_cache
+          echo "Removed packer_cache directory"
+        fi
+
+        if [ -f "packer.log" ]; then
+          rm packer.log
+          echo "Removed packer.log"
+        fi
+
+        # Remove any .box files (if any)
+        if ls *.box 1> /dev/null 2>&1; then
+          rm *.box
+          echo "Removed .box files"
+        fi
+
+        echo "Cleanup completed"
+
+  inspect:
+    desc: "Inspect Packer template configuration"
+    silent: true
+    cmds:
+      - |
+        echo "Packer Template Configuration:"
+        echo "=================================="
+        echo ""
+        echo "Variable files:"
+        ls -la variables*.pkr*
+        echo ""
+        echo "Build files:"
+        find build_files -type f | head -20
+        echo ""
+        echo "Available templates:"
+        echo "  - Pro           (Windows 11 Pro)"
+        echo "  - ProN          (Windows 11 Pro N)"
+        echo "  - Enterprise    (Windows 11 Enterprise)"
+        echo "  - EnterpriseN   (Windows 11 Enterprise N)"
+        echo "  - Education     (Windows 11 Education)"
+        echo "  - EducationN    (Windows 11 Education N)"
+        echo ""
+        echo "Current configuration:"
+        packer inspect .
+
+  logs:
+    desc: "Show recent Packer build logs"
+    silent: true
+    cmds:
+      - |
+        if [ -f "packer.log" ]; then
+          echo "Last 50 lines of packer.log:"
+          echo "================================"
+          tail -50 packer.log
+        else
+          echo "ERROR: No packer.log found"
+          echo "Set PACKER_LOG=1 to enable logging"
+        fi
+
+  help:
+    desc: "Show detailed help and usage examples"
+    silent: true
+    cmds:
+      - |
+        echo "Windows 11 Packer Template Builder"
+        echo "==================================="
+        echo ""
+        echo "Common Tasks:"
+        echo "  task setup              # Check prerequisites and environment"
+        echo "  task validate           # Validate configuration"
+        echo "  task build-iso          # Build default template (Pro)"
+        echo "  task build-clone        # Build clone template"
+        echo "  task clean              # Clean up cache and logs"
+        echo ""
+        echo "Specific Template Builds:"
+        echo "  task build-iso TEMPLATE=Pro           # Windows 11 Pro (default)"
+        echo "  task build-iso TEMPLATE=Enterprise    # Windows 11 Enterprise"
+        echo "  task build-iso TEMPLATE=Education     # Windows 11 Education"
+        echo ""
+        echo "Clone Build Requirements:"
+        echo "  task env-check-clone                           # Check clone-specific env vars"
+        echo "  task build-clone PKR_VAR_clone_vm_id=12345    # Specify source VM ID"
+        echo "  # Note: PKR_VAR_clone_vm_id must be set to an existing Windows 11 template ID"
+        echo ""
+        echo "Debug Options:"
+        echo "  task build-iso DEBUG=true          # Enable breakpoints for ISO build"
+        echo "  task build-clone DEBUG=true        # Enable breakpoints for clone build"
+        echo "  task build-iso DEBUG=true TEMPLATE=Pro   # Debug specific template"
+        echo "  PACKER_LOG=1 task build-iso        # Enable verbose logging"
+        echo ""
+        echo "Important:"
+        echo "  - Create .env file from template: cp .env.template .env"
+        echo "  - Edit windows_iso in variables.auto.pkrvars.hcl with your ISO filename"
+        echo "  - Edit .env with your actual credentials"
+        echo "  - For clone builds, set PKR_VAR_clone_vm_id to an existing VM template ID"
+        echo "  - Never commit .env to version control"
+        echo "  - Test builds in non-production environment first"
+        echo ""
+        echo "See README.md for full documentation"
