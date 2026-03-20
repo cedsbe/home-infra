@@ -773,6 +773,7 @@ vlan
 vmbr
 vmdk
 vmid
+vms
 vmware
 vnc
 vscode

@@ -1,10 +1,10 @@
-# Enhanced generalization script for Windows Server 2025
+# Generalization script for Windows 11 (ISO build)
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "Starting enhanced generalization process..."
+Write-Host "Starting generalization process..."
 
-# Copy the unattend file to the C:\Deploy directory
+# Copy the unattend.xml from the CD to C:\Deploy so sysprep can find it after the ISO is ejected
 Write-Host "Copying unattend.xml to C:\Deploy..."
 $unattendPath = "C:\Deploy\unattend.xml"
 if (Test-Path -Path $unattendPath) {
@@ -17,17 +17,12 @@ if (Test-Path -Path $unattendPath) {
     Write-Host "Backup created at $backupPath."
 }
 
-# Find the source unattend.xml file located at the root of a drive.
-# To avoid hardcoding, we will search for it in every drive.
-Write-Host "Searching for unattend.xml at the root of all drives..."
-
 $sourceUnattendPath = $null
 $mountedDrives = Get-PSDrive -PSProvider FileSystem | Where-Object { $_.Used -ne $null }
 
 foreach ($drive in $mountedDrives) {
     $testPath = Join-Path -Path "$($drive.Name):\" -ChildPath "unattend.xml"
     Write-Host "Checking: $testPath"
-
     if (Test-Path -Path $testPath) {
         $sourceUnattendPath = $testPath
         Write-Host "Found unattend.xml at: $sourceUnattendPath"
@@ -37,14 +32,10 @@ foreach ($drive in $mountedDrives) {
 
 if (-not $sourceUnattendPath) {
     Write-Host "unattend.xml not found at the root of any drive. Checking CD/DVD drives..."
-
-    # Also check removable drives and CD/DVD drives
-    $allDrives = Get-WmiObject -Class Win32_LogicalDisk | Where-Object { $_.DriveType -in @(2, 5) } # 2=Removable, 5=CD-ROM
-
+    $allDrives = Get-WmiObject -Class Win32_LogicalDisk | Where-Object { $_.DriveType -in @(2, 5) }
     foreach ($drive in $allDrives) {
         $testPath = Join-Path -Path "$($drive.DeviceID)\" -ChildPath "unattend.xml"
         Write-Host "Checking removable/CD drive: $testPath"
-
         if (Test-Path -Path $testPath) {
             $sourceUnattendPath = $testPath
             Write-Host "Found unattend.xml at: $sourceUnattendPath"
@@ -61,28 +52,57 @@ else {
     Write-Host "Source unattend.xml not found at the root of any drive. Nothing to copy."
 }
 
-# Stop Windows Update service to prevent conflicts during sysprep
+# Stop services early to avoid file locks during cleanup
 Write-Host "Stopping Windows Update services..."
 Stop-Service -Name wuauserv -Force -ErrorAction SilentlyContinue
 Stop-Service -Name bits -Force -ErrorAction SilentlyContinue
 Stop-Service -Name cryptsvc -Force -ErrorAction SilentlyContinue
 
-# Stop tile data model service
 Write-Host "Stopping tiledatamodelsvc..."
 Get-Service -Name tiledatamodelsvc -ErrorAction SilentlyContinue | Stop-Service -Force
+
+# Remove per-user AppX packages that are not provisioned system-wide.
+# Sysprep fails with 0x80073cf2 if any package was installed for a specific user
+# but not provisioned for all users (e.g. MicrosoftOfficeHub installed during OOBE).
+# Do this before temp cleanup since AppX removal generates temp files.
+Write-Host "Removing per-user AppX packages not provisioned for all users..."
+$provisionedPackageNames = (Get-AppxProvisionedPackage -Online).PackageName
+$packagesToRemove = Get-AppxPackage -AllUsers | Where-Object {
+    -not $_.NonRemovable -and $provisionedPackageNames -notcontains $_.PackageFamilyName
+}
+# First pass: remove non-framework packages. Framework packages (e.g. WindowsAppRuntime)
+# throw a COMException if dependents are still present, but auto-remove once they are gone.
+foreach ($pkg in $packagesToRemove) {
+    Write-Host "  Removing: $($pkg.Name)"
+    try {
+        Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
+    }
+    catch {
+        Write-Host "  Skipped (will retry or auto-removed with dependents): $($pkg.Name) - $($_.Exception.Message)" -ForegroundColor DarkGray
+    }
+}
+# Second pass: retry any that failed due to dependency ordering
+foreach ($pkg in $packagesToRemove) {
+    if (Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $pkg.PackageFullName }) {
+        Write-Host "  Retrying: $($pkg.Name)"
+        try {
+            Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
+        }
+        catch {
+            Write-Host "  Could not remove $($pkg.Name): $($_.Exception.Message)" -ForegroundColor DarkGray
+        }
+    }
+}
+Write-Host "AppX cleanup complete."
 
 # Clear Windows Update cache
 Write-Host "Clearing Windows Update cache..."
 Remove-Item -Path "C:\Windows\SoftwareDistribution\*" -Recurse -Force -ErrorAction SilentlyContinue
 
-# Clear temporary files
+# Clear temporary files (after AppX removal so its temp output is also wiped)
 Write-Host "Clearing temporary files..."
 Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item -Path "C:\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
-
-# Clear event logs (optional - comment out if you want to keep logs)
-Write-Host "Clearing event logs..."
-Get-EventLog -LogName * | ForEach-Object { Clear-EventLog -LogName $_.Log -ErrorAction SilentlyContinue }
 
 # Remove any leftover user profiles except default ones
 Write-Host "Cleaning up user profiles..."
@@ -92,14 +112,34 @@ Get-WmiObject -Class Win32_UserProfile | Where-Object {
     $_.LocalPath -notlike "*Default*"
 } | Remove-WmiObject -ErrorAction SilentlyContinue
 
+# Failsafe: BitLocker should have been prevented by the PreventDeviceEncryption registry key
+# set during the specialize pass in autounattend.xml. If the volume is still encrypted here,
+# something went wrong upstream and this block should not have been reached.
+# Check before defrag/sdelete since decryption changes free space state.
+$bitlockerStatus = Get-BitLockerVolume -MountPoint "C:" -ErrorAction SilentlyContinue
+if ($bitlockerStatus -and $bitlockerStatus.VolumeStatus -ne "FullyDecrypted") {
+    Write-Warning "UNEXPECTED: BitLocker is active (VolumeStatus=$($bitlockerStatus.VolumeStatus)). The PreventDeviceEncryption registry key set during specialize should have prevented this. Disabling BitLocker now as a failsafe - investigate the autounattend specialize pass."
+    Disable-BitLocker -MountPoint "C:" | Out-Null
+    do {
+        Start-Sleep -Seconds 10
+        $bitlockerStatus = Get-BitLockerVolume -MountPoint "C:"
+        Write-Host "Decryption progress: $($bitlockerStatus.EncryptionPercentage)%"
+    } while ($bitlockerStatus.VolumeStatus -ne "FullyDecrypted")
+    Write-Host "BitLocker fully decrypted on C:." -ForegroundColor Green
+}
+
 # Defragment the disk (optional but recommended for template optimization)
 Write-Host "Optimizing disk..."
 Optimize-Volume -DriveLetter C -Defrag -Verbose
 
 # Zero out free space (use with caution - this takes time but reduces template size)
-# Uncomment the following lines if you want maximum compression:
-# Write-Host "Zeroing free space (this may take a while)..."
+# Comment the following lines if you don't want maximum compression:
+Write-Host "Zeroing free space (this may take a while)..."
 sdelete.exe -z C: -accepteula
+
+# Clear event logs last so log entries generated by this script are also wiped
+Write-Host "Clearing event logs..."
+Get-EventLog -LogName * | ForEach-Object { Clear-EventLog -LogName $_.Log -ErrorAction SilentlyContinue }
 
 Write-Host "Pre-sysprep cleanup completed successfully."
 Write-Host "Starting Sysprep generalization..." -ForegroundColor Yellow
@@ -113,7 +153,6 @@ if (-not (Test-Path "C:\Deploy\unattend.xml")) {
 Write-Host "Unattend file verified at: C:\Deploy\unattend.xml" -ForegroundColor Green
 Write-Host "File size: $((Get-Item 'C:\Deploy\unattend.xml').Length) bytes" -ForegroundColor Cyan
 
-# Run sysprep with proper error handling and monitoring
 try {
     Write-Host "Executing sysprep command..." -ForegroundColor Yellow
     Write-Host "Command: sysprep.exe /oobe /generalize /mode:vm /quit /unattend:C:\Deploy\unattend.xml" -ForegroundColor Gray
@@ -121,7 +160,6 @@ try {
     $sysrepStartTime = Get-Date
     Write-Host "Sysprep started at: $($sysrepStartTime.ToString('yyyy-MM-dd HH:mm:ss'))" -ForegroundColor Cyan
 
-    # Construct sysprep argument list for clarity and maintainability
     $sysprepArgs = @(
         "/oobe"
         "/generalize"
@@ -139,16 +177,11 @@ try {
     Write-Host "Exit Code: $($process.ExitCode)" -ForegroundColor Cyan
 
     if ($process.ExitCode -eq 0) {
-        Write-Host "✅ Sysprep completed successfully!" -ForegroundColor Green
+        Write-Host "Sysprep completed successfully!" -ForegroundColor Green
 
-        # Post-sysprep actions can be added here if needed
-        Write-Host "Performing final cleanup..." -ForegroundColor Yellow
-
-        # Final log cleanup (optional)
         Write-Host "Clearing PowerShell history..." -ForegroundColor Cyan
         Remove-Item -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
 
-        # Clear any remaining temp files
         Write-Host "Final temp file cleanup..." -ForegroundColor Cyan
         Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
 
@@ -156,21 +189,17 @@ try {
         Write-Host "Script finished at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Cyan
         Write-Host "Initiating system shutdown..." -ForegroundColor Yellow
 
-        # Give a brief pause to ensure all output is flushed
         Start-Sleep -Seconds 2
-
-        # Shutdown the system
         Stop-Computer -Force
     }
     else {
-        Write-Error "❌ Sysprep failed with exit code: $($process.ExitCode)"
+        Write-Error "Sysprep failed with exit code: $($process.ExitCode)"
         exit 1
     }
 }
 catch {
-    Write-Error "❌ Sysprep execution failed: $($_.Exception.Message)"
+    Write-Error "Sysprep execution failed: $($_.Exception.Message)"
 
-    # Check if sysprep log exists for troubleshooting
     $sysrepLog = "C:\Windows\System32\Sysprep\Panther\setuperr.log"
     if (Test-Path $sysrepLog) {
         Write-Host "Sysprep error log found. Last 10 lines:" -ForegroundColor Yellow
