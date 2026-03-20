@@ -1,6 +1,20 @@
-# Windows 2022 - Remove Features
+# Windows Server 2025 - Remove Features
 
 $ErrorActionPreference = "Stop"
+
+# Gracefully disable an optional feature - skip if not present or already disabled
+function Disable-FeatureSafely {
+    param ([string]$FeatureName)
+    $feature = Get-WindowsOptionalFeature -Online -FeatureName $FeatureName -ErrorAction SilentlyContinue
+    if ($null -eq $feature) {
+        Write-Host "$FeatureName not found - skipping"
+    } elseif ($feature.State -eq "Disabled") {
+        Write-Host "$FeatureName already disabled - skipping"
+    } else {
+        Write-Host "Disabling $FeatureName"
+        Disable-WindowsOptionalFeature -Online -FeatureName $FeatureName -NoRestart | Out-Null
+    }
+}
 
 # Determine if Core or Desktop Experience
 $osVersion = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -Name InstallationType
@@ -9,9 +23,10 @@ $osVersion = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\Cu
 
 # Remove PowerShell v2
 Write-Host "Remove PowerShell v2"
-Disable-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2 -NoRestart | Out-Null
+Disable-FeatureSafely -FeatureName "MicrosoftWindowsPowerShellV2Root"
+Disable-FeatureSafely -FeatureName "MicrosoftWindowsPowerShellV2"
 
-# If Desktop Experience is installed disable these services, otherwise Exit cleanly
+# If Desktop Experience is installed disable these features, otherwise Exit cleanly
 
 if ( $osVersion -eq "Server" )
 {
@@ -21,19 +36,19 @@ if ( $osVersion -eq "Server" )
 
     # Remove Microsoft XPS Document Writer
     Write-Host "Remove Microsoft XPS Document Writer"
-    Disable-WindowsOptionalFeature -Online -FeatureName Printing-XPSServices-Features -NoRestart | Out-Null
+    Disable-FeatureSafely -FeatureName "Printing-XPSServices-Features"
 
     # Remove Windows Media Player
     Write-Host "Remove Windows Media Player"
-    Disable-WindowsOptionalFeature -Online -FeatureName WindowsMediaPlayer -NoRestart | Out-Null
+    Disable-FeatureSafely -FeatureName "WindowsMediaPlayer"
 
     # Remove Windows Media Playback
     Write-Host "Remove Windows Media Playback"
-    Disable-WindowsOptionalFeature -Online -FeatureName MediaPlayback -NoRestart | Out-Null
+    Disable-FeatureSafely -FeatureName "MediaPlayback"
 
     # Remove Microsoft Print to PDF
     Write-Host "Remove Microsoft Print to PDF"
-    Disable-WindowsOptionalFeature -Online -FeatureName Printing-PrintToPDFServices-Features -NoRestart | Out-Null
+    Disable-FeatureSafely -FeatureName "Printing-PrintToPDFServices-Features"
 }
 else
 {
