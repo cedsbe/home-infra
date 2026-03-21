@@ -204,6 +204,7 @@ ecdh
 ecdsa
 ecosia
 eddsa
+edgeupdatem
 editorconfig
 edns
 efi
