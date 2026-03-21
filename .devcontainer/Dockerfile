@@ -33,7 +33,7 @@ ARG KUSTOMIZE_VERSION=v5.8.0
 # renovate: datasource=github-releases depName=jesseduffield/lazygit
 ARG LAZYGIT_VERSION=v0.60.0
 # renovate: datasource=github-releases depName=gitleaks/gitleaks
-ARG GITLEAKS_VERSION=v8.30.0
+ARG GITLEAKS_VERSION=v8.30.1
 # renovate: datasource=github-releases depName=starship/starship
 ARG STARSHIP_VERSION=v1.24.2
 # renovate: datasource=github-releases depName=stern/stern
