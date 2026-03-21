@@ -696,6 +696,7 @@ talos
 talosctl
 tar
 taskfile
+TCUI
 tee
 temp
 tempo
@@ -825,3 +826,4 @@ zero
 zip
 zsh
 zst
+Zune

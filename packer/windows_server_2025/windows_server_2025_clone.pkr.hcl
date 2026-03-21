@@ -124,10 +124,10 @@ build {
   }
 
   provisioner "file" {
-    sources      = [
-        "./build_files/scripts/enable-openssh.ps1",
-        "./build_files/scripts/set-network-private.ps1"
-      ]
+    sources = [
+      "./build_files/scripts/enable-openssh.ps1",
+      "./build_files/scripts/set-network-private.ps1"
+    ]
     destination = "C:/Program Files/Cloudbase Solutions/Cloudbase-Init/LocalScripts/"
   }
 

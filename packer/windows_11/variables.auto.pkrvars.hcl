@@ -5,23 +5,23 @@ cdrom_drive_unattended_files_windows = "D:"
 cdrom_drive_virtio_windows = "F:"
 
 # Optimized resources for template creation
-cores                           = 2
+cores                           = 4
 disable_pre_sysprep_breakpoints = true
 disk_size_gb                    = 64 # Windows 11 minimum requirement
 disk_storage                    = "local-lvm"
 efi_storage                     = "local-lvm"
 
 image_index = {
-  "Pro"          = 6
-  "ProN"         = 7
-  "Enterprise"   = 12
-  "EnterpriseN"  = 13
-  "Education"    = 4
-  "EducationN"   = 5
+  "Pro"         = 6
+  "ProN"        = 7
+  "Enterprise"  = 12
+  "EnterpriseN" = 13
+  "Education"   = 4
+  "EducationN"  = 5
 }
 
 iso_storage    = "local"
-memory         = 4096
+memory         = 8192 # 8GB recommended for Windows 11, but 16GB is ideal for smoother performance
 proxmox_node   = "hsp-proxmox0"
 proxmox_url    = "https://hsp-proxmox0.ad.ghiot.be:8006/api2/json"
 sockets        = 1
