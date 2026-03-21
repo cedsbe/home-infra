@@ -24,9 +24,9 @@ if (Get-Service -Name sshd -ErrorAction SilentlyContinue) {
 # but not provisioned for all users (e.g. MicrosoftOfficeHub installed during OOBE).
 # Do this before temp cleanup since AppX removal generates temp files.
 Write-Host "Removing per-user AppX packages not provisioned for all users..."
-$provisionedPackageNames = (Get-AppxProvisionedPackage -Online).PackageName
+$provisionedDisplayNames = (Get-AppxProvisionedPackage -Online).DisplayName
 $packagesToRemove = Get-AppxPackage -AllUsers | Where-Object {
-    -not $_.NonRemovable -and $provisionedPackageNames -notcontains $_.PackageFamilyName
+    -not $_.NonRemovable -and $provisionedDisplayNames -notcontains $_.Name
 }
 # First pass: remove non-framework packages. Framework packages (e.g. WindowsAppRuntime)
 # throw a COMException if dependents are still present, but auto-remove once they are gone.
