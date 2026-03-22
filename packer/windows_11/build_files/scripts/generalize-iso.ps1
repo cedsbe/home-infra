@@ -1,6 +1,7 @@
 # Generalization script for Windows 11 (ISO build)
 
 $ErrorActionPreference = "Stop"
+$WarningPreference = "Continue"  # Prevent warning stream from causing failures in Packer/WinRM sessions
 
 Write-Host "=== Generalization script started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ==="
 Write-Host "Host: $env:COMPUTERNAME | OS: $((Get-WmiObject Win32_OperatingSystem).Caption)"
@@ -81,12 +82,22 @@ Stop-ServiceSafely "bits"         "Background Intelligent Transfer (bits)"
 Stop-ServiceSafely "cryptsvc"     "Cryptographic Services (cryptsvc)"
 Stop-ServiceSafely "tiledatamodelsvc" "Tile Data Model (tiledatamodelsvc)"
 
-# Stop Edge and its update services BEFORE AppX cleanup.
-# Edge silently reinstalls companion packages (e.g. Edge.GameAssist) within seconds of removal,
-# causing Remove-AppxPackage to appear to succeed but the package to reappear immediately.
-Stop-ServiceSafely "edgeupdate"                  "Edge Update (edgeupdate)"
-Stop-ServiceSafely "edgeupdatem"                 "Edge Update (edgeupdatem)"
-Stop-ServiceSafely "MicrosoftEdgeElevationService" "Edge Elevation Service"
+# DISABLE (not just stop) Edge update services to prevent auto-restart during the
+# long defrag/sdelete phase. Edge silently reinstalls companion packages (e.g. Edge.GameAssist)
+# if its services recover, causing Remove-AppxPackage to appear to succeed but the package
+# to reappear — even minutes later — and then block sysprep with 0x80073cf2.
+Write-Host "  Disabling and stopping Microsoft Edge update services..."
+foreach ($edgeSvcName in @("edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationService")) {
+    $edgeSvc = Get-Service -Name $edgeSvcName -ErrorAction SilentlyContinue
+    if ($edgeSvc) {
+        Write-Host "  Disabling: $edgeSvcName (was: $($edgeSvc.Status), StartType: $($edgeSvc.StartType))"
+        Set-Service -Name $edgeSvcName -StartupType Disabled -ErrorAction SilentlyContinue
+        Stop-Service -Name $edgeSvcName -Force -ErrorAction SilentlyContinue
+        Write-Host "  Disabled and stopped: $edgeSvcName"
+    } else {
+        Write-Host "  $edgeSvcName - not found (skipping)"
+    }
+}
 
 $edgeProcs = Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContinue
 if ($edgeProcs) {
@@ -94,6 +105,21 @@ if ($edgeProcs) {
     $edgeProcs | Stop-Process -Force -ErrorAction SilentlyContinue
 } else {
     Write-Host "  No Edge processes running"
+}
+
+# Disable Edge scheduled tasks so they cannot relaunch Edge during cleanup
+Write-Host "  Disabling Edge scheduled tasks..."
+$edgeTasks = Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {
+    $_.TaskPath -like "*Edge*" -or $_.TaskName -like "*Edge*"
+}
+if ($edgeTasks) {
+    foreach ($task in $edgeTasks) {
+        Write-Host "  Disabling task: $($task.TaskPath)$($task.TaskName)"
+        Disable-ScheduledTask -TaskPath $task.TaskPath -TaskName $task.TaskName -ErrorAction SilentlyContinue | Out-Null
+    }
+    Write-Host "  Disabled $($edgeTasks.Count) Edge scheduled task(s)"
+} else {
+    Write-Host "  No Edge scheduled tasks found"
 }
 
 # ---------------------------------------------------------------------------
@@ -268,15 +294,15 @@ $sysprepBlockers = Get-AppxPackage -AllUsers | Where-Object {
     -not $_.NonRemovable -and $provisionedNames -notcontains $_.Name
 }
 if ($sysprepBlockers) {
-    Write-Warning "Found $($sysprepBlockers.Count) package(s) that would block sysprep (user-installed, not provisioned). Attempting final removal..."
+    Write-Host "[WARNING] Found $($sysprepBlockers.Count) package(s) that would block sysprep (user-installed, not provisioned). Attempting final removal..."
     foreach ($pkg in $sysprepBlockers) {
-        Write-Warning "  Blocker: $($pkg.Name) ($($pkg.PackageFullName))"
+        Write-Host "[WARNING] Blocker: $($pkg.Name) ($($pkg.PackageFullName))"
         try {
             Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
             Write-Host "  Removed in pre-flight: $($pkg.Name)" -ForegroundColor DarkGray
         }
         catch {
-            Write-Warning "  CRITICAL: Could not remove $($pkg.Name). Sysprep WILL fail with 0x80073cf2. Error: $($_.Exception.Message)"
+            Write-Host "[WARNING] CRITICAL: Could not remove $($pkg.Name). Sysprep WILL fail with 0x80073cf2. Error: $($_.Exception.Message)"
         }
     }
     $stillBlocking = Get-AppxPackage -AllUsers | Where-Object {
@@ -308,6 +334,27 @@ Write-Host "--- Launching sysprep ---"
 Write-Host "  Command: sysprep.exe /oobe /generalize /mode:vm /quit /unattend:C:\Deploy\unattend.xml"
 
 try {
+    # Final Edge kill right before sysprep to close the race window between the pre-flight
+    # check and sysprep's own AppX validation. Edge may have respawned during event log
+    # clearing or other late operations even with services disabled.
+    Write-Host "  Final Edge sweep before sysprep..."
+    Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    $gameAssistFinal = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue | Where-Object { $_.Name -eq "Microsoft.Edge.GameAssist" }
+    if ($gameAssistFinal) {
+        Write-Host "[WARNING] Edge.GameAssist re-appeared after pre-flight - removing now (Edge respawned despite disabled services)..."
+        foreach ($gaPkg in $gameAssistFinal) {
+            try {
+                Remove-AppxPackage -Package $gaPkg.PackageFullName -AllUsers -ErrorAction Stop
+                Write-Host "  Final removal OK: $($gaPkg.PackageFullName)"
+            }
+            catch {
+                Write-Host "[WARNING] Final removal of Edge.GameAssist failed: $($_.Exception.Message)"
+            }
+        }
+    } else {
+        Write-Host "  Edge.GameAssist not present - safe to proceed"
+    }
+
     $sysrepStartTime = Get-Date
     Write-Host "  Started at: $($sysrepStartTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 

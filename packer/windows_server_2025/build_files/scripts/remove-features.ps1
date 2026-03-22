@@ -1,6 +1,7 @@
 # Windows Server 2025 - Remove Features
 
 $ErrorActionPreference = "Stop"
+$WarningPreference = "Continue"  # Prevent warning stream from causing failures in Packer/WinRM sessions
 
 # Gracefully disable an optional feature - skip if not present or already disabled
 function Disable-FeatureSafely {
@@ -69,7 +70,7 @@ if ( $osVersion -eq "Server" )
             }
         }
         catch {
-            Write-Warning "  Failed to deprovision $DisplayName`: $($_.Exception.Message)"
+            Write-Host "[WARNING] Failed to deprovision $DisplayName`: $($_.Exception.Message)"
         }
     }
 
