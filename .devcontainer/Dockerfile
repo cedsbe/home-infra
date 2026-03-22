@@ -106,6 +106,7 @@ RUN <<EOF
     bzip2 \
     tar \
     unzip \
+    xorriso \
     xz-utils \
     zip \
     fuse-overlayfs \
