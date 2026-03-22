@@ -64,6 +64,23 @@ spec:
             - port: "32400"
               protocol: UDP
 ---
+# Allow ingress from the arr namespace (Sonarr/Radarr library update integration)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-arr-ingress
+  namespace: plex
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: arr
+      toPorts:
+        - ports:
+            - port: "32400"
+              protocol: TCP
+---
 # Allow egress to NFS server (Synology NAS) for media library access
 # Synology DSM uses fixed ports for NFSv3 auxiliary services
 apiVersion: cilium.io/v2
