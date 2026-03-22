@@ -141,6 +141,23 @@ spec:
             - port: "8191"
               protocol: TCP
 ---
+# Allow arr app to communicate with Plex in the plex namespace. Plex's API is used by Sonarr/Radarr for library updates.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-plex-egress
+  namespace: arr
+spec:
+  endpointSelector: {}
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: plex
+      toPorts:
+        - ports:
+            - port: "32400"
+              protocol: TCP
+---
 # Allow egress to external services (indexers, download APIs)
 # Note: This is permissive. Consider using toFQDNs for stricter control.
 apiVersion: cilium.io/v2
