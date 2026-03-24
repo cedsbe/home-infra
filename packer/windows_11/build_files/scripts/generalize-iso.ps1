@@ -82,6 +82,22 @@ Stop-ServiceSafely "bits"         "Background Intelligent Transfer (bits)"
 Stop-ServiceSafely "cryptsvc"     "Cryptographic Services (cryptsvc)"
 Stop-ServiceSafely "tiledatamodelsvc" "Tile Data Model (tiledatamodelsvc)"
 
+# Stop Windows Store services (ClipSVC + InstallService) to prevent the Store from
+# auto-downloading or reinstalling packages (e.g. Edge.GameAssist) during the long
+# defrag/sdelete phase. Per MS doc: https://learn.microsoft.com/en-us/troubleshoot/
+# windows-client/setup-upgrade-and-drivers/sysprep-fails-remove-or-update-store-apps
+Write-Host "  Stopping Windows Store services to prevent auto-reinstall..."
+Stop-ServiceSafely "ClipSVC"      "Client License Service (ClipSVC)"
+Stop-ServiceSafely "InstallService" "Microsoft Store Install Service"
+
+# Disable Store auto-download via policy registry key
+$storePolicy = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
+if (-not (Test-Path $storePolicy)) {
+    New-Item -Path $storePolicy -Force | Out-Null
+}
+Set-ItemProperty -Path $storePolicy -Name "AutoDownload" -Value 2 -Type DWord -Force
+Write-Host "  Store auto-download disabled (policy key set)"
+
 # DISABLE (not just stop) Edge update services to prevent auto-restart during the
 # long defrag/sdelete phase. Edge silently reinstalls companion packages (e.g. Edge.GameAssist)
 # if its services recover, causing Remove-AppxPackage to appear to succeed but the package
@@ -134,8 +150,14 @@ Write-Host "--- [3/9] AppX cleanup ---"
 $provisionedDisplayNames = (Get-AppxProvisionedPackage -Online).DisplayName
 Write-Host "  Provisioned packages in image: $($provisionedDisplayNames.Count)"
 
+# Skip framework packages (IsFramework = true): these are runtime dependencies
+# (VCLibs, NET.Native, UI.Xaml, WindowsAppRuntime) that cannot be removed while
+# provisioned apps depend on them, and they do NOT block sysprep because sysprep
+# only fails (0x80073cf2) on non-framework per-user packages not in the provisioned list.
 $packagesToRemove = Get-AppxPackage -AllUsers | Where-Object {
-    -not $_.NonRemovable -and $provisionedDisplayNames -notcontains $_.Name
+    -not $_.NonRemovable -and
+    -not $_.IsFramework -and
+    $provisionedDisplayNames -notcontains $_.Name
 }
 Write-Host "  Packages to remove (user-installed, not provisioned): $($packagesToRemove.Count)"
 
@@ -291,7 +313,9 @@ Write-Host ""
 Write-Host "--- AppX pre-flight check ---"
 $provisionedNames = (Get-AppxProvisionedPackage -Online).DisplayName
 $sysprepBlockers = Get-AppxPackage -AllUsers | Where-Object {
-    -not $_.NonRemovable -and $provisionedNames -notcontains $_.Name
+    -not $_.NonRemovable -and
+    -not $_.IsFramework -and
+    $provisionedNames -notcontains $_.Name
 }
 if ($sysprepBlockers) {
     Write-Host "[WARNING] Found $($sysprepBlockers.Count) package(s) that would block sysprep (user-installed, not provisioned). Attempting final removal..."
@@ -305,8 +329,32 @@ if ($sysprepBlockers) {
             Write-Host "[WARNING] CRITICAL: Could not remove $($pkg.Name). Sysprep WILL fail with 0x80073cf2. Error: $($_.Exception.Message)"
         }
     }
+    # Kill Edge before re-checking — it may have re-registered Edge.GameAssist during
+    # the long sdelete operation even with services disabled.
+    Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Start-Sleep -Seconds 2
+
     $stillBlocking = Get-AppxPackage -AllUsers | Where-Object {
-        -not $_.NonRemovable -and $provisionedNames -notcontains $_.Name
+        -not $_.NonRemovable -and
+        -not $_.IsFramework -and
+        $provisionedNames -notcontains $_.Name
+    }
+    # One more removal pass for anything that re-appeared (e.g. Edge.GameAssist)
+    foreach ($pkg in $stillBlocking) {
+        Write-Host "[WARNING] Re-appeared after pre-flight removal: $($pkg.Name) - retrying..."
+        try {
+            Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
+            Write-Host "  Retry removed: $($pkg.Name)"
+        }
+        catch {
+            Write-Host "[WARNING] Retry failed: $($pkg.Name) - $($_.Exception.Message)"
+        }
+    }
+
+    $stillBlocking = Get-AppxPackage -AllUsers | Where-Object {
+        -not $_.NonRemovable -and
+        -not $_.IsFramework -and
+        $provisionedNames -notcontains $_.Name
     }
     if ($stillBlocking) {
         $names = ($stillBlocking | Select-Object -ExpandProperty Name) -join ", "

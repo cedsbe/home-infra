@@ -131,7 +131,7 @@ build {
 
   provisioner "windows-restart" {
     restart_check_command = "powershell -command \"& {Write-Output 'Machine restarted.'}\""
-    pause_before          = "10m" # Wait for the Windows installation to settle
+    pause_before          = "5m" # Wait for the Windows installation to settle
   }
 
   provisioner "breakpoint" {
