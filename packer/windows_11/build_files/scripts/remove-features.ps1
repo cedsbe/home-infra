@@ -132,3 +132,13 @@ Remove-ProvisionedAppSafely "MSTeams"
 Remove-ProvisionedAppSafely "MicrosoftCorporationII.QuickAssist"
 
 Write-Host "AppX deprovisioning complete."
+
+Write-Host "Here are the remaining Microsoft-provisioned AppX packages (should be empty or close to it):"
+
+# 8wekyb3d8bbwe is the package family name for Microsoft-provisioned apps. Filter out framework packages (e.g. .NET) since those are dependencies and not user-facing apps.
+$appX = Get-AppxPackage -AllUsers | Where {$_.PackageFullName -like "*8wekyb3d8bbwe*" -and -not $_.IsFramework};
+foreach ($pkg in $appX) {
+    Write-Host "  $($pkg.PackageFullName)"
+}
+
+Write-Host "Feature removal complete."

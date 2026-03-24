@@ -128,3 +128,55 @@ Disable-Service -ServiceName "XboxNetApiSvc"
 
 Write-Host "Disable Xbox Accessory Management Service"
 Disable-Service -ServiceName "XboxGipSvc"
+
+# Disable Edge's sidebar/games hub via policy so Edge cannot re-register
+# GameAssist (or other companion packages) at any point during the build —
+# including during Windows Update and the defrag/sdelete phase.
+# This key persists across reboots so it remains effective in generalize-iso.ps1.
+Write-Host "Disable Edge sidebar (prevents GameAssist re-registration)"
+$edgePolicy = "HKLM:\SOFTWARE\Policies\Microsoft\Edge"
+if (-not (Test-Path $edgePolicy)) { New-Item -Path $edgePolicy -Force | Out-Null }
+Set-ItemProperty -Path $edgePolicy -Name "HubsSidebarEnabled" -Value 0 -Type DWord -Force
+
+# Disable Edge update services early so Edge cannot update itself (and silently
+# reinstall companion packages like GameAssist) during the Windows Update phase.
+Write-Host "Disable Edge update services"
+Disable-Service -ServiceName "edgeupdate"
+Disable-Service -ServiceName "edgeupdatem"
+Disable-Service -ServiceName "MicrosoftEdgeElevationService"
+
+# List all the services containing "edge" and their startup types for validation/debugging purposes.
+Write-Host "Current services containing 'edge' in their name and their startup types:"
+Get-Service -Name "*edge*" | ForEach-Object {
+    Write-Host "  $($_.Name): $($_.StartType)"
+}
+
+# List all the services and their startup types for validation/debugging purposes.
+Write-Host "Current services and their startup types:"
+Get-Service | ForEach-Object {
+    Write-Host "  $($_.Name): $($_.StartType)"
+}
+
+# Disable Store auto-download policy early so the Store does not download or
+# update app packages during Windows Update. Persists across reboots.
+Write-Host "Disable Windows Store auto-download"
+$storePolicy = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
+if (-not (Test-Path $storePolicy)) { New-Item -Path $storePolicy -Force | Out-Null }
+Set-ItemProperty -Path $storePolicy -Name "AutoDownload" -Value 2 -Type DWord -Force
+
+# Disable Edge scheduled tasks (first pass — prevents them from firing during
+# Windows Update; generalize-iso.ps1 runs a second pass to catch any re-added
+# by Edge's own Windows Update).
+Write-Host "Disable Edge scheduled tasks"
+Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object {
+    $_.TaskPath -like "*Edge*" -or $_.TaskName -like "*Edge*"
+} | ForEach-Object {
+    Disable-ScheduledTask -TaskPath $_.TaskPath -TaskName $_.TaskName -ErrorAction SilentlyContinue | Out-Null
+    Write-Host "  Disabled task: $($_.TaskPath)$($_.TaskName)"
+}
+
+# List all the scheduled tasks and their states for validation/debugging purposes.
+Write-Host "Current scheduled tasks and their states:"
+Get-ScheduledTask -ErrorAction SilentlyContinue | ForEach-Object {
+    Write-Host "  $($_.TaskPath)$($_.TaskName): $($_.State)"
+}

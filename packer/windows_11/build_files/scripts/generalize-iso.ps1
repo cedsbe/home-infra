@@ -82,40 +82,20 @@ Stop-ServiceSafely "bits"         "Background Intelligent Transfer (bits)"
 Stop-ServiceSafely "cryptsvc"     "Cryptographic Services (cryptsvc)"
 Stop-ServiceSafely "tiledatamodelsvc" "Tile Data Model (tiledatamodelsvc)"
 
-# Stop Windows Store services (ClipSVC + InstallService) to prevent the Store from
-# auto-downloading or reinstalling packages (e.g. Edge.GameAssist) during the long
-# defrag/sdelete phase. Per MS doc: https://learn.microsoft.com/en-us/troubleshoot/
-# windows-client/setup-upgrade-and-drivers/sysprep-fails-remove-or-update-store-apps
+# Stop Windows Store services (ClipSVC + InstallService) right before AppX cleanup
+# to prevent the Store from reinstalling packages during the defrag/sdelete phase.
+# These are kept here (not in disable-services.ps1) because stopping them too early
+# can break license checks that Windows Update needs for app components.
+# Per MS doc: https://learn.microsoft.com/en-us/troubleshoot/windows-client/
+# setup-upgrade-and-drivers/sysprep-fails-remove-or-update-store-apps
 Write-Host "  Stopping Windows Store services to prevent auto-reinstall..."
-Stop-ServiceSafely "ClipSVC"      "Client License Service (ClipSVC)"
+Stop-ServiceSafely "ClipSVC"        "Client License Service (ClipSVC)"
 Stop-ServiceSafely "InstallService" "Microsoft Store Install Service"
+# Store auto-download policy and Edge update services are set in disable-services.ps1.
 
-# Disable Store auto-download via policy registry key
-$storePolicy = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
-if (-not (Test-Path $storePolicy)) {
-    New-Item -Path $storePolicy -Force | Out-Null
-}
-Set-ItemProperty -Path $storePolicy -Name "AutoDownload" -Value 2 -Type DWord -Force
-Write-Host "  Store auto-download disabled (policy key set)"
-
-# DISABLE (not just stop) Edge update services to prevent auto-restart during the
-# long defrag/sdelete phase. Edge silently reinstalls companion packages (e.g. Edge.GameAssist)
-# if its services recover, causing Remove-AppxPackage to appear to succeed but the package
-# to reappear — even minutes later — and then block sysprep with 0x80073cf2.
-Write-Host "  Disabling and stopping Microsoft Edge update services..."
-foreach ($edgeSvcName in @("edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationService")) {
-    $edgeSvc = Get-Service -Name $edgeSvcName -ErrorAction SilentlyContinue
-    if ($edgeSvc) {
-        Write-Host "  Disabling: $edgeSvcName (was: $($edgeSvc.Status), StartType: $($edgeSvc.StartType))"
-        Set-Service -Name $edgeSvcName -StartupType Disabled -ErrorAction SilentlyContinue
-        Stop-Service -Name $edgeSvcName -Force -ErrorAction SilentlyContinue
-        Write-Host "  Disabled and stopped: $edgeSvcName"
-    } else {
-        Write-Host "  $edgeSvcName - not found (skipping)"
-    }
-}
-
-$edgeProcs = Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContinue
+# Kill ALL Edge-related processes — msedge, MicrosoftEdge, Edge WebView2, Edge helpers, etc.
+# A narrow name list misses broker/helper processes that can trigger GameAssist re-registration.
+$edgeProcs = Get-Process | Where-Object { $_.Name -like "*edge*" } -ErrorAction SilentlyContinue
 if ($edgeProcs) {
     $edgeProcs | ForEach-Object { Write-Host "  Killing Edge process: $($_.Name) (PID $($_.Id))" }
     $edgeProcs | Stop-Process -Force -ErrorAction SilentlyContinue
@@ -329,25 +309,30 @@ if ($sysprepBlockers) {
             Write-Host "[WARNING] CRITICAL: Could not remove $($pkg.Name). Sysprep WILL fail with 0x80073cf2. Error: $($_.Exception.Message)"
         }
     }
-    # Kill Edge before re-checking — it may have re-registered Edge.GameAssist during
-    # the long sdelete operation even with services disabled.
-    Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
+    # Kill ALL Edge processes before re-checking — Edge can re-register GameAssist via
+    # COM activation even with services disabled. Remove-AppxPackage is also asynchronous:
+    # the call returns success while the OS still completes removal in the background,
+    # so an immediate re-check will see the package as still present.
+    Get-Process | Where-Object { $_.Name -like "*edge*" } | Stop-Process -Force -ErrorAction SilentlyContinue
 
-    $stillBlocking = Get-AppxPackage -AllUsers | Where-Object {
-        -not $_.NonRemovable -and
-        -not $_.IsFramework -and
-        $provisionedNames -notcontains $_.Name
-    }
-    # One more removal pass for anything that re-appeared (e.g. Edge.GameAssist)
-    foreach ($pkg in $stillBlocking) {
-        Write-Host "[WARNING] Re-appeared after pre-flight removal: $($pkg.Name) - retrying..."
-        try {
-            Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
-            Write-Host "  Retry removed: $($pkg.Name)"
+    # Poll each blocker until it is actually gone (up to 30 s per package).
+    foreach ($pkg in $sysprepBlockers) {
+        $fullName = $pkg.PackageFullName
+        $deadline = (Get-Date).AddSeconds(30)
+        while ((Get-Date) -lt $deadline) {
+            $still = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $fullName }
+            if (-not $still) { break }
+            Write-Host "  Waiting for async removal of $($pkg.Name)..."
+            try {
+                Remove-AppxPackage -Package $fullName -AllUsers -ErrorAction Stop
+            } catch { }
+            Start-Sleep -Seconds 5
         }
-        catch {
-            Write-Host "[WARNING] Retry failed: $($pkg.Name) - $($_.Exception.Message)"
+        $confirmed = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $fullName }
+        if ($confirmed) {
+            Write-Host "[WARNING] $($pkg.Name) still present after 30s wait"
+        } else {
+            Write-Host "  Confirmed removed: $($pkg.Name)"
         }
     }
 
@@ -386,7 +371,7 @@ try {
     # check and sysprep's own AppX validation. Edge may have respawned during event log
     # clearing or other late operations even with services disabled.
     Write-Host "  Final Edge sweep before sysprep..."
-    Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Get-Process | Where-Object { $_.Name -like "*edge*" } | Stop-Process -Force -ErrorAction SilentlyContinue
     $gameAssistFinal = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue | Where-Object { $_.Name -eq "Microsoft.Edge.GameAssist" }
     if ($gameAssistFinal) {
         Write-Host "[WARNING] Edge.GameAssist re-appeared after pre-flight - removing now (Edge respawned despite disabled services)..."

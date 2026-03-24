@@ -129,11 +129,6 @@ build {
   name    = "iso_build"
   sources = ["source.proxmox-iso.windows11"]
 
-  provisioner "windows-restart" {
-    restart_check_command = "powershell -command \"& {Write-Output 'Machine restarted.'}\""
-    pause_before          = "5m" # Wait for the Windows installation to settle
-  }
-
   provisioner "breakpoint" {
     disable = var.disable_debug_breakpoints
     note    = "Debug breakpoint 1. Wait before starting the installation."
@@ -143,6 +138,11 @@ build {
     elevated_user     = var.winrm_username
     elevated_password = var.winrm_password
     scripts           = local.powershell_scripts_iso
+  }
+
+  provisioner "windows-restart" {
+    restart_check_command = "powershell -command \"& {Write-Output 'Machine restarted.'}\""
+    pause_before          = "5m" # Wait for the Windows installation to settle
   }
 
   provisioner "breakpoint" {

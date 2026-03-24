@@ -5,6 +5,7 @@
 # To add a new word: task spell_add_word WORD=yourword
 # To sort manually: begin; head -7 cspell-dict.txt; tail -n +8 cspell-dict.txt | sort -u; end > temp; and mv temp cspell-dict.txt
 #
+8wekyb3d8bbwe
 AAAAB
 acme
 add
