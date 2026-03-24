@@ -14,6 +14,12 @@ function Disable-FeatureSafely {
     } else {
         Write-Host "Disabling $FeatureName"
         Disable-WindowsOptionalFeature -Online -FeatureName $FeatureName -NoRestart | Out-Null
+        $after = Get-WindowsOptionalFeature -Online -FeatureName $FeatureName -ErrorAction SilentlyContinue
+        if ($after -and $after.State -ne "Disabled") {
+            Write-Host "  [WARNING] Validation FAILED: $FeatureName state is '$($after.State)' after disable attempt"
+        } else {
+            Write-Host "  Validation OK: $FeatureName is disabled"
+        }
     }
 }
 
@@ -70,11 +76,19 @@ function Remove-ProvisionedAppSafely {
         } else {
             Write-Host "    Deprovisioning: $DisplayName ($($provPkg.PackageName))"
             Remove-AppxProvisionedPackage -Online -PackageName $provPkg.PackageName -ErrorAction Stop | Out-Null
-            Write-Host "      Done: $DisplayName"
+            Write-Host "    Removed: $DisplayName"
         }
     }
     catch {
-        Write-Host "[WARNING] Failed to deprovision ${DisplayName}: $($_.Exception.Message)"
+        Write-Host "    [WARNING] Failed to deprovision ${DisplayName}: $($_.Exception.Message)"
+    }
+
+    # Validate step 1: confirm the package is no longer in the provisioned list.
+    $stillProvisioned = Get-AppxProvisionedPackage -Online | Where-Object { $_.DisplayName -eq $DisplayName }
+    if ($stillProvisioned) {
+        Write-Host "    [WARNING] Validation FAILED: $DisplayName is still provisioned after removal attempt"
+    } else {
+        Write-Host "    Validation OK: $DisplayName is not provisioned"
     }
 
     # Step 2: Remove all currently-installed instances for all users, including
@@ -83,15 +97,27 @@ function Remove-ProvisionedAppSafely {
     # to fail with 0x80073cf2 if left behind.
     Write-Host "  Step 2: Remove installed instances of $DisplayName for all users"
     $installedPkgs = Get-AppxPackage -AllUsers | Where-Object { $_.Name -eq $DisplayName }
+    if ($installedPkgs.Count -eq 0) {
+        Write-Host "    No installed instances found"
+    }
     foreach ($pkg in $installedPkgs) {
         try {
-            Write-Host "  Removing installed: $DisplayName ($($pkg.PackageFullName))"
+            Write-Host "    Removing: $($pkg.PackageFullName)"
             Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
-            Write-Host "    Removed installed: $($pkg.PackageFullName)"
+            Write-Host "    Removed: $($pkg.PackageFullName)"
         }
         catch {
-            Write-Host "  [WARNING] Could not remove installed $($pkg.PackageFullName): $($_.Exception.Message)"
+            Write-Host "    [WARNING] Could not remove $($pkg.PackageFullName): $($_.Exception.Message)"
         }
+    }
+
+    # Validate step 2: confirm no installed instances remain.
+    $stillInstalled = Get-AppxPackage -AllUsers | Where-Object { $_.Name -eq $DisplayName }
+    if ($stillInstalled) {
+        $names = ($stillInstalled | Select-Object -ExpandProperty PackageFullName) -join ", "
+        Write-Host "    [WARNING] Validation FAILED: $($stillInstalled.Count) instance(s) still installed: $names"
+    } else {
+        Write-Host "    Validation OK: no installed instances of $DisplayName remain"
     }
 }
 

@@ -73,7 +73,11 @@ function Stop-ServiceSafely {
         Write-Host "  $Label - stopping (was: $($svc.Status))..."
         Stop-Service -Name $Name -Force -ErrorAction SilentlyContinue
         $svc.Refresh()
-        Write-Host "  $Label - now: $($svc.Status)"
+        if ($svc.Status -ne 'Stopped') {
+            Write-Host "  [WARNING] Validation FAILED: $Label is still '$($svc.Status)' after stop attempt"
+        } else {
+            Write-Host "  $Label - now: $($svc.Status)"
+        }
     }
 }
 
@@ -313,26 +317,46 @@ if ($sysprepBlockers) {
     # COM activation even with services disabled. Remove-AppxPackage is also asynchronous:
     # the call returns success while the OS still completes removal in the background,
     # so an immediate re-check will see the package as still present.
-    Get-Process | Where-Object { $_.Name -like "*edge*" } | Stop-Process -Force -ErrorAction SilentlyContinue
+    Write-Host "  Stopping Edge update services (second pass)..."
+    Stop-Service -Name "edgeupdate"              -Force -ErrorAction SilentlyContinue
+    Stop-Service -Name "edgeupdatem"             -Force -ErrorAction SilentlyContinue
+    Stop-Service -Name "MicrosoftEdgeElevationService" -Force -ErrorAction SilentlyContinue
+    Write-Host "  Killing Edge processes..."
+    Get-Process | Where-Object { $_.Name -like "*edge*" } | ForEach-Object {
+        Write-Host "    Killing: $($_.Name) (PID $($_.Id))"
+        Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
+    }
 
-    # Poll each blocker until it is actually gone (up to 30 s per package).
+    # Poll each blocker until it is actually gone (up to 60 s per package).
     foreach ($pkg in $sysprepBlockers) {
         $fullName = $pkg.PackageFullName
-        $deadline = (Get-Date).AddSeconds(30)
+        $deadline = (Get-Date).AddSeconds(60)
+        $attempt = 0
         while ((Get-Date) -lt $deadline) {
             $still = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $fullName }
             if (-not $still) { break }
-            Write-Host "  Waiting for async removal of $($pkg.Name)..."
+            $attempt++
+            Write-Host "  [attempt $attempt] Still present: $($pkg.Name) - killing Edge and retrying..."
+            # Kill Edge before each attempt: it actively reinstalls GameAssist via COM activation
+            Get-Process | Where-Object { $_.Name -like "*edge*" } | ForEach-Object {
+                Write-Host "    Killing: $($_.Name) (PID $($_.Id))"
+                Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
+            }
             try {
                 Remove-AppxPackage -Package $fullName -AllUsers -ErrorAction Stop
-            } catch { }
+                Write-Host "    Remove-AppxPackage returned success"
+            } catch {
+                Write-Host "    [WARNING] Remove-AppxPackage error: $($_.Exception.Message)"
+            }
             Start-Sleep -Seconds 5
         }
         $confirmed = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $fullName }
         if ($confirmed) {
-            Write-Host "[WARNING] $($pkg.Name) still present after 30s wait"
+            Write-Host "[WARNING] $($pkg.Name) still present after 60s / $attempt attempt(s)"
+            Write-Host "  Running processes at failure time:"
+            Get-Process | Sort-Object Name | ForEach-Object { Write-Host "    $($_.Name) (PID $($_.Id))" }
         } else {
-            Write-Host "  Confirmed removed: $($pkg.Name)"
+            Write-Host "  Confirmed removed: $($pkg.Name) (took $attempt attempt(s))"
         }
     }
 

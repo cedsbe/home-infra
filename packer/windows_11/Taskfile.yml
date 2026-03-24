@@ -6,6 +6,7 @@ version: "3"
 vars:
   DEFAULT_TEMPLATE: Pro
   PACKER_LOG_LEVEL: ""
+  ON_ERROR: abort
 
 env:
   PACKER_LOG: "{{.PACKER_LOG_LEVEL}}"
@@ -196,13 +197,14 @@ tasks:
 
         {{if eq .DEBUG "true"}}
         packer build \
+          -on-error={{.ON_ERROR}} \
           -var 'disable_debug_breakpoints=false' \
           -var 'disable_pre_sysprep_breakpoints=false' \
           -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' \
           -only="iso_build.proxmox-iso.windows11" \
           .
         {{else}}
-        packer build -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' -only="iso_build.proxmox-iso.windows11" .
+        packer build -on-error={{.ON_ERROR}} -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' -only="iso_build.proxmox-iso.windows11" .
         {{end}}
 
         echo ""
@@ -228,12 +230,13 @@ tasks:
 
         {{if eq .DEBUG "true"}}
         packer build \
+          -on-error={{.ON_ERROR}} \
           -var 'disable_debug_breakpoints=false' \
           -var 'disable_pre_sysprep_breakpoints=false' \
           -only="clone_build.proxmox-clone.windows11" \
           .
         {{else}}
-        packer build -only="clone_build.proxmox-clone.windows11" .
+        packer build -on-error={{.ON_ERROR}} -only="clone_build.proxmox-clone.windows11" .
         {{end}}
 
         echo ""

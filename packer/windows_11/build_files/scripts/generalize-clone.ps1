@@ -23,7 +23,11 @@ function Stop-ServiceSafely {
         Write-Host "  $Label - stopping (was: $($svc.Status))..."
         Stop-Service -Name $Name -Force -ErrorAction SilentlyContinue
         $svc.Refresh()
-        Write-Host "  $Label - now: $($svc.Status)"
+        if ($svc.Status -ne 'Stopped') {
+            Write-Host "  [WARNING] Validation FAILED: $Label is still '$($svc.Status)' after stop attempt"
+        } else {
+            Write-Host "  $Label - now: $($svc.Status)"
+        }
     }
 }
 
