@@ -165,12 +165,23 @@ build {
 
   provisioner "breakpoint" {
     disable = var.disable_pre_sysprep_breakpoints
-    note    = "Sysprep breakpoint. Wait before starting the sysprep generalize process."
+    note    = "Generalize breakpoint. Wait before starting the generalize process."
   }
 
   provisioner "powershell" {
     elevated_user     = var.winrm_username
     elevated_password = var.winrm_password
     scripts           = ["./build_files/scripts/generalize-iso.ps1"]
+  }
+
+  provisioner "breakpoint" {
+    disable = var.disable_pre_sysprep_breakpoints
+    note    = "Sysprep breakpoint. Wait before starting the sysprep process."
+  }
+
+  provisioner "powershell" {
+    elevated_user     = var.winrm_username
+    elevated_password = var.winrm_password
+    scripts           = ["./build_files/scripts/sysprep.ps1"]
   }
 }

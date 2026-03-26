@@ -88,7 +88,7 @@
 
             <UserData>
                 <ProductKey>
-                    <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
+                    <Key>W269N-WFGWX-YVC9B-4J6C9-T83GX</Key>
                     <WillShowUI>OnError</WillShowUI>
                 </ProductKey>
                 <AcceptEula>true</AcceptEula>
@@ -141,6 +141,26 @@
                     <Description>Disable Windows Store automatic app downloads</Description>
                     <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\WindowsStore" /v AutoDownload /t REG_DWORD /d 2 /f</Path>
                 </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>4</Order>
+                    <Description>Disable Windows Update automatic downloads during build</Description>
+                    <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v NoAutoUpdate /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>5</Order>
+                    <Description>Disable Microsoft Edge automatic updates</Description>
+                    <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v Update /t REG_DWORD /d 0 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>6</Order>
+                    <Description>Disable Microsoft Edge automatic update check</Description>
+                    <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v AutoUpdateCheckPeriodMinutes /t REG_DWORD /d 0 /f</Path>
+                </RunSynchronousCommand>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>7</Order>
+                    <Description>Disable Microsoft Edge update notifications</Description>
+                    <Path>reg add "HKLM\SOFTWARE\Policies\Microsoft\EdgeUpdate" /v DisableUpdateNotification /t REG_DWORD /d 1 /f</Path>
+                </RunSynchronousCommand>
             </RunSynchronous>
         </component>
     </settings>
@@ -170,14 +190,12 @@
                     <Order>1</Order>
                     <Description>Set Execution Policy 64-bit</Description>
                     <CommandLine>cmd.exe /c powershell -Command &quot;Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force&quot;</CommandLine>
-                    <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
 
                 <SynchronousCommand wcm:action="add">
                     <Order>2</Order>
                     <Description>Set Execution Policy 32-bit</Description>
                     <CommandLine>C:\Windows\SysWOW64\cmd.exe /c powershell -Command &quot;Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force&quot;</CommandLine>
-                    <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
 
                 <SynchronousCommand wcm:action="add">
@@ -219,7 +237,7 @@
                 <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
                 <SkipUserOOBE>true</SkipUserOOBE>
                 <SkipMachineOOBE>true</SkipMachineOOBE>
-                <ProtectYourPC>1</ProtectYourPC>
+                <ProtectYourPC>3</ProtectYourPC>
             </OOBE>
 
             <UserAccounts>

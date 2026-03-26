@@ -210,6 +210,12 @@ RUN <<EOF
       | tee /etc/apt/sources.list.d/azure-cli.list > /dev/null
 EOF
 
+# Add PowerShell repo (reuses Microsoft GPG key from Azure CLI setup)
+RUN <<EOF
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/microsoft.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" \
+      | tee /etc/apt/sources.list.d/microsoft-powershell.list > /dev/null
+EOF
+
 # Add Fish shell PPA
 RUN <<EOF
     add-apt-repository -y ppa:fish-shell/release-4
@@ -226,6 +232,7 @@ RUN <<EOF
     nodejs \
     packer \
     postgresql-client \
+    powershell \
     terraform \
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF

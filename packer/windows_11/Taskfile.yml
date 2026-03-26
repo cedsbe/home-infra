@@ -6,7 +6,9 @@ version: "3"
 vars:
   DEFAULT_TEMPLATE: Pro
   PACKER_LOG_LEVEL: ""
-  ON_ERROR: abort
+  ON_ERROR: ask
+  DISABLE_DEBUG_BREAKPOINTS: "true"
+  DISABLE_PRE_SYSPREP_BREAKPOINTS: "false"
 
 env:
   PACKER_LOG: "{{.PACKER_LOG_LEVEL}}"
@@ -17,6 +19,19 @@ tasks:
     silent: true
     cmds:
       - task --list
+
+  variables:
+    desc: "Show current variable values"
+    silent: true
+    cmds:
+      - |
+        echo 'Current variable values:'
+        echo '  TEMPLATE: {{.TEMPLATE | default .DEFAULT_TEMPLATE}}'
+        echo '  DEBUG: {{.DEBUG}}'
+        echo '  DISABLE_DEBUG_BREAKPOINTS: {{.DISABLE_DEBUG_BREAKPOINTS}}'
+        echo '  DISABLE_PRE_SYSPREP_BREAKPOINTS: {{.DISABLE_PRE_SYSPREP_BREAKPOINTS}}'
+        echo '  ON_ERROR: {{.ON_ERROR}}'
+        echo '  PACKER_LOG_LEVEL: {{.PACKER_LOG_LEVEL}}'
 
   validate:
     desc: "Validate Packer template configuration"
@@ -179,15 +194,27 @@ tasks:
         echo "Environment is ready for building Windows 11 clone templates!"
 
   build-iso:
-    desc: "Build Windows 11 template - Use DEBUG=true to enable breakpoints"
+    desc: |
+      Build Windows 11 template.
+       Use DEBUG=true to enable all breakpoints,
+       or set DISABLE_DEBUG_BREAKPOINTS/DISABLE_PRE_SYSPREP_BREAKPOINTS individually
     silent: true
     deps: [setup, validate]
     cmds:
       - |
         echo "Building Windows 11 template: {{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
 
+        echo "DEBUG: {{.DEBUG}}"
+        echo "DISABLE_DEBUG_BREAKPOINTS: {{.DISABLE_DEBUG_BREAKPOINTS}}"
+        echo "DISABLE_PRE_SYSPREP_BREAKPOINTS: {{.DISABLE_PRE_SYSPREP_BREAKPOINTS}}"
+
         {{if eq .DEBUG "true"}}
         echo "Debug mode enabled - build will pause at breakpoints"
+        echo "Use VNC to connect to the VM during breakpoints"
+        {{else if or (eq .DISABLE_DEBUG_BREAKPOINTS "false") (eq .DISABLE_PRE_SYSPREP_BREAKPOINTS "false")}}
+        echo "Selective breakpoints enabled:"
+        echo "  disable_debug_breakpoints: {{.DISABLE_DEBUG_BREAKPOINTS}}"
+        echo "  disable_pre_sysprep_breakpoints: {{.DISABLE_PRE_SYSPREP_BREAKPOINTS}}"
         echo "Use VNC to connect to the VM during breakpoints"
         {{else}}
         echo "This process typically takes 60 - 120 minutes, depending on Windows Updates..."
@@ -195,24 +222,25 @@ tasks:
 
         echo ""
 
-        {{if eq .DEBUG "true"}}
         packer build \
           -on-error={{.ON_ERROR}} \
-          -var 'disable_debug_breakpoints=false' \
+          {{if eq .DEBUG "true"}}-var 'disable_debug_breakpoints=false' \
           -var 'disable_pre_sysprep_breakpoints=false' \
-          -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' \
+          {{else}}-var 'disable_debug_breakpoints={{.DISABLE_DEBUG_BREAKPOINTS}}' \
+          -var 'disable_pre_sysprep_breakpoints={{.DISABLE_PRE_SYSPREP_BREAKPOINTS}}' \
+          {{end}}-var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' \
           -only="iso_build.proxmox-iso.windows11" \
           .
-        {{else}}
-        packer build -on-error={{.ON_ERROR}} -var 'template={{.TEMPLATE | default .DEFAULT_TEMPLATE}}' -only="iso_build.proxmox-iso.windows11" .
-        {{end}}
 
         echo ""
         echo "Template build completed successfully!"
         echo "Template available in Proxmox as: template-win11-{{.TEMPLATE | default .DEFAULT_TEMPLATE}}"
 
   build-clone:
-    desc: "Build Windows 11 clone template - Use DEBUG=true to enable breakpoints"
+    desc: |
+      Build Windows 11 clone template.
+       Use DEBUG=true to enable all breakpoints,
+       or set DISABLE_DEBUG_BREAKPOINTS/DISABLE_PRE_SYSPREP_BREAKPOINTS individually
     silent: true
     deps: [setup-clone, validate]
     cmds:
@@ -222,22 +250,25 @@ tasks:
         {{if eq .DEBUG "true"}}
         echo "Debug mode enabled - build will pause at breakpoints"
         echo "Use VNC to connect to the VM during breakpoints"
+        {{else if or (eq .DISABLE_DEBUG_BREAKPOINTS "false") (eq .DISABLE_PRE_SYSPREP_BREAKPOINTS "false")}}
+        echo "Selective breakpoints enabled:"
+        echo "  disable_debug_breakpoints: {{.DISABLE_DEBUG_BREAKPOINTS}}"
+        echo "  disable_pre_sysprep_breakpoints: {{.DISABLE_PRE_SYSPREP_BREAKPOINTS}}"
+        echo "Use VNC to connect to the VM during breakpoints"
         {{else}}
         echo "This process typically takes 20 - 45 minutes, depending on Windows Updates..."
         {{end}}
 
         echo ""
 
-        {{if eq .DEBUG "true"}}
         packer build \
           -on-error={{.ON_ERROR}} \
-          -var 'disable_debug_breakpoints=false' \
+          {{if eq .DEBUG "true"}}-var 'disable_debug_breakpoints=false' \
           -var 'disable_pre_sysprep_breakpoints=false' \
-          -only="clone_build.proxmox-clone.windows11" \
+          {{else}}-var 'disable_debug_breakpoints={{.DISABLE_DEBUG_BREAKPOINTS}}' \
+          -var 'disable_pre_sysprep_breakpoints={{.DISABLE_PRE_SYSPREP_BREAKPOINTS}}' \
+          {{end}}-only="clone_build.proxmox-clone.windows11" \
           .
-        {{else}}
-        packer build -on-error={{.ON_ERROR}} -only="clone_build.proxmox-clone.windows11" .
-        {{end}}
 
         echo ""
         echo "Template build completed successfully!"
@@ -332,10 +363,12 @@ tasks:
         echo "  # Note: PKR_VAR_win11_clone_vm_id must be set to an existing Windows 11 base template ID"
         echo ""
         echo "Debug Options:"
-        echo "  task build-iso DEBUG=true          # Enable breakpoints for ISO build"
-        echo "  task build-clone DEBUG=true        # Enable breakpoints for clone build"
-        echo "  task build-iso DEBUG=true TEMPLATE=Pro   # Debug specific template"
-        echo "  PACKER_LOG=1 task build-iso        # Enable verbose logging"
+        echo "  task build-iso DEBUG=true                                    # Enable all breakpoints"
+        echo "  task build-iso DISABLE_DEBUG_BREAKPOINTS=false               # Enable only debug breakpoints"
+        echo "  task build-iso DISABLE_PRE_SYSPREP_BREAKPOINTS=false         # Enable only pre-sysprep breakpoints"
+        echo "  task build-clone DEBUG=true                                  # Enable all breakpoints for clone build"
+        echo "  task build-iso DEBUG=true TEMPLATE=Pro                       # Debug specific template"
+        echo "  PACKER_LOG=1 task build-iso                                  # Enable verbose logging"
         echo ""
         echo "Important:"
         echo "  - Create .env file from template: cp .env.template .env"

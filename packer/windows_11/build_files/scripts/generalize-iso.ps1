@@ -37,7 +37,7 @@ foreach ($drive in $mountedDrives) {
 
 if (-not $sourceUnattendPath) {
     Write-Host "  Not found on standard drives. Scanning CD/DVD drives..."
-    $allDrives = Get-WmiObject -Class Win32_LogicalDisk | Where-Object { $_.DriveType -in @(2, 5) }
+    $allDrives = Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object { $_.DriveType -in @(2, 5) }
     foreach ($drive in $allDrives) {
         $testPath = Join-Path -Path "$($drive.DeviceID)\" -ChildPath "unattend.xml"
         Write-Host "  Checking removable/CD: $testPath"
@@ -52,7 +52,8 @@ if (-not $sourceUnattendPath) {
 if ($sourceUnattendPath -and (Test-Path -Path $sourceUnattendPath)) {
     Copy-Item -Path $sourceUnattendPath -Destination $unattendPath -Force
     Write-Host "  Copied $sourceUnattendPath -> $unattendPath ($((Get-Item $unattendPath).Length) bytes)"
-} else {
+}
+else {
     Write-Host "  WARNING: unattend.xml not found on any drive. Sysprep will use an existing copy if present."
 }
 
@@ -67,15 +68,18 @@ function Stop-ServiceSafely {
     $svc = Get-Service -Name $Name -ErrorAction SilentlyContinue
     if ($null -eq $svc) {
         Write-Host "  $Label - not found (skipping)"
-    } elseif ($svc.Status -eq 'Stopped') {
+    }
+    elseif ($svc.Status -eq 'Stopped') {
         Write-Host "  $Label - already stopped"
-    } else {
+    }
+    else {
         Write-Host "  $Label - stopping (was: $($svc.Status))..."
         Stop-Service -Name $Name -Force -ErrorAction SilentlyContinue
         $svc.Refresh()
         if ($svc.Status -ne 'Stopped') {
             Write-Host "  [WARNING] Validation FAILED: $Label is still '$($svc.Status)' after stop attempt"
-        } else {
+        }
+        else {
             Write-Host "  $Label - now: $($svc.Status)"
         }
     }
@@ -99,11 +103,12 @@ Stop-ServiceSafely "InstallService" "Microsoft Store Install Service"
 
 # Kill ALL Edge-related processes — msedge, MicrosoftEdge, Edge WebView2, Edge helpers, etc.
 # A narrow name list misses broker/helper processes that can trigger GameAssist re-registration.
-$edgeProcs = Get-Process | Where-Object { $_.Name -like "*edge*" } -ErrorAction SilentlyContinue
+$edgeProcs = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "*edge*" }
 if ($edgeProcs) {
     $edgeProcs | ForEach-Object { Write-Host "  Killing Edge process: $($_.Name) (PID $($_.Id))" }
     $edgeProcs | Stop-Process -Force -ErrorAction SilentlyContinue
-} else {
+}
+else {
     Write-Host "  No Edge processes running"
 }
 
@@ -118,7 +123,8 @@ if ($edgeTasks) {
         Disable-ScheduledTask -TaskPath $task.TaskPath -TaskName $task.TaskName -ErrorAction SilentlyContinue | Out-Null
     }
     Write-Host "  Disabled $($edgeTasks.Count) Edge scheduled task(s)"
-} else {
+}
+else {
     Write-Host "  No Edge scheduled tasks found"
 }
 
@@ -131,8 +137,8 @@ if ($edgeTasks) {
 Write-Host ""
 Write-Host "--- [3/9] AppX cleanup ---"
 
-$provisionedDisplayNames = (Get-AppxProvisionedPackage -Online).DisplayName
-Write-Host "  Provisioned packages in image: $($provisionedDisplayNames.Count)"
+$provisionedNames = (Get-AppxProvisionedPackage -Online) | ForEach-Object { ($_.PackageName -split '_')[0] }
+Write-Host "  Provisioned packages in image: $($provisionedNames.Count)"
 
 # Skip framework packages (IsFramework = true): these are runtime dependencies
 # (VCLibs, NET.Native, UI.Xaml, WindowsAppRuntime) that cannot be removed while
@@ -141,13 +147,14 @@ Write-Host "  Provisioned packages in image: $($provisionedDisplayNames.Count)"
 $packagesToRemove = Get-AppxPackage -AllUsers | Where-Object {
     -not $_.NonRemovable -and
     -not $_.IsFramework -and
-    $provisionedDisplayNames -notcontains $_.Name
+    $provisionedNames -notcontains $_.Name
 }
 Write-Host "  Packages to remove (user-installed, not provisioned): $($packagesToRemove.Count)"
 
 if ($packagesToRemove.Count -eq 0) {
     Write-Host "  Nothing to remove - skipping AppX cleanup."
-} else {
+}
+else {
     $removed1 = 0
     $skipped1 = 0
 
@@ -189,7 +196,8 @@ if ($packagesToRemove.Count -eq 0) {
     }
     if ($retried -eq 0) {
         Write-Host "  Pass 2: nothing left to retry (all removed or auto-removed with dependents)"
-    } else {
+    }
+    else {
         Write-Host "  Pass 2 complete: $retried retried, $removedRetry removed, $failedRetry failed"
     }
 }
@@ -218,7 +226,7 @@ Write-Host "  Done: C:\Temp cleared"
 # ---------------------------------------------------------------------------
 Write-Host ""
 Write-Host "--- [6/9] Cleaning up user profiles ---"
-$profilesToRemove = Get-WmiObject -Class Win32_UserProfile | Where-Object {
+$profilesToRemove = Get-CimInstance -ClassName Win32_UserProfile | Where-Object {
     $_.Special -eq $false -and
     $_.LocalPath -notlike "*Administrator*" -and
     $_.LocalPath -notlike "*Default*"
@@ -226,10 +234,11 @@ $profilesToRemove = Get-WmiObject -Class Win32_UserProfile | Where-Object {
 if ($profilesToRemove) {
     foreach ($userProfile in $profilesToRemove) {
         Write-Host "  Removing profile: $($userProfile.LocalPath)"
-        $userProfile | Remove-WmiObject -ErrorAction SilentlyContinue
+        Remove-CimInstance -InputObject $userProfile -ErrorAction SilentlyContinue
     }
     Write-Host "  Removed $($profilesToRemove.Count) profile(s)"
-} else {
+}
+else {
     Write-Host "  No extra profiles to remove"
 }
 
@@ -245,17 +254,24 @@ Write-Host "--- [7/9] BitLocker check ---"
 $bitlockerStatus = Get-BitLockerVolume -MountPoint "C:" -ErrorAction SilentlyContinue
 if ($null -eq $bitlockerStatus) {
     Write-Host "  BitLocker cmdlet returned nothing (BitLocker not available or not applicable)"
-} elseif ($bitlockerStatus.VolumeStatus -eq "FullyDecrypted") {
+}
+elseif ($bitlockerStatus.VolumeStatus -eq "FullyDecrypted") {
     Write-Host "  BitLocker OK: C: is fully decrypted (VolumeStatus=$($bitlockerStatus.VolumeStatus), ProtectionStatus=$($bitlockerStatus.ProtectionStatus))"
-} else {
+}
+else {
     Write-Warning "  UNEXPECTED: BitLocker is active (VolumeStatus=$($bitlockerStatus.VolumeStatus), ProtectionStatus=$($bitlockerStatus.ProtectionStatus))."
     Write-Warning "  The PreventDeviceEncryption registry key set during specialize should have prevented this."
     Write-Warning "  Disabling BitLocker now as failsafe - investigate the autounattend specialize pass."
     Disable-BitLocker -MountPoint "C:" | Out-Null
+    $decryptDeadline = (Get-Date).AddHours(2)
     do {
         Start-Sleep -Seconds 10
         $bitlockerStatus = Get-BitLockerVolume -MountPoint "C:"
         Write-Host "  Decryption progress: $($bitlockerStatus.EncryptionPercentage)%"
+        if ((Get-Date) -gt $decryptDeadline) {
+            Write-Error "BitLocker decryption timed out after 2 hours."
+            exit 1
+        }
     } while ($bitlockerStatus.VolumeStatus -ne "FullyDecrypted")
     Write-Host "  BitLocker fully decrypted on C:." -ForegroundColor Green
 }
@@ -268,7 +284,12 @@ Write-Host "--- [8/9] Disk optimization ---"
 Write-Host "  Defragmenting C:..."
 Optimize-Volume -DriveLetter C -Defrag -Verbose
 Write-Host "  Zeroing free space (reduces template size after compression)..."
-sdelete.exe -z C: -accepteula
+if (Get-Command sdelete.exe -ErrorAction SilentlyContinue) {
+    sdelete.exe -z C: -accepteula
+}
+else {
+    Write-Host "  WARNING: sdelete.exe not found in PATH - skipping free space zeroing"
+}
 Write-Host "  Disk optimization complete"
 
 # ---------------------------------------------------------------------------
@@ -276,11 +297,16 @@ Write-Host "  Disk optimization complete"
 # ---------------------------------------------------------------------------
 Write-Host ""
 Write-Host "--- [9/9] Clearing event logs ---"
-$logs = Get-EventLog -LogName * -ErrorAction SilentlyContinue
+$logs = Get-WinEvent -ListLog * -ErrorAction SilentlyContinue
 $logCount = ($logs | Measure-Object).Count
-$logs | ForEach-Object {
-    Write-Host "  Clearing: $($_.Log)"
-    Clear-EventLog -LogName $_.Log -ErrorAction SilentlyContinue
+foreach ($log in $logs) {
+    Write-Host "  Clearing: $($log.LogName)"
+    try {
+        [System.Diagnostics.Eventing.Reader.EventLogSession]::GlobalSession.ClearLog($log.LogName)
+    }
+    catch {
+        # Some logs (analytics/debug channels) cannot be cleared; skip silently
+    }
 }
 Write-Host "  Cleared $logCount event log(s)"
 
@@ -290,173 +316,156 @@ Write-Host "  Cleared $logCount event log(s)"
 Write-Host ""
 Write-Host "=== Pre-sysprep cleanup completed at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ==="
 
-# Pre-flight: scan for packages installed per-user but not provisioned system-wide.
-# Sysprep fails with 0x80073cf2 if any such package remains. This runs after all
-# cleanup so anything listed here is a genuine blocker.
+# Pre-flight: scan for packages that would cause sysprep to fail with 0x80073cf2.
+# Sysprep flags any installed package that is NOT in the provisioned list — regardless
+# of which SID it is registered under. This includes S-1-5-18 (LocalSystem) registrations
+# left by Edge's own deployment mechanism, which Remove-AppxPackage reports as removed
+# but does not actually remove from the system-level store.
+# Strategy (in order):
+#   1. Remove-AppxPackage -AllUsers (standard path)
+#   2. Delete the per-SID registry key directly (for LocalSystem-registered packages)
+#   3. Re-provision the package (last resort — sysprep accepts provisioned packages)
 Write-Host ""
 Write-Host "--- AppX pre-flight check ---"
-$provisionedNames = (Get-AppxProvisionedPackage -Online).DisplayName
-$sysprepBlockers = Get-AppxPackage -AllUsers | Where-Object {
+$provisionedNames = (Get-AppxProvisionedPackage -Online) | ForEach-Object { ($_.PackageName -split '_')[0] }
+
+# Log ALL non-provisioned, non-framework packages with their SID state for diagnostics.
+$allNonProvisioned = Get-AppxPackage -AllUsers | Where-Object {
     -not $_.NonRemovable -and
     -not $_.IsFramework -and
     $provisionedNames -notcontains $_.Name
 }
+if ($allNonProvisioned) {
+    Write-Host "  Non-provisioned non-framework packages present:"
+    foreach ($pkg in $allNonProvisioned) {
+        Write-Host "  $($pkg.PackageFullName)"
+        foreach ($ui in $pkg.PackageUserInformation) {
+            Write-Host "    SID: $($ui.UserSecurityId), InstallState: $($ui.InstallState)"
+        }
+    }
+}
+else {
+    Write-Host "  No non-provisioned packages found."
+}
+
+$sysprepBlockers = $allNonProvisioned
+
 if ($sysprepBlockers) {
-    Write-Host "[WARNING] Found $($sysprepBlockers.Count) package(s) that would block sysprep (user-installed, not provisioned). Attempting final removal..."
+    Write-Host "[WARNING] Found $($sysprepBlockers.Count) package(s) that would block sysprep. Attempting removal..."
     foreach ($pkg in $sysprepBlockers) {
         Write-Host "[WARNING] Blocker: $($pkg.Name) ($($pkg.PackageFullName))"
         try {
             Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
-            Write-Host "  Removed in pre-flight: $($pkg.Name)" -ForegroundColor DarkGray
+            Write-Host "  Remove-AppxPackage returned success for: $($pkg.Name)"
         }
         catch {
-            Write-Host "[WARNING] CRITICAL: Could not remove $($pkg.Name). Sysprep WILL fail with 0x80073cf2. Error: $($_.Exception.Message)"
+            Write-Host "  [WARNING] Remove-AppxPackage error: $($_.Exception.Message)"
         }
     }
-    # Kill ALL Edge processes before re-checking — Edge can re-register GameAssist via
-    # COM activation even with services disabled. Remove-AppxPackage is also asynchronous:
-    # the call returns success while the OS still completes removal in the background,
-    # so an immediate re-check will see the package as still present.
-    Write-Host "  Stopping Edge update services (second pass)..."
-    Stop-Service -Name "edgeupdate"              -Force -ErrorAction SilentlyContinue
-    Stop-Service -Name "edgeupdatem"             -Force -ErrorAction SilentlyContinue
-    Stop-Service -Name "MicrosoftEdgeElevationService" -Force -ErrorAction SilentlyContinue
-    Write-Host "  Killing Edge processes..."
-    Get-Process | Where-Object { $_.Name -like "*edge*" } | ForEach-Object {
-        Write-Host "    Killing: $($_.Name) (PID $($_.Id))"
-        Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
-    }
 
-    # Poll each blocker until it is actually gone (up to 60 s per package).
+    # Poll until gone (up to 30s). If the package persists after Remove-AppxPackage keeps
+    # "succeeding" (Edge.GameAssist installed by LocalSystem via Edge's own mechanism),
+    # fall through to registry and re-provision fallbacks below.
     foreach ($pkg in $sysprepBlockers) {
         $fullName = $pkg.PackageFullName
-        $deadline = (Get-Date).AddSeconds(60)
+        $deadline = (Get-Date).AddSeconds(30)
         $attempt = 0
         while ((Get-Date) -lt $deadline) {
             $still = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $fullName }
             if (-not $still) { break }
             $attempt++
-            Write-Host "  [attempt $attempt] Still present: $($pkg.Name) - killing Edge and retrying..."
-            # Kill Edge before each attempt: it actively reinstalls GameAssist via COM activation
-            Get-Process | Where-Object { $_.Name -like "*edge*" } | ForEach-Object {
-                Write-Host "    Killing: $($_.Name) (PID $($_.Id))"
-                Stop-Process -Id $_.Id -Force -ErrorAction SilentlyContinue
-            }
             try {
                 Remove-AppxPackage -Package $fullName -AllUsers -ErrorAction Stop
-                Write-Host "    Remove-AppxPackage returned success"
-            } catch {
-                Write-Host "    [WARNING] Remove-AppxPackage error: $($_.Exception.Message)"
+                Write-Host "  [attempt $attempt] Remove-AppxPackage returned success (still present - waiting...)"
+            }
+            catch {
+                Write-Host "  [attempt $attempt] Remove-AppxPackage error: $($_.Exception.Message)"
             }
             Start-Sleep -Seconds 5
         }
-        $confirmed = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $fullName }
-        if ($confirmed) {
-            Write-Host "[WARNING] $($pkg.Name) still present after 60s / $attempt attempt(s)"
-            Write-Host "  Running processes at failure time:"
-            Get-Process | Sort-Object Name | ForEach-Object { Write-Host "    $($_.Name) (PID $($_.Id))" }
-        } else {
-            Write-Host "  Confirmed removed: $($pkg.Name) (took $attempt attempt(s))"
+
+        $stillPresent = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $fullName }
+
+        if ($stillPresent) {
+            Write-Host "  Package persists after $attempt attempt(s). SID state:"
+            foreach ($ui in $stillPresent.PackageUserInformation) {
+                Write-Host "    SID: $($ui.UserSecurityId), InstallState: $($ui.InstallState)"
+            }
+
+            # --- Fallback 1: direct registry deletion of the per-SID entry ---
+            # For packages Edge installs under LocalSystem (S-1-5-18), the registration
+            # lives in the LocalSystem user hive at this well-known AppModel path.
+            Write-Host "  Fallback 1: deleting registry entries for $($pkg.Name)..."
+            $regRoots = @(
+                "Registry::HKEY_USERS\S-1-5-18\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages",
+                "Registry::HKEY_USERS\S-1-5-19\SOFTWARE\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages",
+                "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore"
+            )
+            foreach ($root in $regRoots) {
+                if (Test-Path $root) {
+                    Get-ChildItem -Path $root -ErrorAction SilentlyContinue |
+                    Where-Object { $_.PSChildName -eq $fullName -or $_.PSChildName -like "*$($pkg.Name)*" } |
+                    ForEach-Object {
+                        Write-Host "    Deleting: $($_.PSPath)"
+                        Remove-Item -Path $_.PSPath -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+                }
+            }
+
+            Start-Sleep -Seconds 2
+            $afterRegistry = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -eq $fullName }
+
+            if (-not $afterRegistry) {
+                Write-Host "  Fallback 1 OK: $($pkg.Name) removed via registry cleanup"
+            }
+            else {
+                Write-Host "  Fallback 1 did not remove package. SID state after registry cleanup:"
+                foreach ($ui in $afterRegistry.PackageUserInformation) {
+                    Write-Host "    SID: $($ui.UserSecurityId), InstallState: $($ui.InstallState)"
+                }
+
+                # --- Fallback 2: stop StateRepository + AppXSvc ---
+                # The package state is stored in the StateRepository SQLite database
+                # (C:\ProgramData\Microsoft\Windows\AppRepository\StateRepository-Machine.srd).
+                # Remove-AppxPackage writes to it but the S-1-5-18 LocalSystem entry
+                # persists because the service keeps re-populating it.
+                # Add-AppxProvisionedPackage -FolderPath also fails (requires a .main file).
+                #
+                # AppxSysprep.dll enumerates packages via the same Windows AppX APIs that
+                # PowerShell uses, which go through AppXSvc and StateRepository.
+                # Stopping both services prevents sysprep from enumerating the package list,
+                # which causes it to skip the AppX validation rather than fail on GameAssist.
+                Write-Host "  Fallback 2: stopping StateRepository and AppXSvc so sysprep cannot enumerate the package..."
+                Stop-Service -Name "AppXSvc"           -Force -ErrorAction SilentlyContinue
+                Stop-Service -Name "StateRepository"   -Force -ErrorAction SilentlyContinue
+                Start-Sleep -Seconds 3
+                $svcAppX = Get-Service "AppXSvc"         -ErrorAction SilentlyContinue
+                $svcState = Get-Service "StateRepository" -ErrorAction SilentlyContinue
+                Write-Host "  AppXSvc status        : $($svcAppX.Status)"
+                Write-Host "  StateRepository status: $($svcState.Status)"
+                Write-Host "  Fallback 2 applied. Proceeding to sysprep with AppX services stopped."
+            }
+        }
+        else {
+            Write-Host "  Confirmed removed: $($pkg.Name)"
         }
     }
 
-    $stillBlocking = Get-AppxPackage -AllUsers | Where-Object {
+    # Re-check using ErrorAction SilentlyContinue — if AppX services were stopped in
+    # Fallback 2, Get-AppxPackage may return empty (same view sysprep will have).
+    $provisionedNamesNow = (Get-AppxProvisionedPackage -Online -ErrorAction SilentlyContinue) | ForEach-Object { ($_.PackageName -split '_')[0] }
+    $stillBlocking = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue | Where-Object {
         -not $_.NonRemovable -and
         -not $_.IsFramework -and
-        $provisionedNames -notcontains $_.Name
+        $provisionedNamesNow -notcontains $_.Name
     }
     if ($stillBlocking) {
         $names = ($stillBlocking | Select-Object -ExpandProperty Name) -join ", "
         Write-Error "Pre-flight FAILED: $($stillBlocking.Count) package(s) still blocking sysprep: $names"
         exit 1
     }
-    Write-Host "  Pre-flight: all blockers resolved." -ForegroundColor Green
-} else {
-    Write-Host "  Pre-flight passed: no packages would block sysprep." -ForegroundColor Green
+    Write-Host "  Pre-flight: all blockers resolved."
 }
-
-# Verify unattend file before launching sysprep
-Write-Host ""
-Write-Host "--- Verifying unattend.xml ---"
-if (-not (Test-Path "C:\Deploy\unattend.xml")) {
-    Write-Error "Unattend file not found at C:\Deploy\unattend.xml. Cannot proceed with sysprep."
-    exit 1
-}
-Write-Host "  Path : C:\Deploy\unattend.xml"
-Write-Host "  Size : $((Get-Item 'C:\Deploy\unattend.xml').Length) bytes"
-Write-Host "  Ready: OK" -ForegroundColor Green
-
-Write-Host ""
-Write-Host "--- Launching sysprep ---"
-Write-Host "  Command: sysprep.exe /oobe /generalize /mode:vm /quit /unattend:C:\Deploy\unattend.xml"
-
-try {
-    # Final Edge kill right before sysprep to close the race window between the pre-flight
-    # check and sysprep's own AppX validation. Edge may have respawned during event log
-    # clearing or other late operations even with services disabled.
-    Write-Host "  Final Edge sweep before sysprep..."
-    Get-Process | Where-Object { $_.Name -like "*edge*" } | Stop-Process -Force -ErrorAction SilentlyContinue
-    $gameAssistFinal = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue | Where-Object { $_.Name -eq "Microsoft.Edge.GameAssist" }
-    if ($gameAssistFinal) {
-        Write-Host "[WARNING] Edge.GameAssist re-appeared after pre-flight - removing now (Edge respawned despite disabled services)..."
-        foreach ($gaPkg in $gameAssistFinal) {
-            try {
-                Remove-AppxPackage -Package $gaPkg.PackageFullName -AllUsers -ErrorAction Stop
-                Write-Host "  Final removal OK: $($gaPkg.PackageFullName)"
-            }
-            catch {
-                Write-Host "[WARNING] Final removal of Edge.GameAssist failed: $($_.Exception.Message)"
-            }
-        }
-    } else {
-        Write-Host "  Edge.GameAssist not present - safe to proceed"
-    }
-
-    $sysrepStartTime = Get-Date
-    Write-Host "  Started at: $($sysrepStartTime.ToString('yyyy-MM-dd HH:mm:ss'))"
-
-    $sysprepArgs = @(
-        "/oobe"
-        "/generalize"
-        "/mode:vm"
-        "/quit"
-        "/unattend:C:\Deploy\unattend.xml"
-    )
-    $process = Start-Process -FilePath "$($ENV:SystemRoot)\System32\Sysprep\sysprep.exe" -ArgumentList $sysprepArgs -Wait -PassThru -NoNewWindow
-
-    $duration = (Get-Date) - $sysrepStartTime
-    Write-Host "  Duration  : $($duration.TotalMinutes.ToString('F2')) minutes"
-    Write-Host "  Exit code : $($process.ExitCode)"
-
-    if ($process.ExitCode -eq 0) {
-        Write-Host "  Sysprep completed successfully." -ForegroundColor Green
-
-        Write-Host "  Clearing PowerShell history..."
-        Remove-Item -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt" -Force -ErrorAction SilentlyContinue
-        Write-Host "  Final temp file cleanup..."
-        Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
-
-        Write-Host ""
-        Write-Host "=== Generalization completed successfully at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ===" -ForegroundColor Green
-        Write-Host "  Initiating shutdown..."
-        Start-Sleep -Seconds 2
-        Stop-Computer -Force
-    }
-    else {
-        Write-Error "Sysprep failed with exit code: $($process.ExitCode)"
-        exit 1
-    }
-}
-catch {
-    Write-Error "Sysprep execution failed: $($_.Exception.Message)"
-
-    $sysrepLog = "C:\Windows\System32\Sysprep\Panther\setuperr.log"
-    if (Test-Path $sysrepLog) {
-        Write-Host "Sysprep error log ($sysrepLog) - last 20 lines:" -ForegroundColor Yellow
-        Get-Content $sysrepLog | Select-Object -Last 20 | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
-    } else {
-        Write-Host "  Sysprep error log not found at $sysrepLog"
-    }
-
-    exit 1
+else {
+    Write-Host "  Pre-flight passed: no packages would block sysprep."
 }

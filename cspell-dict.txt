@@ -659,6 +659,7 @@ sourcehut
 spice
 sqlite
 squash
+srd
 sre
 srv
 SSDP

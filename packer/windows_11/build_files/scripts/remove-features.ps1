@@ -143,6 +143,7 @@ Remove-ProvisionedAppSafely "Microsoft.Windows.DevHome"
 
 # Xbox / gaming
 Remove-ProvisionedAppSafely "Microsoft.Xbox.TCUI"
+Remove-ProvisionedAppSafely "Microsoft.XboxGameCallableUI"
 Remove-ProvisionedAppSafely "Microsoft.XboxGamingOverlay"
 Remove-ProvisionedAppSafely "Microsoft.XboxIdentityProvider"
 Remove-ProvisionedAppSafely "Microsoft.XboxSpeechToTextOverlay"
