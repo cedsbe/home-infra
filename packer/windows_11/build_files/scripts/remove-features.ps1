@@ -103,7 +103,13 @@ function Remove-ProvisionedAppSafely {
     foreach ($pkg in $installedPkgs) {
         try {
             Write-Host "    Removing: $($pkg.PackageFullName)"
-            Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction Stop
+            # Iterate through PackageUserInformation to remove only for users where actually installed
+            foreach ($userInfo in $pkg.PackageUserInformation) {
+                if ($userInfo.InstallState -eq "Installed") {
+                    Write-Host "      Removing for user: $($userInfo.User)"
+                    Remove-AppxPackage -Package $pkg.PackageFullName -User $userInfo.User -ErrorAction Stop
+                }
+            }
             Write-Host "    Removed: $($pkg.PackageFullName)"
         }
         catch {
@@ -163,7 +169,7 @@ Write-Host "AppX deprovisioning complete."
 Write-Host "Here are the remaining Microsoft-provisioned AppX packages (should be empty or close to it):"
 
 # 8wekyb3d8bbwe is the package family name for Microsoft-provisioned apps. Filter out framework packages (e.g. .NET) since those are dependencies and not user-facing apps.
-$appX = Get-AppxPackage -AllUsers | Where {$_.PackageFullName -like "*8wekyb3d8bbwe*" -and -not $_.IsFramework};
+$appX = Get-AppxPackage -AllUsers | Where-Object {$_.PackageFullName -like "*8wekyb3d8bbwe*" -and -not $_.IsFramework};
 foreach ($pkg in $appX) {
     Write-Host "  $($pkg.PackageFullName)"
 }

@@ -176,6 +176,17 @@ build {
 
   provisioner "breakpoint" {
     disable = var.disable_pre_sysprep_breakpoints
+    note    = "Nuke breakpoint. Wait before starting the nuke process."
+  }
+
+  provisioner "powershell" {
+    elevated_user     = var.winrm_username
+    elevated_password = var.winrm_password
+    scripts           = ["./build_files/scripts/remove-edge-gameassist.ps1"]
+  }
+
+  provisioner "breakpoint" {
+    disable = var.disable_pre_sysprep_breakpoints
     note    = "Sysprep breakpoint. Wait before starting the sysprep process."
   }
 

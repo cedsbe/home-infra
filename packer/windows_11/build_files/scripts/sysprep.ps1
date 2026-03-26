@@ -14,28 +14,6 @@ Write-Host "--- Launching sysprep ---"
 Write-Host "  Command: sysprep.exe /oobe /generalize /mode:vm /quit /unattend:C:\Deploy\unattend.xml"
 
 try {
-  # Final Edge kill right before sysprep to close the race window between the pre-flight
-  # check and sysprep's own AppX validation. Edge may have respawned during event log
-  # clearing or other late operations even with services disabled.
-  Write-Host "  Final Edge sweep before sysprep..."
-  Get-Process | Where-Object { $_.Name -like "*edge*" } | Stop-Process -Force -ErrorAction SilentlyContinue
-  $gameAssistFinal = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue | Where-Object { $_.Name -eq "Microsoft.Edge.GameAssist" }
-  if ($gameAssistFinal) {
-    Write-Host "[WARNING] Edge.GameAssist re-appeared after pre-flight - removing now (Edge respawned despite disabled services)..."
-    foreach ($gaPkg in $gameAssistFinal) {
-      try {
-        Remove-AppxPackage -Package $gaPkg.PackageFullName -AllUsers -ErrorAction Stop
-        Write-Host "  Final removal OK: $($gaPkg.PackageFullName)"
-      }
-      catch {
-        Write-Host "[WARNING] Final removal of Edge.GameAssist failed: $($_.Exception.Message)"
-      }
-    }
-  }
-  else {
-    Write-Host "  Edge.GameAssist not present - safe to proceed"
-  }
-
   $sysrepStartTime = Get-Date
   Write-Host "  Started at: $($sysrepStartTime.ToString('yyyy-MM-dd HH:mm:ss'))"
 
