@@ -60,6 +60,9 @@ if ( $osVersion -eq "Server" )
     Write-Host "Disable Contact Data"
     Disable-Service -ServiceName "PimIndexMaintenanceSvc"
 
+    Write-Host "Disable Diagnostics Tracking Service"
+    Disable-Service -ServiceName "DiagTrack"
+
     Write-Host "Disable WAP Push Message Routing Service"
     Disable-Service -ServiceName "dmwappushservice"
 

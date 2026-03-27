@@ -4,7 +4,7 @@ $ErrorActionPreference = "Stop"
 $WarningPreference = "Continue"  # Prevent warning stream from causing failures in Packer/WinRM sessions
 
 Write-Host "=== Generalization script started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ==="
-Write-Host "Host: $env:COMPUTERNAME | OS: $((Get-WmiObject Win32_OperatingSystem).Caption)"
+Write-Host "Host: $env:COMPUTERNAME | OS: $((Get-CimInstance -ClassName Win32_OperatingSystem).Caption)"
 
 # ---------------------------------------------------------------------------
 # 1. Stop services early to release file locks before cleanup
@@ -25,7 +25,12 @@ function Stop-ServiceSafely {
         Write-Host "  $Label - stopping (was: $($svc.Status))..."
         Stop-Service -Name $Name -Force -ErrorAction SilentlyContinue
         $svc.Refresh()
-        Write-Host "  $Label - now: $($svc.Status)"
+        if ($svc.Status -ne 'Stopped') {
+            Write-Host "  [WARNING] Validation FAILED: $Label is still '$($svc.Status)' after stop attempt"
+        }
+        else {
+            Write-Host "  $Label - now: $($svc.Status)"
+        }
     }
 }
 
@@ -55,7 +60,9 @@ foreach ($edgeSvcName in @("edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationS
     }
 }
 
-$edgeProcs = Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContinue
+# Kill ALL Edge-related processes - msedge, MicrosoftEdge, Edge WebView2, Edge helpers, etc.
+# A narrow name list misses broker/helper processes that can trigger GameAssist re-registration.
+$edgeProcs = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "*edge*" }
 if ($edgeProcs) {
     $edgeProcs | ForEach-Object { Write-Host "  Killing Edge process: $($_.Name) (PID $($_.Id))" }
     $edgeProcs | Stop-Process -Force -ErrorAction SilentlyContinue
@@ -172,7 +179,7 @@ Write-Host "  Done: C:\Temp cleared"
 # ---------------------------------------------------------------------------
 Write-Host ""
 Write-Host "--- [5/8] Cleaning up user profiles ---"
-$profilesToRemove = Get-WmiObject -Class Win32_UserProfile | Where-Object {
+$profilesToRemove = Get-CimInstance -ClassName Win32_UserProfile | Where-Object {
     $_.Special -eq $false -and
     $_.LocalPath -notlike "*Administrator*" -and
     $_.LocalPath -notlike "*Default*"
@@ -180,7 +187,7 @@ $profilesToRemove = Get-WmiObject -Class Win32_UserProfile | Where-Object {
 if ($profilesToRemove) {
     foreach ($userProfile in $profilesToRemove) {
         Write-Host "  Removing profile: $($userProfile.LocalPath)"
-        $userProfile | Remove-WmiObject -ErrorAction SilentlyContinue
+        Remove-CimInstance -InputObject $userProfile -ErrorAction SilentlyContinue
     }
     Write-Host "  Removed $($profilesToRemove.Count) profile(s)"
 }

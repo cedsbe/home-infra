@@ -37,7 +37,7 @@ foreach ($drive in $mountedDrives) {
 
 if (-not $sourceUnattendPath) {
     Write-Host "  Not found on standard drives. Scanning CD/DVD drives..."
-    $allDrives = Get-WmiObject -Class Win32_LogicalDisk | Where-Object { $_.DriveType -in @(2, 5) }
+    $allDrives = Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object { $_.DriveType -in @(2, 5) }
     foreach ($drive in $allDrives) {
         $testPath = Join-Path -Path "$($drive.DeviceID)\" -ChildPath "unattend.xml"
         Write-Host "  Checking removable/CD: $testPath"
@@ -76,7 +76,12 @@ function Stop-ServiceSafely {
         Write-Host "  $Label - stopping (was: $($svc.Status))..."
         Stop-Service -Name $Name -Force -ErrorAction SilentlyContinue
         $svc.Refresh()
-        Write-Host "  $Label - now: $($svc.Status)"
+        if ($svc.Status -ne 'Stopped') {
+            Write-Host "  [WARNING] Validation FAILED: $Label is still '$($svc.Status)' after stop attempt"
+        }
+        else {
+            Write-Host "  $Label - now: $($svc.Status)"
+        }
     }
 }
 
@@ -103,7 +108,9 @@ foreach ($edgeSvcName in @("edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationS
     }
 }
 
-$edgeProcs = Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContinue
+# Kill ALL Edge-related processes - msedge, MicrosoftEdge, Edge WebView2, Edge helpers, etc.
+# A narrow name list misses broker/helper processes that can trigger GameAssist re-registration.
+$edgeProcs = Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Name -like "*edge*" }
 if ($edgeProcs) {
     $edgeProcs | ForEach-Object { Write-Host "  Killing Edge process: $($_.Name) (PID $($_.Id))" }
     $edgeProcs | Stop-Process -Force -ErrorAction SilentlyContinue
@@ -220,7 +227,7 @@ Write-Host "  Done: C:\Temp cleared"
 # ---------------------------------------------------------------------------
 Write-Host ""
 Write-Host "--- [6/9] Cleaning up user profiles ---"
-$profilesToRemove = Get-WmiObject -Class Win32_UserProfile | Where-Object {
+$profilesToRemove = Get-CimInstance -ClassName Win32_UserProfile | Where-Object {
     $_.Special -eq $false -and
     $_.LocalPath -notlike "*Administrator*" -and
     $_.LocalPath -notlike "*Default*"
@@ -228,7 +235,7 @@ $profilesToRemove = Get-WmiObject -Class Win32_UserProfile | Where-Object {
 if ($profilesToRemove) {
     foreach ($userProfile in $profilesToRemove) {
         Write-Host "  Removing profile: $($userProfile.LocalPath)"
-        $userProfile | Remove-WmiObject -ErrorAction SilentlyContinue
+        Remove-CimInstance -InputObject $userProfile -ErrorAction SilentlyContinue
     }
     Write-Host "  Removed $($profilesToRemove.Count) profile(s)"
 }
