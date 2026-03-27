@@ -23,7 +23,7 @@ ARG KUBECOLOR_VERSION=v0.5.3
 # renovate: datasource=github-releases depName=yannh/kubeconform
 ARG KUBECONFORM_VERSION=v0.7.0
 # renovate: datasource=github-releases depName=ahmetb/kubectx
-ARG KUBECTX_VERSION=v0.10.2
+ARG KUBECTX_VERSION=v0.11.0
 # renovate: datasource=github-releases depName=int128/kubelogin
 ARG KUBELOGIN_VERSION=v1.36.0
 # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
