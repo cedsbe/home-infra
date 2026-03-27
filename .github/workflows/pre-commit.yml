@@ -46,7 +46,7 @@ jobs:
           python-version: "3.x"
 
       - name: Install CLI tools
-        uses: alexellis/arkade-get@master
+        uses: alexellis/arkade-get@24a6bc79f04626b1407868031c02a0ddbc38112d # master
         with:
           kubectl: v1.35.3 # renovate: datasource=github-releases depName=kubernetes/kubernetes packageName=kubernetes/kubernetes versioning=semver-coerced registryUrl=https://github.com
           kustomize: v5.8.0 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
@@ -110,7 +110,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # master
         with:
           scan-type: "config"
           hide-progress: false
