@@ -48,11 +48,21 @@ variable "disk_size_gb" {
 variable "disk_storage" {
   description = "The disk storage pool."
   type        = string
+
+  validation {
+    condition     = length(var.disk_storage) > 0
+    error_message = "Storage pool name must not be empty."
+  }
 }
 
 variable "efi_storage" {
   description = "The EFI storage pool."
   type        = string
+
+  validation {
+    condition     = length(var.efi_storage) > 0
+    error_message = "Storage pool name must not be empty."
+  }
 }
 
 variable "full_clone" {
@@ -69,6 +79,11 @@ variable "image_index" {
 variable "iso_storage" {
   description = "The ISO storage pool."
   type        = string
+
+  validation {
+    condition     = length(var.iso_storage) > 0
+    error_message = "Storage pool name must not be empty."
+  }
 }
 
 variable "memory" {
@@ -79,6 +94,7 @@ variable "memory" {
 variable "proxmox_api_token" {
   description = "The Proxmox API user."
   type        = string
+  sensitive   = true
 }
 
 variable "proxmox_node" {
@@ -131,6 +147,7 @@ variable "windows_iso" {
 variable "winrm_password" {
   description = "The WinRM password."
   type        = string
+  sensitive   = true
 }
 
 variable "winrm_username" {
