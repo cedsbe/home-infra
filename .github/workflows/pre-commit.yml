@@ -54,7 +54,7 @@ jobs:
           task: v3.49.1 # renovate: datasource=github-releases depName=go-task/task packageName=go-task/task versioning=semver-coerced registryUrl=https://github.com
           tflint: v0.61.0 # renovate: datasource=github-releases depName=terraform-linters/tflint packageName=terraform-linters/tflint versioning=semver-coerced registryUrl=https://github.com
           terraform: v1.14.7 # renovate: datasource=github-releases depName=hashicorp/terraform packageName=hashicorp/terraform versioning=semver-coerced registryUrl=https://github.com
-          packer: v1.15.0 # renovate: datasource=github-releases depName=hashicorp/packer packageName=hashicorp/packer versioning=semver-coerced registryUrl=https://github.com
+          packer: v1.15.1 # renovate: datasource=github-releases depName=hashicorp/packer packageName=hashicorp/packer versioning=semver-coerced registryUrl=https://github.com
 
       - name: Install Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
