@@ -130,7 +130,7 @@ Write-Host "Disable Xbox Accessory Management Service"
 Disable-Service -ServiceName "XboxGipSvc"
 
 # Disable Edge's sidebar/games hub via policy so Edge cannot re-register
-# GameAssist (or other companion packages) at any point during the build —
+# GameAssist (or other companion packages) at any point during the build -
 # including during Windows Update and the defrag/sdelete phase.
 # This key persists across reboots so it remains effective in generalize-iso.ps1.
 Write-Host "Disable Edge sidebar (prevents GameAssist re-registration)"
@@ -164,7 +164,7 @@ $storePolicy = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
 if (-not (Test-Path $storePolicy)) { New-Item -Path $storePolicy -Force | Out-Null }
 Set-ItemProperty -Path $storePolicy -Name "AutoDownload" -Value 2 -Type DWord -Force
 
-# Disable Edge scheduled tasks (first pass — prevents them from firing during
+# Disable Edge scheduled tasks (first pass - prevents them from firing during
 # Windows Update; generalize-iso.ps1 runs a second pass to catch any re-added
 # by Edge's own Windows Update).
 Write-Host "Disable Edge scheduled tasks"

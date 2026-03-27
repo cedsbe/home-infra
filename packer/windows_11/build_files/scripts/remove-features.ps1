@@ -9,15 +9,18 @@ function Disable-FeatureSafely {
     $feature = Get-WindowsOptionalFeature -Online -FeatureName $FeatureName -ErrorAction SilentlyContinue
     if ($null -eq $feature) {
         Write-Host "$FeatureName not found - skipping"
-    } elseif ($feature.State -eq "Disabled") {
+    }
+    elseif ($feature.State -eq "Disabled") {
         Write-Host "$FeatureName already disabled - skipping"
-    } else {
+    }
+    else {
         Write-Host "Disabling $FeatureName"
         Disable-WindowsOptionalFeature -Online -FeatureName $FeatureName -NoRestart | Out-Null
         $after = Get-WindowsOptionalFeature -Online -FeatureName $FeatureName -ErrorAction SilentlyContinue
         if ($after -and $after.State -ne "Disabled") {
             Write-Host "  [WARNING] Validation FAILED: $FeatureName state is '$($after.State)' after disable attempt"
-        } else {
+        }
+        else {
             Write-Host "  Validation OK: $FeatureName is disabled"
         }
     }
@@ -64,7 +67,7 @@ function Remove-ProvisionedAppSafely {
     Write-Host "  Processing: $DisplayName"
 
     # Step 1: Remove from the provisioning list so the package is not reinstalled for
-    # new users after sysprep. Remove-AppxProvisionedPackage alone is not enough —
+    # new users after sysprep. Remove-AppxProvisionedPackage alone is not enough -
     # it does NOT remove the package from users that already have it installed.
     # Per MS: https://learn.microsoft.com/en-us/troubleshoot/windows-client/
     # setup-upgrade-and-drivers/sysprep-fails-remove-or-update-store-apps
@@ -73,7 +76,8 @@ function Remove-ProvisionedAppSafely {
         $provPkg = Get-AppxProvisionedPackage -Online | Where-Object { $_.DisplayName -eq $DisplayName }
         if ($null -eq $provPkg) {
             Write-Host "    $DisplayName not provisioned - skipping deprovision"
-        } else {
+        }
+        else {
             Write-Host "    Deprovisioning: $DisplayName ($($provPkg.PackageName))"
             Remove-AppxProvisionedPackage -Online -PackageName $provPkg.PackageName -ErrorAction Stop | Out-Null
             Write-Host "    Removed: $DisplayName"
@@ -87,7 +91,8 @@ function Remove-ProvisionedAppSafely {
     $stillProvisioned = Get-AppxProvisionedPackage -Online | Where-Object { $_.DisplayName -eq $DisplayName }
     if ($stillProvisioned) {
         Write-Host "    [WARNING] Validation FAILED: $DisplayName is still provisioned after removal attempt"
-    } else {
+    }
+    else {
         Write-Host "    Validation OK: $DisplayName is not provisioned"
     }
 
@@ -106,8 +111,8 @@ function Remove-ProvisionedAppSafely {
             # Iterate through PackageUserInformation to remove only for users where actually installed
             foreach ($userInfo in $pkg.PackageUserInformation) {
                 if ($userInfo.InstallState -eq "Installed") {
-                    Write-Host "      Removing for user: $($userInfo.User)"
-                    Remove-AppxPackage -Package $pkg.PackageFullName -User $userInfo.User -ErrorAction Stop
+                    Write-Host "      Removing for user: $($userInfo.UserSecurityId.Username) (SID: $($userInfo.UserSecurityId.Sid))"
+                    Remove-AppxPackage -Package $pkg.PackageFullName -User $userInfo.UserSecurityId.Sid -ErrorAction Stop
                 }
             }
             Write-Host "    Removed: $($pkg.PackageFullName)"
@@ -122,7 +127,8 @@ function Remove-ProvisionedAppSafely {
     if ($stillInstalled) {
         $names = ($stillInstalled | Select-Object -ExpandProperty PackageFullName) -join ", "
         Write-Host "    [WARNING] Validation FAILED: $($stillInstalled.Count) instance(s) still installed: $names"
-    } else {
+    }
+    else {
         Write-Host "    Validation OK: no installed instances of $DisplayName remain"
     }
 }
@@ -169,7 +175,7 @@ Write-Host "AppX deprovisioning complete."
 Write-Host "Here are the remaining Microsoft-provisioned AppX packages (should be empty or close to it):"
 
 # 8wekyb3d8bbwe is the package family name for Microsoft-provisioned apps. Filter out framework packages (e.g. .NET) since those are dependencies and not user-facing apps.
-$appX = Get-AppxPackage -AllUsers | Where-Object {$_.PackageFullName -like "*8wekyb3d8bbwe*" -and -not $_.IsFramework};
+$appX = Get-AppxPackage -AllUsers | Where-Object { $_.PackageFullName -like "*8wekyb3d8bbwe*" -and -not $_.IsFramework };
 foreach ($pkg in $appX) {
     Write-Host "  $($pkg.PackageFullName)"
 }

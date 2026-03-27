@@ -17,15 +17,18 @@ function Stop-ServiceSafely {
     $svc = Get-Service -Name $Name -ErrorAction SilentlyContinue
     if ($null -eq $svc) {
         Write-Host "  $Label - not found (skipping)"
-    } elseif ($svc.Status -eq 'Stopped') {
+    }
+    elseif ($svc.Status -eq 'Stopped') {
         Write-Host "  $Label - already stopped"
-    } else {
+    }
+    else {
         Write-Host "  $Label - stopping (was: $($svc.Status))..."
         Stop-Service -Name $Name -Force -ErrorAction SilentlyContinue
         $svc.Refresh()
         if ($svc.Status -ne 'Stopped') {
             Write-Host "  [WARNING] Validation FAILED: $Label is still '$($svc.Status)' after stop attempt"
-        } else {
+        }
+        else {
             Write-Host "  $Label - now: $($svc.Status)"
         }
     }
@@ -42,7 +45,7 @@ Stop-ServiceSafely "sshd" "OpenSSH Server (sshd)"
 # DISABLE (not just stop) Edge update services to prevent auto-restart during the
 # long defrag/sdelete phase. Edge silently reinstalls companion packages (e.g. Edge.GameAssist)
 # if its services recover, causing Remove-AppxPackage to appear to succeed but the package
-# to reappear — even minutes later — and then block sysprep with 0x80073cf2.
+# to reappear - even minutes later - and then block sysprep with 0x80073cf2.
 Write-Host "  Disabling and stopping Microsoft Edge update services..."
 foreach ($edgeSvcName in @("edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationService")) {
     $edgeSvc = Get-Service -Name $edgeSvcName -ErrorAction SilentlyContinue
@@ -51,7 +54,8 @@ foreach ($edgeSvcName in @("edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationS
         Set-Service -Name $edgeSvcName -StartupType Disabled -ErrorAction SilentlyContinue
         Stop-Service -Name $edgeSvcName -Force -ErrorAction SilentlyContinue
         Write-Host "  Disabled and stopped: $edgeSvcName"
-    } else {
+    }
+    else {
         Write-Host "  $edgeSvcName - not found (skipping)"
     }
 }
@@ -60,7 +64,8 @@ $edgeProcs = Get-Process -Name msedge, MicrosoftEdge -ErrorAction SilentlyContin
 if ($edgeProcs) {
     $edgeProcs | ForEach-Object { Write-Host "  Killing Edge process: $($_.Name) (PID $($_.Id))" }
     $edgeProcs | Stop-Process -Force -ErrorAction SilentlyContinue
-} else {
+}
+else {
     Write-Host "  No Edge processes running"
 }
 
@@ -75,7 +80,8 @@ if ($edgeTasks) {
         Disable-ScheduledTask -TaskPath $task.TaskPath -TaskName $task.TaskName -ErrorAction SilentlyContinue | Out-Null
     }
     Write-Host "  Disabled $($edgeTasks.Count) Edge scheduled task(s)"
-} else {
+}
+else {
     Write-Host "  No Edge scheduled tasks found"
 }
 
@@ -98,7 +104,8 @@ Write-Host "  Packages to remove (user-installed, not provisioned): $($packagesT
 
 if ($packagesToRemove.Count -eq 0) {
     Write-Host "  Nothing to remove - skipping AppX cleanup."
-} else {
+}
+else {
     $removed1 = 0
     $skipped1 = 0
 
@@ -140,7 +147,8 @@ if ($packagesToRemove.Count -eq 0) {
     }
     if ($retried -eq 0) {
         Write-Host "  Pass 2: nothing left to retry (all removed or auto-removed with dependents)"
-    } else {
+    }
+    else {
         Write-Host "  Pass 2 complete: $retried retried, $removedRetry removed, $failedRetry failed"
     }
 }
@@ -159,8 +167,8 @@ Write-Host "  Done: C:\Windows\SoftwareDistribution cleared"
 # ---------------------------------------------------------------------------
 Write-Host ""
 Write-Host "--- [4/8] Clearing temporary files ---"
-Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
-Write-Host "  Done: C:\Windows\Temp cleared"
+Remove-Item -Path "C:\Windows\Temp\*" -Recurse -Force -Exclude "packer*" -ErrorAction SilentlyContinue
+Write-Host "  Done: C:\Windows\Temp cleared (excluding packer temp files)"
 Remove-Item -Path "C:\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host "  Done: C:\Temp cleared"
 
@@ -180,7 +188,8 @@ if ($profilesToRemove) {
         $userProfile | Remove-WmiObject -ErrorAction SilentlyContinue
     }
     Write-Host "  Removed $($profilesToRemove.Count) profile(s)"
-} else {
+}
+else {
     Write-Host "  No extra profiles to remove"
 }
 
@@ -206,10 +215,12 @@ if (Test-Path $sshHostKeyPath) {
             }
         }
         Write-Host "  Removed $($hostKeys.Count) host key file(s)"
-    } else {
+    }
+    else {
         Write-Host "  No ssh_host_* files found in $sshHostKeyPath"
     }
-} else {
+}
+else {
     Write-Host "  OpenSSH directory not found ($sshHostKeyPath) - skipping"
 }
 
@@ -250,9 +261,11 @@ Write-Host "--- [7/8] BitLocker check ---"
 $bitlockerStatus = Get-BitLockerVolume -MountPoint "C:" -ErrorAction SilentlyContinue
 if ($null -eq $bitlockerStatus) {
     Write-Host "  BitLocker cmdlet returned nothing (BitLocker not available or not applicable)"
-} elseif ($bitlockerStatus.VolumeStatus -eq "FullyDecrypted") {
+}
+elseif ($bitlockerStatus.VolumeStatus -eq "FullyDecrypted") {
     Write-Host "  BitLocker OK: C: is fully decrypted (VolumeStatus=$($bitlockerStatus.VolumeStatus), ProtectionStatus=$($bitlockerStatus.ProtectionStatus))"
-} else {
+}
+else {
     Write-Warning "  UNEXPECTED: BitLocker is active (VolumeStatus=$($bitlockerStatus.VolumeStatus), ProtectionStatus=$($bitlockerStatus.ProtectionStatus))."
     Write-Warning "  The PreventDeviceEncryption registry key set during specialize should have prevented this."
     Write-Warning "  Disabling BitLocker now as failsafe - investigate the autounattend specialize pass."
@@ -317,7 +330,8 @@ if ($sysprepBlockers) {
         exit 1
     }
     Write-Host "  Pre-flight: all blockers resolved." -ForegroundColor Green
-} else {
+}
+else {
     Write-Host "  Pre-flight passed: no packages would block sysprep." -ForegroundColor Green
 }
 
@@ -355,7 +369,8 @@ try {
                 Write-Host "[WARNING] Final removal of Edge.GameAssist failed: $($_.Exception.Message)"
             }
         }
-    } else {
+    }
+    else {
         Write-Host "  Edge.GameAssist not present - safe to proceed"
     }
 
@@ -396,7 +411,8 @@ catch {
     if (Test-Path $sysrepLog) {
         Write-Host "Sysprep error log ($sysrepLog) - last 20 lines:" -ForegroundColor Yellow
         Get-Content $sysrepLog | Select-Object -Last 20 | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
-    } else {
+    }
+    else {
         Write-Host "  Sysprep error log not found at $sysrepLog"
     }
 

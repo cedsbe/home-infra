@@ -14,7 +14,7 @@
 #   5. Restart services so Remove-AppxPackage -User can reach the DB
 #   6. Remove the S-1-5-18 user registration via Remove-AppxPackage -User
 #   7. Remove the AppX-Sysprep block from Generalize.xml (AppxSysprep.dll
-#      reads the StateRepository directly — even a "pending removal" ghost
+#      reads the StateRepository directly - even a "pending removal" ghost
 #      entry will make it fail; all AppX cleanup is already done upstream)
 # ---------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ $gameAssist = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue |
 Where-Object { $_.Name -eq "Microsoft.Edge.GameAssist" }
 
 if (-not $gameAssist) {
-  Write-Host "  Edge.GameAssist not present — no action needed"
+  Write-Host "  Edge.GameAssist not present - no action needed"
 }
 else {
   foreach ($pkg in $gameAssist) {
@@ -50,14 +50,14 @@ else {
       Write-Host "  SID: $($ui.UserSecurityId)  State: $($ui.InstallState)"
     }
 
-    # Step 1 — Stop services that own the StateRepository
+    # Step 1 - Stop services that own the StateRepository
     Write-Host "  [1/7] Stopping StateRepository and AppXSvc..."
     Stop-Service -Name "StateRepository" -Force -ErrorAction SilentlyContinue
     Stop-Service -Name "AppXSvc" -Force -ErrorAction SilentlyContinue
     Get-Service StateRepository, AppXSvc -ErrorAction SilentlyContinue |
     ForEach-Object { Write-Host "    $($_.Name): $($_.Status)" }
 
-    # Step 2 — Delete AppRepository XML metadata
+    # Step 2 - Delete AppRepository XML metadata
     Write-Host "  [2/7] Deleting AppRepository XML metadata..."
     $xmlPath = "C:\ProgramData\Microsoft\Windows\AppRepository\$fullName.xml"
     if (Test-Path $xmlPath) {
@@ -68,7 +68,7 @@ else {
       Write-Host "    Not found: $xmlPath (already removed or different path)"
     }
 
-    # Step 3 — Delete the Deprovisioned registry entry
+    # Step 3 - Delete the Deprovisioned registry entry
     Write-Host "  [3/7] Deleting Deprovisioned registry entry..."
     $deprovPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\Deprovisioned\$familyName"
     if (Test-Path $deprovPath) {
@@ -79,7 +79,7 @@ else {
       Write-Host "    Not found: $deprovPath (already removed)"
     }
 
-    # Step 4 — Take ownership and delete the package folder
+    # Step 4 - Take ownership and delete the package folder
     Write-Host "  [4/7] Deleting package folder..."
     if ($installPath -and (Test-Path $installPath)) {
       $null = takeown /f $installPath /r /d y 2>&1
@@ -93,17 +93,17 @@ else {
       }
     }
     else {
-      Write-Host "    InstallLocation empty or path not found — skipping"
+      Write-Host "    InstallLocation empty or path not found - skipping"
     }
 
-    # Step 5 — Restart services so Remove-AppxPackage -User can reach the DB
+    # Step 5 - Restart services so Remove-AppxPackage -User can reach the DB
     Write-Host "  [5/7] Restarting StateRepository and AppXSvc..."
     Start-Service -Name "StateRepository" -ErrorAction SilentlyContinue
     Start-Service -Name "AppXSvc" -ErrorAction SilentlyContinue
     Get-Service StateRepository, AppXSvc -ErrorAction SilentlyContinue |
     ForEach-Object { Write-Host "    $($_.Name): $($_.Status)" }
 
-    # Step 6 — Remove the S-1-5-18 (LocalSystem) user registration
+    # Step 6 - Remove the S-1-5-18 (LocalSystem) user registration
     Write-Host "  [6/7] Removing S-1-5-18 (LocalSystem) registration..."
     Remove-AppxPackage -Package $fullName -User "S-1-5-18" -ErrorAction SilentlyContinue
     $afterRemoval = Get-AppxPackage -AllUsers -ErrorAction SilentlyContinue |
@@ -119,7 +119,7 @@ else {
     }
   }
 
-  # Step 7 — Remove AppxSysprep.dll from Generalize.xml
+  # Step 7 - Remove AppxSysprep.dll from Generalize.xml
   # AppxSysprep.dll reads the StateRepository SQLite database directly (not
   # via AppXSvc). Even a ghost "pending removal" entry causes 0x80073cf2.
   # All AppX cleanup was already performed by generalize-iso.ps1.
@@ -142,7 +142,7 @@ else {
   }
 }
 
-# Defensive: ensure MountedDevices key exists — a previous partial sysprep
+# Defensive: ensure MountedDevices key exists - a previous partial sysprep
 # run deletes it, and MountPointManager fails with error=2 if it is missing.
 if (-not (Test-Path "HKLM:\SYSTEM\MountedDevices")) {
   New-Item "HKLM:\SYSTEM\MountedDevices" -Force | Out-Null
