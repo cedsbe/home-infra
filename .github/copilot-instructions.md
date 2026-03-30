@@ -86,6 +86,32 @@ This is a home infrastructure repository that automates the deployment of a Kube
 - **Namespacing**: Follow consistent namespace patterns (`kube-system`, `argocd`, `monitoring`)
 - **Labels**: Apply consistent labeling for pod security and topology awareness
 
+#### LoadBalancer Services & Health Probes
+- **Required**: All LoadBalancer-type services MUST have readiness and liveness probes on their pods
+- **Why**: Cilium's L2 announcer uses readiness probes to determine which backends are healthy and properly announce the VIP on the physical network
+- **Without probes**: The VIP may be allocated but not respond on the network (connection refused from external clients)
+- **Minimum probe configuration**:
+  ```yaml
+  readinessProbe:
+    httpGet:
+      path: /              # or appropriate health check endpoint
+      port: <service-port>
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+  livenessProbe:
+    httpGet:
+      path: /
+      port: <service-port>
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 2
+    failureThreshold: 3
+  ```
+- **Probe timing**: Readiness should be faster than liveness (earlier initial delay, shorter period) to detect availability quickly
+- **Example**: See `k8s/infra/network/dns/adguard/deployment.yaml` for a complete example
+
 ### Packer Templates
 - **Security**: Use environment variables for credentials, never hardcode secrets
 - **Modularity**: Separate scripts by function (disable-services, remove-features, config-os)
@@ -223,12 +249,49 @@ resource "azurerm_resource" "from_set" {
 - **Packer Builds**: Verify VirtIO drivers and WinRM connectivity
 - **ArgoCD Sync**: Check RBAC permissions and repository access
 - **Storage Issues**: Validate CSI plugin configuration and Proxmox permissions
+- **LoadBalancer VIP Not Responding**: Service has VIP but connection refused from workstation
 
 ### Debugging Tools
 - `task packer:setup` - Validate Packer environment
 - `talosctl health` - Check cluster health
 - `kubectl get nodes -o wide` - Verify node status
 - `argocd app get <app-name>` - Check application sync status
+
+### LoadBalancer VIP Issues
+
+**Symptoms**: Service has VIP assigned (e.g., `192.168.65.150`) but connection refused from workstation
+
+**Root Cause**: Missing readiness probes prevent Cilium L2 announcer from detecting healthy backends, so the VIP is not announced on the physical network
+
+**Diagnostic Steps**:
+1. Verify pods are ready and have readiness probes:
+   ```bash
+   kubectl describe pod -n <namespace> <pod-name> | grep -A 5 readinessProbe
+   ```
+2. Check Cilium L2 announcer health:
+   ```bash
+   kubectl logs -n kube-system -l k8s-app=cilium | grep -i "l2announce\|health" | tail -20
+   ```
+3. Verify service configuration:
+   ```bash
+   kubectl get svc -n <namespace> <service-name> -o yaml | grep -A 10 "status:"
+   ```
+
+**Solution**:
+1. Add readiness and liveness probes to the pod spec (see LoadBalancer Services & Health Probes section above)
+2. Restart Cilium agents to reset L2 announcer state:
+   ```bash
+   kubectl rollout restart daemonset/cilium -n kube-system
+   ```
+3. Wait 30-60 seconds for Cilium to stabilize
+4. Test VIP connectivity:
+   ```bash
+   # From workstation on same network
+   nslookup example.com <VIP-IP>
+   # Or use curl, dig, etc. as appropriate for the service
+   ```
+
+**Prevention**: Ensure all LoadBalancer services include readiness and liveness probes as documented in the Kubernetes Manifests section
 
 ## Dependencies and Tool Versions
 
