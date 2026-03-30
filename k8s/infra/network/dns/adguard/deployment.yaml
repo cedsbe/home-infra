@@ -62,6 +62,22 @@ spec:
             readOnlyRootFilesystem: true
           # capabilities:
           #   drop: [ "ALL" ]
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
           ports:
             - name: dns-tcp
               containerPort: 53
