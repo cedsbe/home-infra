@@ -46,6 +46,22 @@ spec:
             - name: plex-udp
               containerPort: 32400
               protocol: UDP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 32400
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 32400
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 2
+            failureThreshold: 3
           env:
             - name: TZ
               value: "Europe/Brussels"
