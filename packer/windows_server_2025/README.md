@@ -31,15 +31,20 @@ This directory contains Packer configurations for building Windows Server 2025 t
 ## Quick Setup
 
 ### 1. Environment Configuration
+Set the following environment variables before building. You can either export them in your shell or create a `.env` file in the `packer/` directory:
+
 ```bash
-cp packer/.env.template packer/.env
-# Edit packer/.env with your actual Proxmox credentials
+export PKR_VAR_proxmox_api_token="PVEAPIToken=user@pve!token-name=token-uuid"
+export PKR_VAR_proxmox_username="user@pve"
+export PKR_VAR_winrm_password="your-secure-windows-password"
+# For clone builds only:
+export PKR_VAR_ws2025_clone_vm_id="123"
 ```
 
-Required environment variables (in `packer/.env`):
+Or save to `packer/.env` (automatically gitignored):
 ```bash
-PKR_VAR_proxmox_api_token=your-proxmox-api-token
-PKR_VAR_proxmox_username=your-username@pve!your-token-name
+PKR_VAR_proxmox_api_token=PVEAPIToken=user@pve!token-name=token-uuid
+PKR_VAR_proxmox_username=user@pve
 PKR_VAR_winrm_password=your-secure-windows-password
 PKR_VAR_ws2025_clone_vm_id=123  # Only needed for clone builds
 ```
@@ -50,7 +55,7 @@ task env-check    # Check environment variables
 task validate     # Validate Packer configuration
 ```
 
-> **Note**: The `packer/.env` file is automatically ignored by git to prevent credential leaks.
+> **Note**: The `packer/.env` file is automatically ignored by git to prevent credential leaks. If you created an `.env` file, it will be automatically loaded by task commands.
 
 > **⚠️ First-time setup**: If you get "permission denied" errors, ensure your Proxmox API token has sufficient permissions. See [Troubleshooting](#troubleshooting) for details.
 
@@ -118,36 +123,42 @@ packer build -var 'clone_vm_id=200' -only="clone_build.proxmox-clone.windows2025
 
 ```
 packer/windows_server_2025/
-├── main.pkr.hcl                    # Packer plugin requirements
-├── variables.pkr.hcl               # Variable definitions with validation
-├── variables.auto.pkrvars.hcl      # Default configuration values
-├── windows_server_2025_iso.pkr.hcl # ISO-based template build
-├── windows_server_2025_clone.pkr.hcl # Clone-based template build
-├── .env.template                   # Environment variables template
-├── .gitignore                      # Git ignore rules
-├── Taskfile.yml                    # Task automation
+├── main.pkr.hcl                       # Packer plugin requirements
+├── variables.pkr.hcl                  # Variable definitions with validation
+├── variables.auto.pkrvars.hcl         # Default configuration values
+├── windows_server_2025_iso.pkr.hcl    # ISO-based template build
+├── windows_server_2025_clone.pkr.hcl  # Clone-based template build
+├── .gitignore                         # Git ignore rules
+├── Taskfile.yml                       # Task automation
 └── build_files/
-    ├── configs/                    # Unattended installation configs
-    │   ├── cloudbase-init/         # Cloud-init configuration files
-    │   └── unattended/             # Windows unattended installation
-    │       ├── unattended-iso.xml.pkrtpl   # ISO build unattended config
-    │       └── unattended-clone.xml.pkrtpl # Clone build unattended config
-    └── scripts/                    # PowerShell provisioning scripts
-        ├── config-os.ps1          # OS optimization
-        ├── disable-services.ps1   # Security hardening
-        ├── remove-features.ps1    # Feature cleanup
-        ├── install-cloudbase-init.ps1 # Cloud-init setup
-        ├── initial-setup.ps1      # Initial Windows setup
-        └── ...                     # Additional scripts
+    ├── configs/
+    │   ├── cloudbase-init/            # Cloud-init configuration files
+    │   └── unattended/
+    │       ├── unattended-iso.xml.pkrtpl    # ISO build unattended config
+    │       └── unattended-clone.xml.pkrtpl  # Clone build unattended config
+    └── scripts/
+        ├── config-os.ps1                    # OS configuration
+        ├── disable-services.ps1             # Service hardening
+        ├── remove-features.ps1              # Feature cleanup
+        ├── remove-azure-arc.ps1             # Azure Arc removal
+        ├── install-sdelete.ps1              # SDelete installation
+        ├── initial-setup.ps1                # Initial Windows setup (WinRM)
+        ├── install-powershell-core.ps1      # PowerShell Core setup
+        ├── install-cloudbase-init.ps1       # Cloud-init setup
+        ├── configure-cloudbase-init.ps1     # Cloud-init configuration
+        ├── enable-openssh.ps1               # OpenSSH server setup
+        ├── set-network-private.ps1          # Network profile configuration
+        ├── generalize-iso.ps1               # Sysprep for ISO builds
+        └── generalize-clone.ps1             # Sysprep for clone builds
 ```
 
 ## Configuration
 
 ### Default Settings (variables.auto.pkrvars.hcl)
 ```hcl
-# Resource allocation
-cores = 2
-memory = 4096
+# Resource allocation (optimized for faster builds)
+cores = 4
+memory = 8192
 disk_size_gb = 40
 
 # Proxmox configuration
@@ -162,6 +173,9 @@ iso_storage = "local"
 
 # Template selection
 template = "DcDesktop"  # Default: Datacenter with Desktop Experience
+
+# Windows Server ISO filename (update with your actual filename)
+windows_iso = "local:iso/en-us_windows_server_2025_updated_july_2025_x64_dvd_a1f0681d.iso"
 ```
 
 ### Available Task Commands

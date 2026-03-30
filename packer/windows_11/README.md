@@ -36,7 +36,7 @@ This directory contains Packer configurations for building Windows 11 templates 
 - **Network bridge**: `vmbr0`
 
 ### Windows 11 Hardware Requirements
-- Minimum 4 GB RAM (default: 4096 MB)
+- Minimum 4 GB RAM (build default: 16384 MB for faster builds)
 - Minimum 64 GB disk (default: 64 GB)
 - TPM 2.0 (enabled in config)
 - UEFI/Secure Boot (enabled in config via OVMF with pre-enrolled keys)
@@ -45,15 +45,20 @@ This directory contains Packer configurations for building Windows 11 templates 
 ## Quick Setup
 
 ### 1. Environment Configuration
+Set the following environment variables before building. You can either export them in your shell or create a `.env` file in the `packer/` directory:
+
 ```bash
-cp packer/.env.template packer/.env
-# Edit packer/.env with your actual Proxmox credentials
+export PKR_VAR_proxmox_api_token="PVEAPIToken=user@pve!token-name=token-uuid"
+export PKR_VAR_proxmox_username="user@pve"
+export PKR_VAR_winrm_password="your-secure-windows-password"
+# For clone builds only:
+export PKR_VAR_win11_clone_vm_id="123"
 ```
 
-Required environment variables (in `packer/.env`):
+Or save to `packer/.env` (automatically gitignored):
 ```bash
-PKR_VAR_proxmox_api_token=your-proxmox-api-token
-PKR_VAR_proxmox_username=your-username@pve!your-token-name
+PKR_VAR_proxmox_api_token=PVEAPIToken=user@pve!token-name=token-uuid
+PKR_VAR_proxmox_username=user@pve
 PKR_VAR_winrm_password=your-secure-windows-password
 PKR_VAR_win11_clone_vm_id=123  # Only needed for clone builds
 ```
@@ -70,7 +75,7 @@ task env-check    # Check environment variables
 task validate     # Validate Packer configuration
 ```
 
-> **Note**: The `packer/.env` file is automatically ignored by git to prevent credential leaks.
+> **Note**: The `packer/.env` file is automatically ignored by git to prevent credential leaks. If you created an `.env` file, it will be automatically loaded by task commands.
 
 ## Build Instructions
 
@@ -137,7 +142,6 @@ packer/windows_11/
 ├── variables.auto.pkrvars.hcl          # Default configuration values
 ├── windows_11_iso.pkr.hcl              # ISO-based template build
 ├── windows_11_clone.pkr.hcl            # Clone-based template build
-├── .env.template                       # Environment variables template
 ├── .gitignore                          # Git ignore rules
 ├── Taskfile.yml                        # Task automation
 └── build_files/
@@ -147,28 +151,31 @@ packer/windows_11/
     │       ├── unattended-iso.xml.pkrtpl    # ISO build unattended config
     │       └── unattended-clone.xml.pkrtpl  # Clone build unattended config
     └── scripts/
-        ├── config-os.ps1              # OS configuration
-        ├── disable-services.ps1       # Service hardening
-        ├── remove-features.ps1        # Feature cleanup
-        ├── remove-azure-arc.ps1       # Azure Arc removal
-        ├── install-sdelete.ps1        # SDelete installation
-        ├── initial-setup.ps1          # Initial Windows setup (WinRM)
-        ├── install-powershell-core.ps1  # PowerShell Core setup
-        ├── install-cloudbase-init.ps1   # Cloud-init setup
-        ├── configure-cloudbase-init.ps1 # Cloud-init configuration
-        ├── enable-openssh.ps1           # OpenSSH server setup
-        ├── set-network-private.ps1      # Network profile configuration
-        ├── generalize-iso.ps1           # Sysprep for ISO builds
-        └── generalize-clone.ps1         # Sysprep for clone builds
+        ├── config-os.ps1                    # OS configuration
+        ├── disable-services.ps1             # Service hardening
+        ├── remove-features.ps1              # Feature cleanup
+        ├── remove-azure-arc.ps1             # Azure Arc removal
+        ├── remove-edge-gameassist.ps1       # Edge GameAssist removal
+        ├── install-sdelete.ps1              # SDelete installation
+        ├── initial-setup.ps1                # Initial Windows setup (WinRM)
+        ├── install-powershell-core.ps1      # PowerShell Core setup
+        ├── install-cloudbase-init.ps1       # Cloud-init setup
+        ├── configure-cloudbase-init.ps1     # Cloud-init configuration
+        ├── enable-openssh.ps1               # OpenSSH server setup
+        ├── set-network-private.ps1          # Network profile configuration
+        ├── optimize-disk.ps1                # Disk optimization (defrag, trim)
+        ├── sysprep.ps1                      # Core sysprep execution
+        ├── generalize-iso.ps1               # Sysprep for ISO builds
+        └── generalize-clone.ps1             # Sysprep for clone builds
 ```
 
 ## Configuration
 
 ### Default Settings (variables.auto.pkrvars.hcl)
 ```hcl
-# Resource allocation
-cores = 2
-memory = 4096
+# Resource allocation (optimized for faster builds)
+cores = 8
+memory = 16384
 disk_size_gb = 64
 
 # Proxmox configuration
@@ -183,6 +190,9 @@ iso_storage = "local"
 
 # Template selection
 template = "Pro"  # Default: Windows 11 Pro
+
+# Windows ISO filename (update with your actual filename)
+windows_iso = "local:iso/Win11_25H2_English_x64_v2.iso"
 ```
 
 ### Available Task Commands

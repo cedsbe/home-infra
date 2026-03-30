@@ -4,7 +4,7 @@ locals {
     "./build_files/scripts/remove-features.ps1",
     "./build_files/scripts/remove-azure-arc.ps1",
     "./build_files/scripts/install-sdelete.ps1",
-    "./build_files/scripts/config-os.ps1",
+    "./build_files/scripts/config-os.ps1"
   ]
 }
 
@@ -16,6 +16,7 @@ source "proxmox-iso" "windows11" {
   username                 = var.proxmox_username
   token                    = var.proxmox_api_token
   node                     = var.proxmox_node
+  task_timeout             = "5m"
 
   # BIOS - UEFI
   bios = "ovmf"

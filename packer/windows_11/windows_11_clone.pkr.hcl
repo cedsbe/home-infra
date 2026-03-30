@@ -1,5 +1,8 @@
 locals {
   powershell_scripts_clone = [
+    "./build_files/scripts/disable-services.ps1",
+    "./build_files/scripts/remove-features.ps1",
+    "./build_files/scripts/install-sdelete.ps1",
     "./build_files/scripts/install-powershell-core.ps1",
     "./build_files/scripts/install-cloudbase-init.ps1",
     "./build_files/scripts/configure-cloudbase-init.ps1"
@@ -85,10 +88,6 @@ build {
   name    = "clone_build"
   sources = ["source.proxmox-clone.windows11"]
 
-  provisioner "windows-restart" {
-    pause_before = "5m" # Wait for the Windows installation to settle
-  }
-
   provisioner "breakpoint" {
     disable = var.disable_debug_breakpoints
     note    = "Debug breakpoint 1. Wait before starting the installation."
@@ -98,6 +97,11 @@ build {
     elevated_user     = var.winrm_username
     elevated_password = var.winrm_password
     scripts           = local.powershell_scripts_clone
+  }
+
+  provisioner "windows-restart" {
+    restart_check_command = "powershell -command \"& {Write-Output 'Machine restarted.'}\""
+    pause_before          = "5m" # Wait for the Windows installation to settle
   }
 
   provisioner "breakpoint" {
@@ -120,7 +124,7 @@ build {
 
   provisioner "breakpoint" {
     disable = var.disable_pre_sysprep_breakpoints
-    note    = "Sysprep breakpoint. Wait before starting the sysprep generalize process."
+    note    = "Generalize breakpoint. Wait before starting the generalize process."
   }
 
   provisioner "file" {
@@ -131,9 +135,38 @@ build {
     destination = "C:/Program Files/Cloudbase Solutions/Cloudbase-Init/LocalScripts/"
   }
 
+
   provisioner "powershell" {
     elevated_user     = var.winrm_username
     elevated_password = var.winrm_password
     scripts           = ["./build_files/scripts/generalize-clone.ps1"]
+  }
+
+  provisioner "breakpoint" {
+    disable = var.disable_pre_sysprep_breakpoints
+    note    = "Nuke breakpoint. Wait before starting the nuke process."
+  }
+
+  provisioner "powershell" {
+    elevated_user     = var.winrm_username
+    elevated_password = var.winrm_password
+    scripts           = ["./build_files/scripts/remove-edge-gameassist.ps1"]
+  }
+
+  # provisioner "powershell" {
+  #   elevated_user     = var.winrm_username
+  #   elevated_password = var.winrm_password
+  #   scripts           = ["./build_files/scripts/optimize-disk.ps1"]
+  # }
+
+  provisioner "breakpoint" {
+    disable = var.disable_pre_sysprep_breakpoints
+    note    = "Sysprep breakpoint. Wait before starting the sysprep process."
+  }
+
+  provisioner "powershell" {
+    elevated_user     = var.winrm_username
+    elevated_password = var.winrm_password
+    scripts           = ["./build_files/scripts/sysprep.ps1"]
   }
 }
