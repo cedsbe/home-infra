@@ -16,7 +16,7 @@ git status --short
 git diff --stat HEAD
 ```
 
-If the working tree is **completely clean** (no changes, nothing staged, nothing untracked that belongs in the commit): stop and tell the user there is nothing to commit.
+If the working tree is **completely clean** (no changes, nothing staged, nothing untracked that belongs in the commit): Inform the user and continue to the next steps.
 
 ### 2. Branch management
 
@@ -40,6 +40,7 @@ If the working tree is **completely clean** (no changes, nothing staged, nothing
 ### 3. Stage, review, and commit
 
 Stage all changes:
+
 ```bash
 git add -A
 git diff --cached --stat
@@ -48,6 +49,7 @@ git diff --cached --stat
 Show the staged file summary to the user.
 
 Generate a commit message following **Conventional Commits** format, consistent with project history:
+
 ```
 <type>(<scope>): <short description in imperative mood>
 
@@ -61,6 +63,7 @@ Scope: the component or directory being changed (e.g. `claude-code`, `terraform`
 Present the generated commit message to the user for confirmation before committing. The user must approve or edit the message.
 
 Run the commit (this triggers pre-commit hooks and git-crypt transparent encryption):
+
 ```bash
 git commit -m "<confirmed message>"
 ```
@@ -81,6 +84,7 @@ git rebase origin/main
 ```
 
 If rebase reports conflicts:
+
 - List all conflicting files.
 - Instruct the user to resolve each conflict manually, then run `git rebase --continue`.
 - **Stop** — do not proceed to push until the user resolves conflicts and re-runs the command.
@@ -92,6 +96,7 @@ If rebase is a no-op (branch is already up to date): proceed.
 > ⚠ This step requires explicit user confirmation before executing.
 
 Show the exact command that will run:
+
 ```bash
 git push --set-upstream origin <branch-name>
 ```
@@ -101,6 +106,7 @@ Wait for the user to confirm. Only push after explicit approval.
 ### 6. Create draft PR via MCP
 
 Parse the GitHub repository owner and name:
+
 ```bash
 git remote get-url origin
 ```
@@ -108,6 +114,7 @@ git remote get-url origin
 Extract `owner` and `repo` from the URL (handles both HTTPS and SSH formats).
 
 Call `mcp__github__create_pull_request` with:
+
 - `title`: the commit message subject line (first line only)
 - `body`: structured PR description (template below)
 - `head`: current branch name
@@ -115,16 +122,21 @@ Call `mcp__github__create_pull_request` with:
 - `draft`: `true`
 
 **PR body template** (fill from diff context):
+
 ```markdown
 ## What changed
+
 - <bullet: key change 1>
 - <bullet: key change 2>
 
 ## Why
+
 <one or two sentences inferred from the commit message and diff>
 
 ## How to test
+
 <relevant verification steps — pick what applies>
+
 - `task kubernetes:plan` — Terraform changes
 - `kubectl get nodes -o wide` — K8s manifest changes
 - `task packer:validate` — Packer template changes
@@ -132,7 +144,8 @@ Call `mcp__github__create_pull_request` with:
 - `/k8s-status` — cluster state check
 
 ---
-*Draft PR — created by `/create-pr`. Mark as ready for review when complete.*
+
+_Draft PR — created by `/create-pr`. Mark as ready for review when complete._
 ```
 
 ### 7. Review (terminal only)
@@ -182,6 +195,7 @@ Branch: <branch-name> → main
 ### 8. Done
 
 Print:
+
 ```
 ✅ Draft PR created: <PR URL>
 

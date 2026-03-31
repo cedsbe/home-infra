@@ -22,6 +22,7 @@
   "files.associations": {
     "**/ansible/**/*.yaml": "ansible",
     "**/ansible/**/*.yml": "ansible",
+    "*.hcl": "hcl",
     "*.xml.pkrtpl": "xml",
     "*.yaml": "yaml",
     "*.yml": "yaml",

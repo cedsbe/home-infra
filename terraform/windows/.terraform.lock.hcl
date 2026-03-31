@@ -5,19 +5,7 @@ provider "registry.terraform.io/bpg/proxmox" {
   version     = "0.99.0"
   constraints = ">= 0.69.0, 0.99.0"
   hashes = [
-    "h1:14/zSyKGFMbIQJXoIzE/QXjBgRf2RI1ox11UMOt4OtE=",
-    "h1:3cnMBru0E+Tr01GuDulXNvMjTZOLFIcnzYw5pW0tq7Q=",
-    "h1:5K8iGuz6XceZAR7F7gpTJbrATuklpnsOu+TEIBzFU9E=",
-    "h1:6V45BVhSDz6rZPFuUT584auK5uTdnbP9E+vXqZTbGYo=",
-    "h1:H5sYFdRa0gc9tC5mnjdlU08B4ltP38DBpQQGgiG/VX4=",
-    "h1:LbbF0pvCXlDf1fiBJUdwKx+hEI7aWoLNdzJSK7X4Czg=",
-    "h1:PQCLzYcFHSBTpvJYEb28OQQ3KHs2AG2GyOowxxcAvXA=",
     "h1:UyNgTFGjDo0Kb9uIM/XrhO0F09eALXyaRqLsFM16XKo=",
-    "h1:YRjL6L38ENbsjvn7/vaSFody8rYdQIDrYpNxrD/xjUY=",
-    "h1:cjl3SlnBhVRoBXJ/zLan4Dqreppp02IVP7s0OELbyV4=",
-    "h1:ec/W6ePcCuAKxrjBg8tfiaqnTSEawqrQo70fb23UnFg=",
-    "h1:esI+LLdV3fwVLlj2XuVmskvw8Q2CzhV5jITuRyZVi8w=",
-    "h1:pznw+rC/DRk5vTn67vkr5uu4uGSfbBev+nUdR37s7F4=",
     "zh:2ac2a659c1d9ceb180337ccc2ad86427383420230b2cd298f821cba9cbf5645c",
     "zh:2f8145d697bd4efbc1ffd3346d686866e104b21303dec3ff2ce0f9f501ddc9be",
     "zh:2fd459efb1b6658891e290111ca85d906eef42fe27c21af96b95442da8d461de",
@@ -39,17 +27,7 @@ provider "registry.terraform.io/hashicorp/local" {
   version     = "2.7.0"
   constraints = "2.7.0"
   hashes = [
-    "h1:+20uTNirfTyV1rfazgsQSMCZu3B5ponP94Q07xFHST0=",
     "h1:2RYa3j7m/0WmET2fqotY4CHxE1Hpk0fgn47/126l+Og=",
-    "h1:3X/HZd6Hw6/ojRu0pCBvdj9pEMJlNQaJF5kMaPtaWH8=",
-    "h1:BOVSidyJ9913P9R+wTNUiCNCQDAz8K6eWphSn5xKmJE=",
-    "h1:GJscnvbBwmuT5XoyBJP7FyuZ+0UolbsRmYvwH7lj7i0=",
-    "h1:N6BbeE1W5iP6j358d7R8yzYsd5FU3o3CQYZhtAE11XA=",
-    "h1:SY06ZmR7rY7QMGoVEkeFrERVitBp2GKl/ATz9tbjXlk=",
-    "h1:ZM8+dCHsSogRknZkPUeUMzHyY1UAZ0GWFJ24YP8v+AQ=",
-    "h1:kgI5jpOtCSsGBX9x7rSShUae3U8DDEI9x9e/E/CcXtE=",
-    "h1:mMq+rX1YOTrxl6jUqwFrYukHC7B0t9z7b5iLSJHQbSg=",
-    "h1:sSwlfp2etjCaE9hIF7bJBDjRIhDCVFglEOVyiCI7vgs=",
     "zh:261fec71bca13e0a7812dc0d8ae9af2b4326b24d9b2e9beab3d2400fab5c5f9a",
     "zh:308da3b5376a9ede815042deec5af1050ec96a5a5410a2206ae847d82070a23e",
     "zh:3d056924c420464dc8aba10e1915956b2e5c4d55b11ffff79aa8be563fbfe298",

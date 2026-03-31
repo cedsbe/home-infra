@@ -1,0 +1,2 @@
+# Shared Packer credentials - never commit
+.env
