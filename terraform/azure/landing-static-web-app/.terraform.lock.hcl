@@ -5,19 +5,7 @@ provider "registry.terraform.io/aztfmod/azurecaf" {
   version     = "1.2.32"
   constraints = "1.2.32"
   hashes = [
-    "h1:02KaiWRdlE4a0A2WSGFCc3MNh5loIqUOPwtJGy/nUL8=",
-    "h1:0FiWd06CIEw27LcS8kWprHdvYqRBlRTLrqjygj1uSc0=",
-    "h1:2fT+9eIrHQWdxGKMeRb1oGNfjVV8giizU/G/Z6bCqSE=",
-    "h1:9mNhYNSJwgig/Inge8qRVygB7b/wLNf+AMFY6dMUvv4=",
-    "h1:BG7H6BLIacCPc8W1R687dUm7iiMVUYCimCqDXP5HAX8=",
-    "h1:CFTLyzcQVxTms271iOWBxN2b/Q4FiTuIiHD6aITalLg=",
-    "h1:EoTgVnuEp52pdu0+OcOCdvUY2JDUjUUE+q707uaQHKo=",
-    "h1:KZYp+8dpYdNdh7sVqq8EWJ3G9G0OLfA1+PXsp0/ihnw=",
-    "h1:NHF3E20Zt7MawaMtO15uBZRcfYeSORGE8OZiHY8KFPo=",
     "h1:RJI603zVxUxm3dGQgb0rUnsFrtZnG9/LEwBLACBiw7E=",
-    "h1:VvGi9Uosjd7C0Ov4TXvZojsKznPJXIMirsLPFcGo4oU=",
-    "h1:w/R5DqmIwv26bdEhn2mBvg0T7uo5uS69iOh5uv/tkNw=",
-    "h1:xv6vJH5BJsBwgcyBHqhdYP6HmzS9/T54HQlAfuGDQW8=",
     "zh:1293cde5d33207667afa32cde3ba5946220b2b0957fcca554055d1793e8f10fe",
     "zh:196ed98631353b22b72083c6a97fbda2591b473635cae716018f568e1d5b239b",
     "zh:2f5a90cda3c0cd1755fbc9725891a0dbe74e00a72db4af1702a9200f7c2dbc68",
@@ -38,17 +26,7 @@ provider "registry.terraform.io/hashicorp/azurerm" {
   version     = "4.66.0"
   constraints = "4.66.0"
   hashes = [
-    "h1:/EgwpAPNeirY9yA8lAf2VmsqypopZSOtM6JsFkGJAxw=",
-    "h1:7onT4gYmegMDxGPx503m6UB8XCE2WRoHW9w1o4hL968=",
-    "h1:BkrEqHVR2JJtnOhQFqzgoGCY3SpukmN49zh6oPZ/q40=",
-    "h1:JzKEScgs8Aa5AYqjvoXsarE9tTupMoUp41bTITJCpj0=",
-    "h1:KiDqbPTnIopDJwwtuxoRcdDfY9g1AJ4GjTEzsBCrdqM=",
-    "h1:NWZpdx69WKIMTtqdFcBb8phX2NZ97YwfMNz+EPsB7Fc=",
-    "h1:OTsSIdfwqgEIFtnCIF9+QA9e0UaqnjVa8yMOJKEs4GI=",
-    "h1:bmNRUZZTvIXBkBPZ2QZpTGHw71U2IEvXgZMlxJUNx+g=",
     "h1:dxkh3j4CkfXVtYuv2FoPRg1hkwOh0l4B5fuSrL+3n4Y=",
-    "h1:oBfHaKKlZRG7UQFUwzNi81wWLJEHHmGAaG3thfTwe2c=",
-    "h1:sbFlbxaBOjo/hAlV1OGsZnDy/FZUkdmpvRMSyrB23GY=",
     "zh:00f3d73192f7d7824daaccf9732ff228f40ff9910aab4aba608dd2bd96f0c8b4",
     "zh:43ea71556d83257060dc24f18aa4bed0414b0c46686b6815a387eb56082a2b16",
     "zh:5638f31d09610de6b10e41d9ca6fb0896a237894a53a94991eea776e4abf7d7f",

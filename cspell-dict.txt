@@ -5,6 +5,7 @@
 # To add a new word: task spell_add_word WORD=yourword
 # To sort manually: begin; head -7 cspell-dict.txt; tail -n +8 cspell-dict.txt | sort -u; end > temp; and mv temp cspell-dict.txt
 #
+8wekyb3d8bbwe
 AAAAB
 acme
 add
@@ -204,6 +205,7 @@ ecdh
 ecdsa
 ecosia
 eddsa
+edgeupdatem
 editorconfig
 edns
 efi
@@ -410,6 +412,7 @@ memcached
 mercurial
 merge
 metallb
+MFC
 microk8s
 minikube
 minimisation
@@ -657,6 +660,7 @@ sourcehut
 spice
 sqlite
 squash
+srd
 sre
 srv
 SSDP
@@ -696,6 +700,7 @@ talos
 talosctl
 tar
 taskfile
+TCUI
 tee
 temp
 tempo
@@ -773,6 +778,7 @@ vlan
 vmbr
 vmdk
 vmid
+vms
 vmware
 vnc
 vscode
@@ -824,3 +830,4 @@ zero
 zip
 zsh
 zst
+Zune

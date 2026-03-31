@@ -7,7 +7,7 @@ cdrom_drive_virtio_windows = "F:"
 cdrom_drive_virtio_winre   = "F:"
 
 # Optimized resources for template creation
-cores                           = 2
+cores                           = 4
 disable_pre_sysprep_breakpoints = true
 disk_size_gb                    = 40 # Increased for better performance
 disk_storage                    = "local-lvm"
@@ -21,7 +21,7 @@ image_index = {
 }
 
 iso_storage    = "local"
-memory         = 4096
+memory         = 8192 # 8GB recommended for Windows Server 2025, but 16GB is ideal for smoother performance
 proxmox_node   = "hsp-proxmox0"
 proxmox_url    = "https://hsp-proxmox0.ad.ghiot.be:8006/api2/json"
 sockets        = 1

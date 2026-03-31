@@ -8,7 +8,7 @@ locals {
 
 source "proxmox-clone" "windows2025" {
 
-  clone_vm_id = var.clone_vm_id
+  clone_vm_id = var.ws2025_clone_vm_id
   full_clone  = var.full_clone
 
   # Proxmox Host Connection
@@ -124,10 +124,10 @@ build {
   }
 
   provisioner "file" {
-    sources      = [
-        "./build_files/scripts/enable-openssh.ps1",
-        "./build_files/scripts/set-network-private.ps1"
-      ]
+    sources = [
+      "./build_files/scripts/enable-openssh.ps1",
+      "./build_files/scripts/set-network-private.ps1"
+    ]
     destination = "C:/Program Files/Cloudbase Solutions/Cloudbase-Init/LocalScripts/"
   }
 

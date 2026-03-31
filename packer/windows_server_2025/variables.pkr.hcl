@@ -23,12 +23,12 @@ variable "cdrom_drive_virtio_winre" {
   type        = string
 }
 
-variable "clone_vm_id" {
-  description = "The VM ID for the clone operation."
+variable "ws2025_clone_vm_id" {
+  description = "The VM ID of the Windows Server 2025 base template to clone."
   type        = number
 
   validation {
-    condition     = var.clone_vm_id >= 100 && var.clone_vm_id <= 999999999
+    condition     = var.ws2025_clone_vm_id >= 100 && var.ws2025_clone_vm_id <= 999999999
     error_message = "VM ID must be a number between 100 and 999999999."
   }
 }
@@ -58,11 +58,21 @@ variable "disk_size_gb" {
 variable "disk_storage" {
   description = "The disk storage pool."
   type        = string
+
+  validation {
+    condition     = length(var.disk_storage) > 0
+    error_message = "Storage pool name must not be empty."
+  }
 }
 
 variable "efi_storage" {
   description = "The EFI storage pool."
   type        = string
+
+  validation {
+    condition     = length(var.efi_storage) > 0
+    error_message = "Storage pool name must not be empty."
+  }
 }
 
 variable "full_clone" {
@@ -79,6 +89,11 @@ variable "image_index" {
 variable "iso_storage" {
   description = "The ISO storage pool."
   type        = string
+
+  validation {
+    condition     = length(var.iso_storage) > 0
+    error_message = "Storage pool name must not be empty."
+  }
 }
 
 variable "memory" {
@@ -89,6 +104,7 @@ variable "memory" {
 variable "proxmox_api_token" {
   description = "The Proxmox API user."
   type        = string
+  sensitive   = true
 }
 
 variable "proxmox_node" {
@@ -139,6 +155,7 @@ variable "windows_iso" {
 variable "winrm_password" {
   description = "The WinRM password."
   type        = string
+  sensitive   = true
 }
 
 variable "winrm_username" {
