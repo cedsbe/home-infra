@@ -8,13 +8,19 @@ The project uses [Task](https://taskfile.dev/) for build automation with a clean
 
 ### Main Taskfile (`/Taskfile.yml`)
 - Contains infrastructure-related tasks (Terraform, Cilium, ArgoCD, etc.)
-- Includes the Packer Taskfile using the `includes` feature
+- Includes the Packer hub Taskfile using the `includes` feature
 - All Packer tasks are prefixed with `packer:` when called from the root
 
-### Packer Taskfile (`/packer/windows_server_2025/Taskfile.yml`)
-- Contains all Packer-specific tasks for Windows Server 2025
-- Can be called directly from the packer directory without prefix
-- Handles environment validation, building, and cleanup
+### Packer Hub Taskfile (`/packer/Taskfile.yml`)
+- Aggregates both Windows template builders under sub-namespaces
+- Exposes `validate` and `help` tasks that cover all templates
+- `ws2025` namespace → Windows Server 2025 tasks
+- `win11` namespace → Windows 11 tasks
+
+### Template Taskfiles
+- `/packer/windows_server_2025/Taskfile.yml` — Windows Server 2025 specific tasks
+- `/packer/windows_11/Taskfile.yml` — Windows 11 specific tasks
+- Both can be called directly from their own directory without any prefix
 
 ## Usage Examples
 
@@ -23,12 +29,24 @@ The project uses [Task](https://taskfile.dev/) for build automation with a clean
 # List all available tasks
 task --list
 
-# Run Packer tasks with namespace
-task packer:setup
+# Validate all Packer templates
 task packer:validate
-task packer:build
-task packer:build-dccore
-task packer:build-all
+
+# Windows Server 2025 tasks
+task packer:ws2025:setup
+task packer:ws2025:validate
+task packer:ws2025:build-iso
+task packer:ws2025:build-iso TEMPLATE=DcCore
+task packer:ws2025:build-clone
+task packer:ws2025:help
+
+# Windows 11 tasks
+task packer:win11:setup
+task packer:win11:validate
+task packer:win11:build-iso
+task packer:win11:build-iso TEMPLATE=Enterprise
+task packer:win11:build-clone
+task packer:win11:help
 
 # Infrastructure tasks (no namespace)
 task bootstrap_terraform_init
@@ -37,66 +55,93 @@ task cilium_test
 
 ### From Packer Directory
 ```bash
-cd packer/windows_server_2025
+cd packer
 
-# Run tasks directly (no namespace needed)
-task setup
+# Windows Server 2025 (no packer: prefix needed)
+task ws2025:build-iso
+task ws2025:build-clone TEMPLATE=StdDesktop
+
+# Windows 11
+task win11:build-iso
+task win11:build-clone
+```
+
+### From Template Directory
+```bash
+cd packer/windows_server_2025
+task build-iso
 task validate
-task build
-task build-dccore
-task build-all
+task help
+
+cd packer/windows_11
+task build-iso TEMPLATE=Pro
+task validate
 task help
 ```
 
 ## Key Configuration
 
-The main Taskfile includes the Packer tasks with directory enforcement:
+The main Taskfile includes the Packer hub with directory enforcement:
 
 ```yaml
 includes:
   packer:
-    taskfile: ./packer/windows_server_2025/Taskfile.yml
-    dir: ./packer/windows_server_2025
+    taskfile: ./packer/Taskfile.yml
+    dir: ./packer
 ```
 
-The `dir` property ensures that all Packer commands execute in the correct directory, even when called from the project root.
+The `packer/Taskfile.yml` then includes the template-specific Taskfiles:
+
+```yaml
+includes:
+  ws2025:
+    taskfile: ./windows_server_2025/Taskfile.yml
+    dir: ./windows_server_2025
+  win11:
+    taskfile: ./windows_11/Taskfile.yml
+    dir: ./windows_11
+```
+
+The `dir` property ensures that all commands execute in the correct directory, even when called from the project root.
 
 ## Benefits
 
 1. **Clean Separation**: Infrastructure and Packer tasks are logically separated
-2. **Consistent Interface**: All tasks follow the same naming conventions
+2. **Template Differentiation**: `ws2025` and `win11` namespaces clearly identify which template is targeted
 3. **Directory Safety**: Commands always run in the correct directory
-4. **Flexibility**: Can run tasks from either root or packer directory
+4. **Flexibility**: Can run tasks from root, `packer/`, or the template directory
 5. **Maintainability**: Each Taskfile focuses on its specific domain
-6. **Secure Credentials**: Environment variables loaded automatically from .env file
+6. **Secure Credentials**: Environment variables loaded automatically from `.env` files
 
 ## Environment Configuration
 
-The project uses a `.env` file for secure credential management:
+Each template directory has its own `.env` file. Both are loaded by the root Taskfile:
+
+```yaml
+dotenv:
+  - "packer/windows_server_2025/.env"
+  - "packer/windows_11/.env"
+```
 
 ### Setup
 ```bash
 cd packer/windows_server_2025
 cp .env.template .env
 # Edit .env with your actual credentials
+
+cd ../windows_11
+cp .env.template .env
+# Edit .env with your actual credentials
 ```
 
 ### Security Features
-- `.env` file is git-ignored automatically
+- `.env` files are git-ignored automatically
 - Environment variables loaded by Task automatically
-- Template provided for easy setup
+- Templates provided for easy setup
 - No secrets in version control
 
 ### Environment Variables
 - `PKR_VAR_proxmox_api_token` - Proxmox API token
 - `PKR_VAR_proxmox_username` - Proxmox username (format: user@pve!token)
 - `PKR_VAR_winrm_password` - Windows Administrator password
-
-## Interactive Script
-
-For users who prefer a menu-driven interface, use:
-```bash
-./packer_build.sh
-```
-
-This provides a friendly menu with all the Packer build options.
+- `PKR_VAR_clone_vm_id` - VM ID to clone from (clone builds only)

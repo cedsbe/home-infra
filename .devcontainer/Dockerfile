@@ -11,7 +11,7 @@ ENV TZ=$TZ
 
 # Tool versions - automatically updated by Renovate
 # renovate: datasource=github-releases depName=argoproj/argo-cd
-ARG ARGOCD_VERSION=v3.3.5
+ARG ARGOCD_VERSION=v3.3.6
 # renovate: datasource=github-releases depName=eza-community/eza
 ARG EZA_VERSION=v0.23.4
 # renovate: datasource=github-releases depName=hadolint/hadolint
@@ -49,7 +49,7 @@ ARG TRIVY_VERSION=v0.69.3
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.52.5
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_CODE_VERSION=2.1.81
+ARG CLAUDE_CODE_VERSION=2.1.86
 # renovate: datasource=npm depName=cspell
 ARG CSPELL_VERSION=9.7.0
 
@@ -106,6 +106,7 @@ RUN <<EOF
     bzip2 \
     tar \
     unzip \
+    xorriso \
     xz-utils \
     zip \
     fuse-overlayfs \
@@ -209,6 +210,12 @@ RUN <<EOF
       | tee /etc/apt/sources.list.d/azure-cli.list > /dev/null
 EOF
 
+# Add PowerShell repo (reuses Microsoft GPG key from Azure CLI setup)
+RUN <<EOF
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/microsoft.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" \
+      | tee /etc/apt/sources.list.d/microsoft-powershell.list > /dev/null
+EOF
+
 # Add Fish shell PPA
 RUN <<EOF
     add-apt-repository -y ppa:fish-shell/release-4
@@ -225,6 +232,7 @@ RUN <<EOF
     nodejs \
     packer \
     postgresql-client \
+    powershell \
     terraform \
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF

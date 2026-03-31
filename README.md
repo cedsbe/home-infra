@@ -124,14 +124,16 @@ kubectl kustomize k8s/apps/dev/whoami | kubectl apply -f -
 ### Windows Template Building
 
 ```bash
-# Validate Packer config
+# Validate all Packer templates
 task packer:validate
 
-# Build template
-task packer:build
+# Windows Server 2025
+task packer:ws2025:build-iso        # ISO build (DcDesktop, ~45-90 min)
+task packer:ws2025:build-clone      # Clone build with cloudbase-init
 
-# Interactive menu
-./packer/windows_server_2025/packer_build.sh
+# Windows 11
+task packer:win11:build-iso         # ISO build (Pro, ~60-120 min)
+task packer:win11:build-clone       # Clone build with cloudbase-init
 ```
 
 ## 📊 Monitoring and Observability

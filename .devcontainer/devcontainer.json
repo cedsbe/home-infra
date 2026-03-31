@@ -25,11 +25,13 @@
         "GitHub.copilot-chat",
         "GitHub.copilot",
         "GitHub.vscode-github-actions",
+        "hashicorp.hcl",
         "hashicorp.terraform",
         "ms-azuretools.vscode-docker",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
         "ms-python.python",
         "ms-python.vscode-pylance",
+        "ms-vscode.powershell",
         "ms-vscode-remote.remote-containers",
         "redhat.ansible",
         "redhat.vscode-yaml",
@@ -58,13 +60,15 @@
     }
   },
   "mounts": [
-    "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.claude.json,target=/home/vscode/.claude.json,type=bind,consistency=cached",
     "source=home-infra-fish-history,target=/home/vscode/.local/share/fish,type=volume"
   ],
   "name": "Home Infrastructure Dev Container",
+  "initializeCommand": "touch ${localEnv:HOME}/.claude.json",
   "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local/share/fish && fish -c 'echo Welcome to Home Infrastructure Dev Container!'",
   "remoteUser": "vscode",
   "runArgs": [

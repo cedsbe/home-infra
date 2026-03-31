@@ -11,15 +11,31 @@ paths:
 | Template | Path | Purpose |
 |----------|------|---------|
 | Windows Server 2025 | `packer/windows_server_2025/` | Proxmox VM template for Windows Server 2025 |
+| Windows 11 | `packer/windows_11/` | Proxmox VM template for Windows 11 |
 
 ## Dual Build Mode
 
-The Windows Server 2025 template supports two build modes:
+Both templates support two build modes:
 
-- **ISO mode**: Builds from a Windows Server 2025 ISO (full install, ~1-3 hours)
-- **Clone mode**: Clones an existing Proxmox VM template (faster, ~15-30 minutes)
+- **ISO mode**: Builds from a Windows ISO (full install, ~1-3 hours)
+- **Clone mode**: Clones an existing Proxmox VM template and adds cloudbase-init (~15-45 minutes)
 
-The build mode is controlled via variables. Check `variables.pkr.hcl` for the `build_from_iso` variable.
+## Task Namespace Hierarchy
+
+```
+task packer:validate               # Validate ALL templates
+task packer:ws2025:validate        # Validate Windows Server 2025 only
+task packer:ws2025:setup           # Check WS2025 credentials/env
+task packer:ws2025:build-iso       # Build WS2025 ISO template
+task packer:ws2025:build-clone     # Build WS2025 cloudbase-init clone
+
+task packer:win11:validate         # Validate Windows 11 only
+task packer:win11:setup            # Check Win11 credentials/env
+task packer:win11:build-iso        # Build Win11 ISO template
+task packer:win11:build-clone      # Build Win11 cloudbase-init clone
+```
+
+**Always validate before building.** The `packer build` command is in the deny list for Claude — it must be run manually by the user.
 
 ## Credential Pattern (PKR_VAR_*)
 
@@ -29,9 +45,11 @@ All credentials use environment variables with the `PKR_VAR_` prefix — never h
 PKR_VAR_proxmox_api_token="PVEAPIToken=user@pve!token=uuid"
 PKR_VAR_proxmox_username="user@pve"
 PKR_VAR_winrm_password="secure_password"
+PKR_VAR_ws2025_clone_vm_id=100  # VM ID of WS2025 base template (clone builds)
+PKR_VAR_win11_clone_vm_id=101   # VM ID of Win11 base template (clone builds)
 ```
 
-These are set in `packer/windows_server_2025/.env` (gitignored). See `.env.template` for the required variables.
+All credentials live in a single shared `packer/.env` (gitignored), loaded by the root `Taskfile.yml`. See `packer/.env.template` for the full list. The clone VM IDs use template-specific variable names to avoid conflicts in the shared file.
 
 ## Storage Pool Variables — Never Hardcode
 
@@ -54,24 +72,13 @@ validation {
 }
 ```
 
-## Task Workflow
-
-```bash
-task packer:validate    # Validate template syntax (always run before build)
-task packer:init        # Initialize Packer plugins
-task packer:build       # Full build (requires credentials, takes 1-3 hours for ISO)
-task packer:setup       # Validate environment and credentials
-```
-
-**Always validate before building.** The `packer build` command is in the deny list for Claude — it must be run manually by the user.
-
 ## Build Time Warning
 
-ISO builds take **1-3 hours**. Clone builds take **15-30 minutes**. Warn users before suggesting a full build.
+ISO builds take **1-3 hours**. Clone builds take **15-45 minutes**. Warn users before suggesting a full build.
 
 ## Provisioner Sequence (Windows)
 
-The Windows template uses a specific provisioner order:
+The Windows templates use a specific provisioner order:
 1. File uploads (drivers, scripts)
 2. WinRM-based PowerShell scripts
 3. Restart provisioners between major changes (feature removal, updates)

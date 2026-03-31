@@ -1,0 +1,34 @@
+# Packer Taskfile hub - includes all Windows template builders
+# https://taskfile.dev
+
+version: "3"
+
+includes:
+  ws2025:
+    taskfile: ./windows_server_2025/Taskfile.yml
+    dir: ./windows_server_2025
+
+  win11:
+    taskfile: ./windows_11/Taskfile.yml
+    dir: ./windows_11
+
+tasks:
+  default:
+    desc: "Show available Packer tasks"
+    silent: true
+    cmds:
+      - task --list
+
+  validate:
+    desc: "Validate all Packer templates (Windows Server 2025 + Windows 11)"
+    silent: true
+    cmds:
+      - task: ws2025:validate
+      - task: win11:validate
+
+  help:
+    desc: "Show help for all Packer templates"
+    silent: true
+    cmds:
+      - task: ws2025:help
+      - task: win11:help
