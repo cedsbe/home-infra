@@ -1,7 +1,7 @@
 {
   "description": "Home infrastructure automation with Terraform, Talos, and Packer",
   "devDependencies": {
-    "cspell": "9.8.0"
+    "cspell": "10.0.0"
   },
   "engines": {
     "node": ">=18"
