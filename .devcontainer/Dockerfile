@@ -43,7 +43,7 @@ ARG TALOS_VERSION=v1.13.3
 # renovate: datasource=github-releases depName=go-task/task
 ARG TASK_VERSION=v3.51.1
 # renovate: datasource=github-releases depName=terraform-linters/tflint
-ARG TFLINT_VERSION=v0.63.0
+ARG TFLINT_VERSION=v0.63.1
 # renovate: datasource=github-releases depName=aquasecurity/trivy
 ARG TRIVY_VERSION=v0.71.0
 # renovate: datasource=github-releases depName=mikefarah/yq
