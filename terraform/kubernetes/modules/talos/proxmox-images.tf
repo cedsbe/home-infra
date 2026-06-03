@@ -40,7 +40,7 @@ locals {
   }
 }
 
-resource "proxmox_virtual_environment_download_file" "this" {
+resource "proxmox_download_file" "this" {
   for_each = local.download_file_loop
 
   node_name    = each.value.proxmox_node_name
@@ -51,4 +51,9 @@ resource "proxmox_virtual_environment_download_file" "this" {
   url                     = each.value.url
   decompression_algorithm = "zst"
   overwrite               = false
+}
+
+moved {
+  from = proxmox_virtual_environment_download_file.this
+  to   = proxmox_download_file.this
 }

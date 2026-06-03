@@ -1,3 +1,4 @@
+# tflint-ignore-file: terraform_standard_module_structure # The outputs are intentionally placed at the end of the file for better readability and organization.
 # Example usage of the Windows Clone VM module
 
 # Basic Windows VM

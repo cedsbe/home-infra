@@ -57,6 +57,10 @@ resource "azurerm_storage_account" "backend" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   tags                     = var.tags
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Add a "tf-backend" container
@@ -64,6 +68,10 @@ resource "azurerm_storage_container" "tf_backend" {
   name                  = "tf-backend"
   storage_account_id    = azurerm_storage_account.backend.id
   container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Create the config file for terraform backend
@@ -107,6 +115,10 @@ resource "azurerm_key_vault" "main" {
     default_action = "Deny"
     bypass         = "AzureServices"
     ip_rules       = local.dynamic_dns_home_ip != null ? [local.dynamic_dns_home_ip] : []
+  }
+
+  lifecycle {
+    prevent_destroy = true
   }
 
 }

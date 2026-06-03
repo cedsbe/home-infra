@@ -1,3 +1,5 @@
+# tflint-ignore-file: terraform_standard_module_structure # The outputs are intentionally placed at the end of the file for better readability and organization.
+
 # Windows 11 Scan Client Configuration
 # Uses the windows_clone_vm module to create a Windows 11 scan client VM
 # Purpose: Dedicated scan client for Brother MFC-L2740DW scanner suite and Evernote

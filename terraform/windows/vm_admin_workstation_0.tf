@@ -1,3 +1,5 @@
+# tflint-ignore-file: terraform_standard_module_structure # The outputs are intentionally placed at the end of the file for better readability and organization.
+
 # System Administration Workstation Configuration
 # Uses the windows_clone_vm module to create a Windows Server 2025 admin workstation
 # Purpose: Central management console with all sysadmin tools (RSAT, PowerShell, consoles)
