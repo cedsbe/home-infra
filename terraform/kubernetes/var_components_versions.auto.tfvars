@@ -4,6 +4,6 @@ cilium_version = "v1.19.4"
 gateway_api_version = "v1.3.0"
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
 kubernetes_version = "v1.36.1"
-talos_version      = "v1.12.2"
+talos_version      = "v1.13.3"
 # renovate: datasource=github-releases depName=siderolabs/talos
 talos_update_version = "v1.13.3"

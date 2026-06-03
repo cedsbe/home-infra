@@ -31,14 +31,15 @@ terraform {
       version = "3.1.2"
     }
 
-    time = {
+
+    time = { # tflint-ignore: terraform_unused_required_providers # Transitive dependency used by module "talos" for time_sleep resource, not directly in this module
       source  = "hashicorp/time"
       version = "0.14.0"
     }
 
-    utils = {
+    utils = { # tflint-ignore: terraform_unused_required_providers # Transitive dependency used by module
       source  = "netascode/utils"
-      version = "2.0.0"
+      version = "1.1.0-beta6"
     }
   }
 }

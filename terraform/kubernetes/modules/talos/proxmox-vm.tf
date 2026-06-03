@@ -30,7 +30,7 @@ resource "proxmox_virtual_environment_vm" "this" {
     datastore_id = each.value.datastore_id
     discard      = "on"
     file_format  = "raw"
-    file_id      = proxmox_virtual_environment_download_file.this[each.key].id
+    file_id      = proxmox_download_file.this[each.key].id
     interface    = "scsi0"
     iothread     = true
     size         = 20
