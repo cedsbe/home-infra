@@ -1,3 +1,5 @@
+# tflint-ignore-file: terraform_standard_module_structure # The outputs are intentionally placed at the end of the file for better readability and organization.
+
 # Domain Controller VM Configuration
 # Uses the windows_clone_vm module to create a Windows Server 2025 domain controller
 

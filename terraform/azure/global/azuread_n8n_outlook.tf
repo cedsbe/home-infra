@@ -120,7 +120,8 @@ resource "azurerm_key_vault_secret" "n8n_outlook_client_id" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [expiration_date]
+    prevent_destroy = true
+    ignore_changes  = [expiration_date]
   }
 }
 
@@ -137,7 +138,8 @@ resource "azurerm_key_vault_secret" "n8n_outlook_client_secret" {
   tags = var.tags
 
   lifecycle {
-    ignore_changes = [expiration_date]
+    prevent_destroy = true
+    ignore_changes  = [expiration_date]
   }
 }
 
