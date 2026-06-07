@@ -14,6 +14,10 @@ spec:
       server: "*"
     - namespace: "kube-system"
       server: "*"
+    - namespace: "arc-systems"
+      server: "*"
+    - namespace: "arc-runners"
+      server: "*"
   clusterResourceWhitelist:
     - group: "*"
       kind: "*"
