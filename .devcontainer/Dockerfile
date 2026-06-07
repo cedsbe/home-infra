@@ -17,7 +17,7 @@ ARG EZA_VERSION=v0.23.4
 # renovate: datasource=github-releases depName=hadolint/hadolint
 ARG HADOLINT_VERSION=v2.14.0
 # renovate: datasource=github-releases depName=derailed/k9s
-ARG K9S_VERSION=v0.50.18
+ARG K9S_VERSION=v0.51.0
 # renovate: datasource=github-releases depName=kubecolor/kubecolor
 ARG KUBECOLOR_VERSION=v0.6.0
 # renovate: datasource=github-releases depName=yannh/kubeconform
