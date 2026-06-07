@@ -21,7 +21,7 @@ ARG K9S_VERSION=v0.50.18
 # renovate: datasource=github-releases depName=kubecolor/kubecolor
 ARG KUBECOLOR_VERSION=v0.6.0
 # renovate: datasource=github-releases depName=yannh/kubeconform
-ARG KUBECONFORM_VERSION=v0.7.0
+ARG KUBECONFORM_VERSION=v0.8.0
 # renovate: datasource=github-releases depName=ahmetb/kubectx
 ARG KUBECTX_VERSION=v0.11.0
 # renovate: datasource=github-releases depName=int128/kubelogin
