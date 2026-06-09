@@ -1,0 +1,9 @@
+githubConfigUrl: https://github.com/cedsbe
+githubConfigSecret: arc-github-secret
+
+minRunners: 0
+maxRunners: 5
+
+controllerServiceAccount:
+  namespace: arc-systems
+  name: arc-systems-gha-runner-scale-set-controller

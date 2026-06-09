@@ -179,6 +179,7 @@ dhcpv
 diff
 digest
 digitalocean
+dind
 disable
 disconnect
 distroless
@@ -261,6 +262,7 @@ gcp
 geerlingguy
 gentoo
 get
+gha
 ghiot
 gif
 git
