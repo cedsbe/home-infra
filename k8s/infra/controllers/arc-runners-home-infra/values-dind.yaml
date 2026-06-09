@@ -1,8 +1,11 @@
-githubConfigUrl: https://github.com/cedsbe
+githubConfigUrl: https://github.com/cedsbe/home-infra
 githubConfigSecret: arc-github-secret
 
 minRunners: 0
-maxRunners: 5
+maxRunners: 3
+
+containerMode:
+  type: dind
 
 controllerServiceAccount:
   namespace: arc-systems
