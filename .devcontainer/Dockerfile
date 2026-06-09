@@ -39,7 +39,7 @@ ARG STARSHIP_VERSION=v1.25.1
 # renovate: datasource=github-releases depName=stern/stern
 ARG STERN_VERSION=v1.34.0
 # renovate: datasource=github-releases depName=siderolabs/talos
-ARG TALOS_VERSION=v1.13.3
+ARG TALOS_VERSION=v1.13.4
 # renovate: datasource=github-releases depName=go-task/task
 ARG TASK_VERSION=v3.51.1
 # renovate: datasource=github-releases depName=terraform-linters/tflint
