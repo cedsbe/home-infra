@@ -12,7 +12,7 @@ This is a home infrastructure repository that automates the deployment of a Kube
 - **GitOps**: ArgoCD for application deployment
 - **Container Networking**: Cilium CNI
 - **Task Automation**: Task (taskfile.dev)
-- **Template Building**: Packer for Virtual machines templates
+- **Template Building**: Packer for virtual machine templates
 
 ## Directory Structure and Conventions
 
