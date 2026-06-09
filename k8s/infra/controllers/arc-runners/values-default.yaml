@@ -6,4 +6,4 @@ maxRunners: 5
 
 controllerServiceAccount:
   namespace: arc-systems
-  name: arc-systems-gha-runner-scale-set-controller
+  name: arc-systems-gha-rs-controller
