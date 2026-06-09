@@ -49,7 +49,7 @@ PKR_VAR_ws2025_clone_vm_id=100  # VM ID of WS2025 base template (clone builds)
 PKR_VAR_win11_clone_vm_id=101   # VM ID of Win11 base template (clone builds)
 ```
 
-All credentials live in a single shared `packer/.env` (gitignored), loaded by the root `Taskfile.yml`. See `packer/.env.template` for the full list. The clone VM IDs use template-specific variable names to avoid conflicts in the shared file.
+All credentials live in a single shared `packer/.env` (git-crypt encrypted, committed), loaded by the root `Taskfile.yml`. See `packer/.env.template` for the full list. The clone VM IDs use template-specific variable names to avoid conflicts in the shared file.
 
 ## Storage Pool Variables — Never Hardcode
 

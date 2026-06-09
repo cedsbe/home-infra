@@ -12,7 +12,7 @@ This is a home infrastructure repository that automates the deployment of a Kube
 - **GitOps**: ArgoCD for application deployment
 - **Container Networking**: Cilium CNI
 - **Task Automation**: Task (taskfile.dev)
-- **Template Building**: Packer for Windows Server 2025 templates
+- **Template Building**: Packer for Virtual machines templates
 
 ## Directory Structure and Conventions
 
@@ -27,8 +27,8 @@ This is a home infrastructure repository that automates the deployment of a Kube
   - `providers.tf` - Azure provider configuration with required providers
   - `backend.tf` - Remote state backend configuration
   - `azure.auto.tfvars` - Default configuration values
-  - `azure.secrets.auto.tfvars` - Sensitive credentials (gitignored)
-  - `backend.config` - Backend configuration (generated/gitignored)
+  - `azure.secrets.auto.tfvars` - Sensitive credentials (git-crypt encrypted)
+  - `backend.config` - Backend configuration (git-crypt encrypted)
   - `Taskfile.yml` - Task automation for Azure operations
 
 ### `/terraform/kubernetes/`
@@ -38,7 +38,7 @@ This is a home infrastructure repository that automates the deployment of a Kube
   - `variables.tf` - Input variables (non-sensitive)
   - `providers.tf` - Provider configurations and versions
   - `proxmox.auto.tfvars` - Proxmox connection settings
-  - `proxmox.secrets.auto.tfvars` - Sensitive credentials (gitignored)
+  - `proxmox.secrets.auto.tfvars` - Sensitive credentials (git-crypt encrypted)
 
 ### `/terraform/kubernetes/modules/`
 - **talos/**: Core Talos Linux cluster module
@@ -60,7 +60,7 @@ This is a home infrastructure repository that automates the deployment of a Kube
 - **Key Components**:
   - `windows_server_2025.pkr.hcl` - Main Packer configuration
   - `variables.pkr.hcl` - Variable definitions with validation
-  - `.env` - Environment variables for credentials (gitignored)
+  - `.env` - Environment variables for credentials (git-crypt encrypted)
   - `Taskfile.yml` - Task automation for builds
   - `build_files/` - Scripts and templates for Windows customization
 
@@ -69,7 +69,7 @@ This is a home infrastructure repository that automates the deployment of a Kube
 ### Terraform
 - **Module Structure**: Use consistent module patterns with `variables.tf`, `main.tf`, `outputs.tf`, `providers.tf`
 - **Variable Validation**: Always include validation blocks for critical inputs (IP addresses, MAC addresses, node types)
-- **Sensitive Data**: Keep sensitive variables in separate `.secrets.auto.tfvars` files (gitignored)
+- **Sensitive Data**: Keep sensitive variables in separate `.secrets.auto.tfvars` files (git-crypt encrypted)
 - **Resource Naming**: Use descriptive names with consistent prefixes or Azure CAF naming conventions
 - **Provider Versions**: Pin provider versions for stability (use `~>` for minor version flexibility)
 - **Default Values**: Provide sensible defaults or explicit null defaults to avoid interactive prompts
@@ -166,7 +166,7 @@ This repository is designed to be publicly available on GitHub while remaining t
 
 ### Credential Management
 - **Environment Variables**: Use `PKR_VAR_*` pattern for Packer credentials
-- **Git Ignore**: Always gitignore `.env`, `*.secrets.*` files
+- **git-crypt**: Encrypt `.env`, `*.secrets.*`, `backend.config`, and `sensitive/**` with git-crypt — committed to the repo but unreadable without `git-crypt unlock`
 - **Templates**: Provide `.env.template` files for user guidance
 - **Rotation**: Use API tokens instead of passwords where possible
 
@@ -505,8 +505,8 @@ When errors or issues occur during development, document the solution in this in
 - **Solution**: Always use variables for storage pools (`var.disk_storage`, `var.iso_storage`, `var.efi_storage`) to maintain flexibility across environments.
 
 #### Security Credential Management
-- **Mistake**: Storing sensitive credentials in `.tfvars` files that get committed to version control
-- **Solution**: Use `.env` files with `PKR_VAR_*` pattern for Packer, and `.secrets.auto.tfvars` files for Terraform (both gitignored).
+- **Mistake**: Storing sensitive credentials in plain `.tfvars` files without encryption
+- **Solution**: Use `.env` files with `PKR_VAR_*` pattern for Packer, and `.secrets.auto.tfvars` files for Terraform — both are git-crypt encrypted and committed to the repo.
 
 #### Variable Validation Issues
 - **Mistake**: Using complex regex validation for simple numeric ranges in Packer/Terraform

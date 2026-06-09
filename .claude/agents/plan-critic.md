@@ -28,7 +28,7 @@ This is a home infrastructure repository deploying a Kubernetes cluster (Talos L
 - **Task Automation**: Taskfile (`task <namespace>:<command>` preferred over raw tool calls)
 - **Templates**: Packer for Windows Server 2025
 - **Node Access**: Talos only — no SSH to cluster nodes, all management via `talosctl`
-- **Secrets**: Never committed; use `.env`, `*.secrets.auto.tfvars` (gitignored), provide `.template` files
+- **Secrets**: Sensitive files (`*.secrets.auto.tfvars`, `.env`, `backend.config`) are encrypted with git-crypt and committed — not gitignored. Provide `.template` files alongside them.
 
 ### Critical Conventions to Enforce
 - `for_each` over `count` in Terraform

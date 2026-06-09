@@ -41,11 +41,11 @@ The `netascode/utils` provider is pinned to `1.1.0-beta4` intentionally — this
 
 ## Git-Crypt Encrypted Files
 
-These files exist but are encrypted and will not be readable without the git-crypt key:
+All sensitive files are encrypted by git-crypt and committed — they must not be gitignored. See `.gitattributes` for the full pattern list. Examples in this workspace:
 
 - `*.secrets.auto.tfvars` — sensitive Terraform variable values
 - `backend.config` — backend connection credentials
-- `terraform/**/.env` — environment credentials
+- `.env` — environment credentials
 
 If a file appears as binary gibberish, it is git-crypt locked. Do NOT modify encrypted files. The user must run `git-crypt unlock` first.
 
