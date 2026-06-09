@@ -1,4 +1,9 @@
 #
+# CSpell Custom Dictionary
+# This file contains project-specific words that are not in the standard dictionary
+# To add a new word: task spell_add_word WORD=yourword
+# To sort manually: begin; head -7 cspell-dict.txt; tail -n +8 cspell-dict.txt | sort -u; end > temp; and mv temp cspell-dict.txt
+# Words are automatically sorted alphabetically when using the spell_add_word task
 8wekyb3d8bbwe
 AAAAB
 acme
@@ -139,7 +144,6 @@ crl
 crypto
 cryptsvc
 csi
-# CSpell Custom Dictionary
 csr
 css
 csv
@@ -708,7 +712,6 @@ tflint
 tfstate
 tftpl
 tfvars
-# This file contains project-specific words that are not in the standard dictionary
 thrift
 throttle
 tiledatamodelsvc
@@ -719,11 +722,9 @@ timesyncd
 tls
 tlsroute
 tmp
-# To add a new word: task spell_add_word WORD=yourword
 tofu
 token
 toml
-# To sort manually: begin; head -7 cspell-dict.txt; tail -n +8 cspell-dict.txt | sort -u; end > temp; and mv temp cspell-dict.txt
 tpm
 trace
 traefik
@@ -808,7 +809,6 @@ winrmlistener
 wisvc
 wlidsvc
 Wmi
-# Words are automatically sorted alphabetically when using the spell_add_word task
 Wpn
 wuauserv
 x509
