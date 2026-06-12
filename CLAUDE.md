@@ -16,7 +16,7 @@ Kubernetes (Talos Linux) on Proxmox VE. Terraform for infra, ArgoCD for GitOps, 
 
 ## Tool Preferences
 
-- **Prefer `task` over raw CLI**: `task kubernetes:plan` instead of `terraform plan`. Task handles env, working dir, and secrets.
+- **Prefer `task` over raw CLI**: `task azure-global:plan` instead of `terraform plan`. Task handles env, working dir, and secrets.
 - **Fish shell** in devcontainer — use Fish syntax in shell snippets unless inside a `.sh` file.
 - **Env vars are auto-set**: `KUBECONFIG`, `TALOSCONFIG`, `KUBE_CONFIG_PATH` — no extra flags needed.
 

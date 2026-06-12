@@ -73,7 +73,7 @@ task ansible:ping:all
 
 # Or with raw ansible:
 ansible linux -m ping
-ansible windows -m ping
+ansible windows -m ping  # use win_ping instead if connecting via WinRM
 ansible all -m ping
 ```
 

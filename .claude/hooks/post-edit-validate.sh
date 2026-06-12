@@ -5,7 +5,7 @@
 set -eu -o pipefail
 
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.path // empty')
+FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // .tool_input.path // empty' 2>/dev/null) || exit 0
 [ -z "$FILE_PATH" ] && exit 0
 
 if [[ "$FILE_PATH" == *.tf || "$FILE_PATH" == *.tfvars ]]; then
