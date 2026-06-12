@@ -163,4 +163,4 @@ Heavily inspired by Vegard S. Hagen's Home lab:
 
 ## 🔍 Troubleshooting
 
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions.
+See [k8s/BOOTSTRAP.md](k8s/BOOTSTRAP.md) for cluster bootstrap steps and common fixes.

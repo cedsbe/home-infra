@@ -48,11 +48,11 @@ ansible/
 ### 1. Install Dependencies
 
 ```bash
-# Install required collections
-ansible-galaxy collection install -r requirements.yml
+# Recommended: run the setup task (copies inventory template + installs collections)
+task ansible:setup
 
-# Install required roles (if any)
-ansible-galaxy role install -r requirements.yml
+# Or manually:
+ansible-galaxy collection install -r requirements.yml
 ```
 
 ### 2. Configure Inventory
@@ -67,30 +67,28 @@ cp inventory/hosts.yml.template inventory/hosts.yml
 ### 3. Test Connectivity
 
 ```bash
-# Test Linux hosts
+task ansible:ping:linux
+task ansible:ping:windows
+task ansible:ping:all
+
+# Or with raw ansible:
 ansible linux -m ping
-
-# Test Windows hosts (using SSH)
-ansible windows -m ping
-
-# Test all hosts
+ansible windows -m ping      # for SSH-connected Windows hosts
+ansible windows -m win_ping  # for WinRM-connected Windows hosts
 ansible all -m ping
 ```
 
 ### 4. Run Playbooks
 
 ```bash
-# Run the master playbook
+task ansible:run:site           # master playbook
+task ansible:update:linux       # update Linux systems
+task ansible:update:windows     # update Windows systems
+
+# Or with raw ansible:
 ansible-playbook site.yml
-
-# Run specific playbook
-ansible-playbook playbooks/linux/update.yml
-
-# Run with tags
 ansible-playbook site.yml --tags "config"
-
-# Run in check mode (dry-run)
-ansible-playbook site.yml --check
+ansible-playbook site.yml --check   # dry-run
 ```
 
 ## Managing Secrets
@@ -123,7 +121,13 @@ echo "your-vault-password" > .vault_password
 chmod 600 .vault_password
 ```
 
-This file is gitignored for security.
+This file is git-crypt encrypted and committed to the repository.
+
+To encrypt a vault file via task:
+
+```bash
+task ansible:vault:encrypt FILE=inventory/group_vars/all/vault.yml
+```
 
 ## Windows Configuration
 
@@ -224,7 +228,18 @@ This Ansible project integrates with the broader home-infra repository:
 
 **Note**: Kubernetes/Talos and Proxmox infrastructure are managed exclusively by Terraform, not by Ansible.
 
+## Available Tasks
+
+```bash
+task --list | grep ansible
+```
+
 ## Troubleshooting
+
+```bash
+task ansible:validate              # check configuration
+task ansible:run:site -- -vvv      # verbose output
+```
 
 ### Connection Issues
 

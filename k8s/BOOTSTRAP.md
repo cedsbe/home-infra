@@ -65,3 +65,17 @@ kubectl apply -k sets
 ```shell
 kustomize build --enable-helm infra/storage/proxmox-csi | kubectl apply -f -
 ```
+
+## Troubleshooting
+
+Restart ArgoCD application controller:
+
+```shell
+kubectl rollout restart statefulset -n argocd argocd-application-controller
+```
+
+Restart Cilium Envoy (fixes unresponsive HTTPRoutes/Gateways — note: at most two pods restart per rollout, may need to delete pods manually):
+
+```shell
+kubectl -n kube-system rollout restart daemonset/cilium-envoy
+```

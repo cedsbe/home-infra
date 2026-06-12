@@ -15,12 +15,6 @@ packer_cache/
 # Generated outputs
 terraform/kubernetes/output/**/*
 
-# Sensitive data
-id_rsa
-*.pem
-*.key
-*.crt
-
 # Kubernetes downloads
 k8s/infra/*/*/charts/*
 k8s/apps/*/*/charts/*

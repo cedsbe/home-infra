@@ -39,7 +39,7 @@ Manifests use Kustomize for templating. ArgoCD ApplicationSets use the `helmChar
 
 Sensitive values use Sealed Secrets. The workflow for updating a secret:
 
-1. Edit the plaintext secret in `sensitive/` (gitignored)
+1. Edit the plaintext secret in `sensitive/` (git-crypt encrypted, committed)
 2. Re-seal: `task k8s:seal:secret FILE=sensitive/my-secret.yaml`
 3. Copy the sealed output to the appropriate path in `k8s/`
 4. Commit the sealed secret file

@@ -161,7 +161,7 @@ Launch an Agent subagent that:
      - `terraform_data` instead of `null_resource`
      - Provider versions pinned with `~>` or exact versions
      - No hardcoded values that should be variables
-     - Sensitive data in `.secrets.auto.tfvars` (gitignored), not inline
+     - Sensitive data in `.secrets.auto.tfvars` (git-crypt encrypted, committed), not inline
    - **Conventional commit compliance**: commit message type/scope match the actual changes
    - **Pre-commit alignment**: changes are consistent with what the hooks enforce
 

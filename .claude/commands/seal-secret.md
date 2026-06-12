@@ -26,9 +26,8 @@ The argument should be the path to a plaintext Kubernetes Secret manifest in the
    | Cluster-wide secrets | `k8s/infra/sealed-secrets/` |
 
 5. Remind the user to:
-   - Copy the sealed secret to the appropriate `k8s/` path
-   - Commit only the **sealed** secret (not the plaintext from `sensitive/`)
-   - The `sensitive/` directory is gitignored — never commit files from it
+   - Copy the sealed secret to the appropriate `k8s/` path and commit it
+   - The plaintext source in `sensitive/` is tracked separately (git-crypt encrypted, only readable after `git-crypt unlock`) — no need to re-commit it as part of this workflow
 
 ## Security Notes
 
