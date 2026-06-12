@@ -16,9 +16,8 @@ if [[ "$FILE_PATH" == *.tf || "$FILE_PATH" == *.tfvars ]]; then
 elif [[ "$FILE_PATH" == *.pkr.hcl || "$FILE_PATH" == *.pkrvars.hcl ]]; then
   echo "ℹ Packer file edited — run 'task packer:validate' to validate"
 
-elif [[ "$FILE_PATH" == k8s/*.yaml || "$FILE_PATH" == k8s/*.yml ]]; then
+elif [[ "$FILE_PATH" =~ ^k8s/.*\.(yaml|yml)$ ]]; then
   kubeconform -ignore-missing-schemas -summary "$FILE_PATH" 2>/dev/null || true
-
 elif [[ "$FILE_PATH" == *.yaml || "$FILE_PATH" == *.yml ]]; then
   if [ -f ".yamllint.yml" ]; then
     yamllint -c .yamllint.yml "$FILE_PATH" 2>/dev/null || true
