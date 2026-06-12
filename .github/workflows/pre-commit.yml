@@ -48,7 +48,7 @@ jobs:
       - name: Install CLI tools
         uses: alexellis/arkade-get@b2570df8acfd04f8ae2e2ea440c24ab6cdca9646 # master
         with:
-          kubectl: v1.36.1 # renovate: datasource=github-releases depName=kubernetes/kubernetes packageName=kubernetes/kubernetes versioning=semver-coerced registryUrl=https://github.com
+          kubectl: v1.36.2 # renovate: datasource=github-releases depName=kubernetes/kubernetes packageName=kubernetes/kubernetes versioning=semver-coerced registryUrl=https://github.com
           kustomize: v5.8.0 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
           kubeconform: v0.8.0 # renovate: datasource=github-releases depName=yannh/kubeconform packageName=yannh/kubeconform versioning=semver-coerced registryUrl=https://github.com
           task: v3.51.1 # renovate: datasource=github-releases depName=go-task/task packageName=go-task/task versioning=semver-coerced registryUrl=https://github.com
