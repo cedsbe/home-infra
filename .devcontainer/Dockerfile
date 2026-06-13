@@ -49,7 +49,7 @@ ARG TRIVY_VERSION=v0.71.0
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.53.3
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_CODE_VERSION=2.1.170
+ARG CLAUDE_CODE_VERSION=2.1.172
 # renovate: datasource=npm depName=cspell
 ARG CSPELL_VERSION=10.0.1
 
