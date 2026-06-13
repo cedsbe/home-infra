@@ -1,6 +1,8 @@
 name: Validate Local Runners
 
 on:
+  push:
+
   workflow_dispatch:
 
 jobs:
