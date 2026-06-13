@@ -70,7 +70,7 @@
     "source=home-infra-fish-history,target=/home/vscode/.local/share/fish,type=volume"
   ],
   "name": "Home Infrastructure Dev Container",
-  "initializeCommand": "touch ${localEnv:HOME}/.claude.json && mkdir -p ${localEnv:HOME}/.config/lazygit && touch ${localEnv:HOME}/.config/lazygit/config.yml",
+  "initializeCommand": "touch ${localEnv:HOME}/.claude.json && mkdir -p ${localEnv:HOME}/.config/lazygit ${localEnv:HOME}/.gnupg && chmod 700 ${localEnv:HOME}/.gnupg && touch ${localEnv:HOME}/.config/lazygit/config.yml",
   "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local/share/fish && fish -c 'echo Welcome to Home Infrastructure Dev Container!'",
   "remoteUser": "vscode",
   "runArgs": [
