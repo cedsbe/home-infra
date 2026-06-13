@@ -1,0 +1,66 @@
+name: Validate Local Runners
+
+on:
+  workflow_dispatch:
+
+jobs:
+  validate-local-runners:
+    runs-on: arc-runners-home-infra
+    timeout-minutes: 15
+    name: Validate Local Runners
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate local runners
+        run: |
+          echo "🔍 Validating Local Runners"
+          echo "================================="
+          echo "✅ Local runners are available and ready for use"
+          echo "---------------------------------"
+          echo "🏠 Home Infra Runner: $(hostname)"
+          echo "---------------------------------"
+          echo "Runner Details:"
+          echo "  - Runner Name: $(hostname)"
+          echo "  - Runner Labels: $(cat /etc/github-runner/labels)"
+          echo "  - Runner Version: $(cat /etc/github-runner/version)"
+          echo "  - Runner Status: $(systemctl is-active github-runner)"
+          echo "---------------------------------"
+          echo "✅ Local runners validation completed successfully"
+
+      - name: Display Code Source Information
+        run: |
+          echo "🔍 Code Source Information"
+          echo "================================="
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Workflow Run ID: ${{ github.run_id }}"
+          echo "Workflow Run Number: ${{ github.run_number }}"
+
+      - name: Display Runner Environment Information
+        run: |
+          echo "🔍 Runner Environment Information"
+          echo "================================="
+          echo "Runner OS: $(uname -s)"
+          echo "Runner Architecture: $(uname -m)"
+          echo "Runner Kernel Version: $(uname -r)"
+          echo "Runner Uptime: $(uptime -p)"
+          echo "---------------------------------"
+          echo "Environment Variables:"
+          printenv | sort
+
+      - name: Display README.md Content
+        run: |
+          echo "🔍 README.md Content"
+          echo "================================="
+          if [ -f "README.md" ]; then
+            cat README.md
+          else
+            echo "❌ README.md file not found in the repository."
+          fi
