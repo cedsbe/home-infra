@@ -1,6 +1,9 @@
 # Git-crypt configuration for secrets management
 # This file defines which files should be encrypted with git-crypt
 
+# Canary file to verify that git-crypt is working correctly
+.git-crypt-canary filter=git-crypt diff=git-crypt
+
 # Terraform secrets files
 *.secrets.auto.tfvars filter=git-crypt diff=git-crypt
 *.secrets.auto.pkrvars.hcl filter=git-crypt diff=git-crypt
