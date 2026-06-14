@@ -13,3 +13,4 @@ template:
     containers:
       - name: runner
         image: "ghcr.io/cedsbe/actions-runner-cedsbe:latest"
+        command: ["/home/runner/run.sh"]
