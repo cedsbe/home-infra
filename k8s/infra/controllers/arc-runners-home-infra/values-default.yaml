@@ -12,4 +12,4 @@ template:
   spec:
     containers:
       - name: runner
-        image: "docker pull ghcr.io/cedsbe/actions-runner-cedsbe:latest"
+        image: "ghcr.io/cedsbe/actions-runner-cedsbe:latest"
