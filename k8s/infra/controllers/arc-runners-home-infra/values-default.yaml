@@ -7,3 +7,9 @@ maxRunners: 5
 controllerServiceAccount:
   namespace: arc-systems
   name: arc-systems-gha-rs-controller
+
+template:
+  spec:
+    containers:
+      - name: runner
+        image: "docker pull ghcr.io/cedsbe/actions-runner-cedsbe:latest"
