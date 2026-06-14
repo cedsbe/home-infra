@@ -24,11 +24,6 @@ jobs:
           echo "✅ Local runners are available and ready for use"
           echo "---------------------------------"
           echo "🏠 Home Infra Runner: $(hostname)"
-          echo "---------------------------------"
-          echo "Runner Details:"
-          tree
-          echo "---------------------------------"
-          echo "✅ Local runners validation completed successfully"
 
       - name: Display Code Source Information
         run: |
@@ -52,12 +47,13 @@ jobs:
           echo "Environment Variables:"
           printenv | sort
 
-      - name: Display README.md Content
+      - name: Display git-crypt Status
         run: |
-          echo "🔍 README.md Content"
+          echo "🔍 git-crypt Status"
           echo "================================="
-          if [ -f "README.md" ]; then
-            cat README.md
+          if command -v git-crypt &> /dev/null; then
+            echo "✅ git-crypt is installed"
+            git-crypt status
           else
-            echo "❌ README.md file not found in the repository."
+            echo "❌ git-crypt is not installed"
           fi
