@@ -1,0 +1,73 @@
+name: Validate Local Runners
+
+on:
+  - workflow_dispatch
+
+jobs:
+  validate-local-runners:
+    runs-on: arc-runners-home-infra
+    timeout-minutes: 15
+    name: Validate Local Runners
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Validate local runners
+        run: |
+          echo "🔍 Validating Local Runners"
+          echo "================================="
+          echo "✅ Local runners are available and ready for use"
+          echo "---------------------------------"
+          echo "🏠 Home Infra Runner: $(hostname)"
+
+      - name: Display Code Source Information
+        run: |
+          echo "🔍 Code Source Information"
+          echo "================================="
+          echo "Repository: ${{ github.repository }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Workflow Run ID: ${{ github.run_id }}"
+          echo "Workflow Run Number: ${{ github.run_number }}"
+
+      - name: Display Runner Environment Information
+        run: |
+          echo "🔍 Runner Environment Information"
+          echo "================================="
+          echo "Runner OS: $(uname -s)"
+          echo "Runner Architecture: $(uname -m)"
+          echo "Runner Kernel Version: $(uname -r)"
+          echo "Runner Uptime: $(uptime -p)"
+          echo "---------------------------------"
+          echo "Environment Variables:"
+          printenv | sort
+
+      - name: Display git-crypt Status
+        run: |
+          echo "🔍 git-crypt Status"
+          echo "================================="
+          if command -v git-crypt &> /dev/null; then
+            echo "✅ git-crypt is installed"
+            git-crypt status
+          else
+            echo "❌ git-crypt is not installed"
+          fi
+
+      - name: Folder structure
+        run: |
+          echo "🔍 Folder Structure"
+          echo "================================="
+          find . -type d -print | sed -e 's;[^/]*/;|___;g;s;___|; |;g'
+          echo "---------------------------------"
+          echo "🔍 Folder tree in $(pwd)"
+          echo "================================="
+          tree -L 3
+          echo "---------------------------------"
+          echo "🔍 Folder tree in root (/)"
+          echo "================================="
+          tree -L 5 /
