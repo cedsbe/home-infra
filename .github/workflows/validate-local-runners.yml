@@ -26,10 +26,7 @@ jobs:
           echo "🏠 Home Infra Runner: $(hostname)"
           echo "---------------------------------"
           echo "Runner Details:"
-          echo "  - Runner Name: $(hostname)"
-          echo "  - Runner Labels: $(cat /etc/github-runner/labels)"
-          echo "  - Runner Version: $(cat /etc/github-runner/version)"
-          echo "  - Runner Status: $(systemctl is-active github-runner)"
+          tree
           echo "---------------------------------"
           echo "✅ Local runners validation completed successfully"
 
