@@ -33,7 +33,7 @@ resource "proxmox_virtual_environment_vm" "this" {
     file_id      = proxmox_download_file.this[each.key].id
     interface    = "scsi0"
     iothread     = true
-    size         = 20
+    size         = each.value.storage_size_gb
     ssd          = true
   }
 
