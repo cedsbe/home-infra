@@ -45,7 +45,7 @@ ARG TASK_VERSION=v3.51.1
 # renovate: datasource=github-releases depName=terraform-linters/tflint
 ARG TFLINT_VERSION=v0.63.1
 # renovate: datasource=github-releases depName=aquasecurity/trivy
-ARG TRIVY_VERSION=v0.71.0
+ARG TRIVY_VERSION=v0.71.1
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.53.3
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
