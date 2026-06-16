@@ -58,16 +58,19 @@ jobs:
             echo "❌ git-crypt is not installed"
           fi
 
+      - name: Display Terraform version
+        run: |
+          echo "🔍 Terraform Status"
+          echo "================================="
+          if command -v terraform &> /dev/null; then
+            echo "✅ Terraform is installed"
+            terraform version
+          else
+            echo "❌ Terraform is not installed"
+          fi
+
       - name: Folder structure
         run: |
-          echo "🔍 Folder Structure"
-          echo "================================="
-          find . -type d -print | sed -e 's;[^/]*/;|___;g;s;___|; |;g'
-          echo "---------------------------------"
           echo "🔍 Folder tree in $(pwd)"
           echo "================================="
           tree -L 3
-          echo "---------------------------------"
-          echo "🔍 Folder tree in root (/)"
-          echo "================================="
-          tree -L 5 /
