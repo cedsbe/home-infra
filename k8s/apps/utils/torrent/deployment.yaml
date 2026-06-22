@@ -64,7 +64,7 @@ spec:
               mountPath: /tmp
         - name: torrent
           # yamllint disable-line rule:line-length
-          image: ghcr.io/home-operations/qbittorrent:5.2.2@sha256:58e7ef6ed77f369c484b3066652c9e2e3d2c87bd44fce9883455565145fbd8eb # renovate: datasource=docker depName=ghcr.io/home-operations/qbittorrent packageName=ghcr.io/home-operations/qbittorrent versioning=docker registryUrl=https://ghcr.io
+          image: ghcr.io/home-operations/qbittorrent:5.2.2@sha256:24f2d793cb7f7a93e755e5d22e533be818e62eadc864f4a82315b901b6ffe807 # renovate: datasource=docker depName=ghcr.io/home-operations/qbittorrent packageName=ghcr.io/home-operations/qbittorrent versioning=docker registryUrl=https://ghcr.io
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
