@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           fetch-depth: 0
 
@@ -87,7 +87,7 @@ jobs:
           key: node-${{ runner.os }}-${{ hashFiles('package*.json') }}
 
       - name: Run pre-commit
-        uses: cloudposse/github-action-pre-commit@828247764461bc41b2bd267e24d76e91a279b093 # v4.0.0
+        uses: cloudposse/github-action-pre-commit@ed9906221c8a4ee1dcb1e665da895998e0f7b396 # v4.1.0
 
       - name: Upload pre-commit logs on failure
         if: failure()
@@ -107,7 +107,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@cf5c088a69634cd13ccddc735d7926162c31f9a6 # master
