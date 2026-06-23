@@ -46,7 +46,7 @@ jobs:
           python-version: "3.x"
 
       - name: Install CLI tools
-        uses: alexellis/arkade-get@b2570df8acfd04f8ae2e2ea440c24ab6cdca9646 # master
+        uses: alexellis/arkade-get@e1bb1a75e948dbbb055aacecaa510edbcbaa6e45 # master
         with:
           kubectl: v1.36.2 # renovate: datasource=github-releases depName=kubernetes/kubernetes packageName=kubernetes/kubernetes versioning=semver-coerced registryUrl=https://github.com
           kustomize: v5.8.0 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
