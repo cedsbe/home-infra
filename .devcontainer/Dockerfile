@@ -211,9 +211,12 @@ RUN <<EOF
 EOF
 
 # Add PowerShell repo (reuses Microsoft GPG key from Azure CLI setup)
+# PowerShell is only available for amd64
 RUN <<EOF
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/trusted.gpg.d/microsoft.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" \
-      | tee /etc/apt/sources.list.d/microsoft-powershell.list > /dev/null
+    if [ "$(dpkg --print-architecture)" = "amd64" ]; then
+      echo "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/microsoft.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" \
+        | tee /etc/apt/sources.list.d/microsoft-powershell.list > /dev/null
+    fi
 EOF
 
 # Add Fish shell PPA
@@ -232,8 +235,10 @@ RUN <<EOF
     nodejs \
     packer \
     postgresql-client \
-    powershell \
     terraform \
+  && if [ "$(dpkg --print-architecture)" = "amd64" ]; then \
+       apt-get install -y --no-install-recommends powershell; \
+     fi \
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*
 EOF
 
@@ -316,8 +321,6 @@ RUN <<EOF
   curl -fsSL "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-${HADOLINT_ARCH}" -o /usr/local/bin/hadolint
   chmod +x /usr/local/bin/hadolint
 
-
-  # Install gitleaks - x86_64 only due to upstream release naming
   GITLEAKS_ARCH="x64"
   if [ "$ARCH" = "arm64" ]; then
     GITLEAKS_ARCH="arm64"
@@ -330,19 +333,17 @@ EOF
 RUN <<EOF
   ARCH=$(dpkg --print-architecture)
 
-  # Install eza (modern ls) - x86_64 only due to upstream release naming
-  if [ "$ARCH" = "amd64" ]; then
-    curl -fsSL "https://github.com/eza-community/eza/releases/download/${EZA_VERSION}/eza_x86_64-unknown-linux-gnu.tar.gz" | tar -xz -C /usr/local/bin
-    chmod +x /usr/local/bin/eza
-  else
-    echo "Warning: eza not available for $ARCH architecture"
+  EZA_ARCH="x86_64"
+  if [ "$ARCH" = "arm64" ]; then
+    EZA_ARCH="aarch64"
   fi
+  curl -fsSL "https://github.com/eza-community/eza/releases/download/${EZA_VERSION}/eza_${EZA_ARCH}-unknown-linux-gnu.tar.gz" | tar -xz -C /usr/local/bin
+  chmod +x /usr/local/bin/eza
 
   # Install yq
   curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${ARCH}" -o /usr/local/bin/yq
   chmod +x /usr/local/bin/yq
 
-  # Install lazygit - x86_64 only due to upstream release naming
   LAZYGIT_ARCH="x86_64"
   if [ "$ARCH" = "arm64" ]; then
     LAZYGIT_ARCH="arm64"
@@ -365,7 +366,7 @@ RUN <<EOF
   # Convert dpkg arch to starship arch naming
   STARSHIP_ARCH="x86_64-unknown-linux-gnu"
   if [ "$ARCH" = "arm64" ]; then
-    STARSHIP_ARCH="aarch64-unknown-linux-gnu"
+    STARSHIP_ARCH="aarch64-unknown-linux-musl"
   fi
   curl -fsSL "https://github.com/starship/starship/releases/download/${STARSHIP_VERSION}/starship-${STARSHIP_ARCH}.tar.gz" | tar -xz -C /usr/local/bin starship
   chmod +x /usr/local/bin/starship
