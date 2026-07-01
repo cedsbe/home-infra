@@ -2,7 +2,7 @@
 # Default variables for base-linux role
 
 # System configuration
-timezone: UTC
+timezone: Europe/Brussels
 ntp_servers:
   - 0.pool.ntp.org
   - 1.pool.ntp.org
