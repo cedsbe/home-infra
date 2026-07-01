@@ -1,0 +1,28 @@
+---
+# System configuration
+timezone: Romance Standard Time
+ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+
+# Windows Firewall
+windows_firewall_enabled: true
+
+# PowerShell
+powershell_execution_policy: RemoteSigned
+
+# Windows Update
+windows_auto_update: false
+windows_update_categories:
+  - CriticalUpdates
+  - SecurityUpdates
+
+# Services to disable (applicable to all Windows editions)
+windows_services_to_disable:
+  - Spooler         # Print Spooler (security risk if not needed)
+  - RemoteRegistry  # Remote Registry (security risk)
+  - WerSvc          # Windows Error Reporting
+  - TrkWks          # Distributed Link Tracking Client (rarely needed)
+  - SysMain         # Superfetch/SysMain (resource overhead)
+  - WSearch         # Windows Search (resource intensive)

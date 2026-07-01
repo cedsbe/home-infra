@@ -134,6 +134,7 @@ RUN <<EOF
     jq \
     pinentry-curses \
     rsync \
+    sshpass \
     tldr \
     util-linux \
   && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean && rm -rf /var/lib/apt/lists/*

@@ -182,6 +182,7 @@ digitalocean
 dind
 disable
 disconnect
+DISM
 distroless
 dmwappushservice
 dnf
@@ -225,6 +226,7 @@ env
 envoy
 esbuild
 eslint
+ESU
 esxi
 etcd
 eux
@@ -312,6 +314,7 @@ hsv
 html
 httproute
 husky
+HWID
 hyper
 hyperv
 iad
