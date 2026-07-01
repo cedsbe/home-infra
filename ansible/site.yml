@@ -18,7 +18,7 @@
   tags:
     - linux
   roles:
-    - role: common/base-linux
+    - role: linux/base
       tags: base
 
 - name: Configure Windows hosts (common baseline)
@@ -27,7 +27,7 @@
   tags:
     - windows
   roles:
-    - role: common/base-windows-common
+    - role: windows/base
       tags: base
 
 - name: Configure Windows servers
@@ -37,7 +37,7 @@
     - windows
     - windows-server
   roles:
-    - role: common/base-windows-server
+    - role: windows/server
       tags: base-server
 
 - name: Configure Windows clients
@@ -47,7 +47,7 @@
     - windows
     - windows-client
   roles:
-    - role: common/base-windows-client
+    - role: windows/client
       tags: base-client
 
 - name: Configure Domain Controllers
