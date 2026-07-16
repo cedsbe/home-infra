@@ -72,12 +72,23 @@
     {
       "description": "Group all non-major updates in the .devcontainer directory into a single PR",
       "groupName": "devcontainer non-major updates",
+      "matchFileNames": [
+        ".devcontainer/**"
+      ],
       "matchUpdateTypes": [
         "minor",
         "patch"
-      ],
+      ]
+    },
+    {
+      "description": "Group all non-major updates in the .github/workflows directory into a single PR",
+      "groupName": "GitHub Workflows non-major updates",
       "matchFileNames": [
-        ".devcontainer/**"
+        ".github/workflows/**"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
       ]
     }
   ],
