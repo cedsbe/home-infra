@@ -68,6 +68,17 @@
       "prBodyNotes": [
         "\u26a0\ufe0f **Dependency Constraint**: Ensure the Gateway API version is supported by Cilium before merging. Check [Cilium Gateway API documentation](https://docs.cilium.io/en/stable/network/servicemesh/gateway-api/gateway-api/) for compatibility."
       ]
+    },
+    {
+      "description": "Group all non-major updates in the .devcontainer directory into a single PR",
+      "groupName": "devcontainer non-major updates",
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchFileNames": [
+        ".devcontainer/**"
+      ]
     }
   ],
   "prBodyColumns": [
