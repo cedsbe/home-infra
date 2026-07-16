@@ -38,7 +38,7 @@ spec:
       containers:
         - name: pocket-id
           # TODO: switch to distroless (ghcr.io/pocket-id/pocket-id:v1.16-distroless) image when the deployment is stable.
-          image: ghcr.io/pocket-id/pocket-id:v2.9@sha256:a2a38a96699d7483d65b5849b015d954f294938306a03a9c0699bc5b79554e86 # renovate: datasource=docker depName=ghcr.io/pocket-id/pocket-id packageName=ghcr.io/pocket-id/pocket-id versioning=docker registryUrl=https://ghcr.io
+          image: ghcr.io/pocket-id/pocket-id:v2.11@sha256:b7c37ab3044e53fd29b5f7295eebff5fdc0367dc043f36b41bcbe1815fcd965d # renovate: datasource=docker depName=ghcr.io/pocket-id/pocket-id packageName=ghcr.io/pocket-id/pocket-id versioning=docker registryUrl=https://ghcr.io
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
