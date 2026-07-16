@@ -13,7 +13,7 @@
 
 .NOTES
     File Name      : set-network-private.ps1
-    Author         : Home Infrastructure Team
+    Author         : Cedric GHIOT
     Prerequisite   : Windows Server 2025 with active network connection
     Version        : 1.0
     Exit Codes     : 0 = Success (don't run again - cloudbase-init)

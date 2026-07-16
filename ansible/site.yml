@@ -18,17 +18,37 @@
   tags:
     - linux
   roles:
-    - role: common/base-linux
+    - role: linux/base
       tags: base
 
-- name: Configure Windows hosts
+- name: Configure Windows hosts (common baseline)
   hosts: windows
   gather_facts: true
   tags:
     - windows
   roles:
-    - role: common/base-windows
+    - role: windows/base
       tags: base
+
+- name: Configure Windows servers
+  hosts: member_servers,domain_controllers
+  gather_facts: false
+  tags:
+    - windows
+    - windows-server
+  roles:
+    - role: windows/server
+      tags: base-server
+
+- name: Configure Windows clients
+  hosts: scanner_servers
+  gather_facts: false
+  tags:
+    - windows
+    - windows-client
+  roles:
+    - role: windows/client
+      tags: base-client
 
 - name: Configure Domain Controllers
   hosts: domain_controllers

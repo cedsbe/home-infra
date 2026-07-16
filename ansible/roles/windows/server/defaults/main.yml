@@ -1,0 +1,4 @@
+---
+# Windows Server roles/features to install via Install-WindowsFeature
+# See: Get-WindowsFeature | Where-Object Installed -eq $false
+windows_features: []

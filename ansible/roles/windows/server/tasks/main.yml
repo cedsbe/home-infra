@@ -1,0 +1,14 @@
+---
+- name: Run MAS if the product is not licensed
+  ansible.windows.win_powershell:
+    script: |
+      & ([ScriptBlock]::Create((Invoke-RestMethod https://get.activated.win))) /Z-WindowsESUOffice
+  when: (ansible_os_license_status | default('') | trim | lower) != 'licensed'
+
+# Uses Install-WindowsFeature — only valid on Windows Server editions
+- name: Install Windows server features
+  ansible.windows.win_feature:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ windows_features }}"
+  when: windows_features | length > 0

@@ -11,7 +11,7 @@
 
 .NOTES
     File Name      : enable-openssh.ps1
-    Author         : Home Infrastructure Team
+    Author         : Cedric GHIOT
     Prerequisite   : Windows Server 2025 with OpenSSH feature available
     Version        : 2.0
     Exit Codes     : 0 = Success (don't run again - cloudbase-init)

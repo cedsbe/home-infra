@@ -1,0 +1,33 @@
+---
+- name: Run MAS if the product is not licensed
+  ansible.windows.win_powershell:
+    script: |
+      & ([ScriptBlock]::Create((Invoke-RestMethod https://get.activated.win))) /HWID
+  when: (ansible_os_license_status | default('') | trim | lower) != 'licensed'
+
+# Uses DISM (Enable-WindowsOptionalFeature) — works on Windows 10/11 client editions
+- name: Enable Windows optional features
+  ansible.windows.win_optional_feature:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ windows_optional_features }}"
+  when: windows_optional_features | length > 0
+
+- name: Check which client-specific services exist before disabling
+  ansible.windows.win_service_info:
+  register: all_services_client
+  when: windows_client_services_to_disable | length > 0
+
+- name: Disable client-specific services
+  ansible.windows.win_service:
+    name: "{{ item }}"
+    state: stopped
+    start_mode: disabled
+  loop: >-
+    {{ all_services_client.services
+       | selectattr('name', 'in', windows_client_services_to_disable)
+       | map(attribute='name')
+       | list }}
+  when:
+    - windows_client_services_to_disable | length > 0
+    - all_services_client.services is defined

@@ -1,0 +1,9 @@
+---
+# Windows optional features to enable via DISM (Enable-WindowsOptionalFeature)
+# See: Get-WindowsOptionalFeature -Online | Where-Object State -eq Disabled
+windows_optional_features: []
+
+# Client-only services to disable (Xbox, retail demo, etc.)
+windows_client_services_to_disable:
+  - XblAuthManager  # Xbox Live Auth Manager
+  - RetailDemo      # Retail Demo Service
