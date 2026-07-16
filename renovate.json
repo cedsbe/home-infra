@@ -70,7 +70,7 @@
       ]
     },
     {
-      "description": "Group all non-major update in the .devcontainer directory into a single PR",
+      "description": "Group all non-major updates in the .devcontainer directory into a single PR",
       "groupName": "devcontainer non-major updates",
       "matchUpdateTypes": [
         "minor",
