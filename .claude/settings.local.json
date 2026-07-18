@@ -17,7 +17,8 @@
       "Bash(git stash *)",
       "Bash(git ls-remote *)",
       "Bash(gh pr list *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
