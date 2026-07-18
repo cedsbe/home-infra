@@ -1,4 +1,9 @@
 {
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "github",
+    "terraform"
+  ],
   "permissions": {
     "allow": [
       "WebSearch",
@@ -9,12 +14,11 @@
       "Bash(git remote *)",
       "Bash(git status *)",
       "Bash(git rebase *)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(git ls-remote *)",
+      "Bash(gh pr list *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
-  },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "github",
-    "terraform"
-  ]
+  }
 }
