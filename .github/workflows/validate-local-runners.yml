@@ -58,6 +58,24 @@ jobs:
             echo "❌ git-crypt is not installed"
           fi
 
+      - name: Unlock git-crypt
+        env:
+          GIT_CRYPT_KEY_BASE64: ${{ secrets.GIT_CRYPT_KEY_BASE64 }}
+        run: |
+          echo "🔍 Unlocking git-crypt"
+          echo "================================="
+          echo "$GIT_CRYPT_KEY_BASE64" | base64 --decode > git-crypt-key
+          if git-crypt unlock git-crypt-key; then
+            echo "✅ git-crypt unlocked successfully"
+            echo "---------------------------------"
+            echo "🔍 Display git-crypt canary file:"
+            cat .git-crypt-canary
+            echo "---------------------------------"
+          else
+            echo "❌ Failed to unlock git-crypt"
+          fi
+          rm -f git-crypt-key
+
       - name: Display Terraform version
         run: |
           echo "🔍 Terraform Status"
