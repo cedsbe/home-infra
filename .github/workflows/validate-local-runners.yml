@@ -56,6 +56,7 @@ jobs:
             git-crypt status
           else
             echo "❌ git-crypt is not installed"
+            exit 1
           fi
 
       - name: Unlock git-crypt
@@ -64,8 +65,11 @@ jobs:
         run: |
           echo "🔍 Unlocking git-crypt"
           echo "================================="
-          echo "$GIT_CRYPT_KEY_BASE64" | base64 --decode > git-crypt-key
-          if git-crypt unlock git-crypt-key; then
+          umask 077
+          KEY_FILE=$(mktemp)
+          trap 'rm -f "$KEY_FILE"' EXIT
+          echo "$GIT_CRYPT_KEY_BASE64" | base64 --decode > "$KEY_FILE"
+          if git-crypt unlock "$KEY_FILE"; then
             echo "✅ git-crypt unlocked successfully"
             echo "---------------------------------"
             echo "🔍 Display git-crypt canary file:"
@@ -73,8 +77,8 @@ jobs:
             echo "---------------------------------"
           else
             echo "❌ Failed to unlock git-crypt"
+            exit 1
           fi
-          rm -f git-crypt-key
 
       - name: Display Terraform version
         run: |
@@ -85,6 +89,7 @@ jobs:
             terraform version
           else
             echo "❌ Terraform is not installed"
+            exit 1
           fi
 
       - name: Folder structure

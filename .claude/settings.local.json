@@ -16,7 +16,8 @@
       "Bash(git rebase *)",
       "Bash(git stash *)",
       "Bash(git ls-remote *)",
-      "Bash(gh pr list *)"
+      "Bash(gh pr list *)",
+      "Bash(git add *)"
     ]
   }
 }
