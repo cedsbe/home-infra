@@ -37,7 +37,7 @@ spec:
             value: "1"
       containers:
         - name: prowlarr
-          image: ghcr.io/home-operations/prowlarr:2.5.1@sha256:5014bec2085b72759570ae958cdee251956c059bf82ca6244a3ce99e1c327a12 # renovate: datasource=docker depName=ghcr.io/home-operations/prowlarr packageName=ghcr.io/home-operations/prowlarr versioning=docker registryUrl=https://ghcr.io
+          image: ghcr.io/home-operations/prowlarr:2.5.2@sha256:dbe7685eb134cd63eaa130fbf60060f33f26d7482b5fc5a81da9fca8552aa4ed # renovate: datasource=docker depName=ghcr.io/home-operations/prowlarr packageName=ghcr.io/home-operations/prowlarr versioning=docker registryUrl=https://ghcr.io
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
