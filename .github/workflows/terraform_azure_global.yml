@@ -5,10 +5,10 @@ on:
   pull_request:
 
 jobs:
-  terraform-validation:
+  terraform-validation-and-plan:
     runs-on: arc-runners-home-infra
     timeout-minutes: 15
-    name: "Terraform Validation"
+    name: "Terraform Validation and Plan"
     permissions:
       contents: read
       id-token: write
@@ -57,7 +57,7 @@ jobs:
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate
+        run: terraform validate -no-color
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
@@ -66,7 +66,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false -no-color
         continue-on-error: true
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
@@ -75,6 +75,7 @@ jobs:
           ARM_USE_OIDC: "true"
 
       - uses: actions/github-script@v9
+        name: "Comment on Pull Request"
         id: comment
         if: github.event_name == 'pull_request'
         env:
@@ -107,7 +108,7 @@ jobs:
 
             <details><summary>Show Plan</summary>
 
-            \`\`\`\n
+            \`\`\`terraform\n
             ${process.env.PLAN}
             \`\`\`
 
