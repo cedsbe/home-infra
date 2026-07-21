@@ -12,6 +12,9 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    defaults:
+      run:
+        working-directory: terraform/azure/global
 
     steps:
       - name: Checkout code
@@ -20,6 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Unlock git-crypt
+        id: unlock-git-crypt
         env:
           GIT_CRYPT_KEY_BASE64: ${{ secrets.GIT_CRYPT_KEY_BASE64 }}
         run: |
@@ -29,22 +33,30 @@ jobs:
           trap 'rm -f "$KEY_FILE"' EXIT
           echo "$GIT_CRYPT_KEY_BASE64" | base64 --decode > "$KEY_FILE"
           git-crypt unlock "$KEY_FILE"
+
       - name: Configure Terraform
+        id: terraform-setup
         uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: "1.15.8"
+          terraform_version: "1.15.8" # renovate: datasource=github-releases depName=hashicorp/terraform packageName=hashicorp/terraform versioning=semver-coerced  extractVersion=^v(?<version>.*)$ registryUrl=https://github.com
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
 
       - name: Terraform Init
+        id: init
         run: terraform init -backend-config="backend.config"
-        working-directory: terraform/azure/global
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: "true"
+
       - name: Terraform Validate
+        id: validate
         run: terraform validate
-        working-directory: terraform/azure/global
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
@@ -52,10 +64,70 @@ jobs:
           ARM_USE_OIDC: "true"
 
       - name: Terraform Plan
+        id: plan
         run: terraform plan -input=false
-        working-directory: terraform/azure/global
+        continue-on-error: true
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: "true"
+
+      - uses: actions/github-script@v7
+        id: comment
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // 1. Retrieve existing bot comments for the PR
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
+            const botComment = comments.find(comment => {
+              return comment.user.type === 'Bot' && comment.body.includes('Terraform Format and Style')
+            })
+
+            // 2. Prepare format of the comment
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            <details><summary>Validation Output</summary>
+
+            \`\`\`\n
+            ${{ steps.validate.outputs.stdout }}
+            \`\`\`
+
+            </details>
+
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+
+            // 3. If we have a comment, update it, otherwise create a new one
+            if (botComment) {
+              github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: output
+              })
+            } else {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
+            }
