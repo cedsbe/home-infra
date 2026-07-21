@@ -12,5 +12,5 @@ template:
   spec:
     containers:
       - name: runner
-        image: "ghcr.io/cedsbe/actions-runner-cedsbe@sha256:530306972196d1e4ff1c60f917dd08708face9606e74f6e42cca8868f4771261"
+        image: "ghcr.io/cedsbe/actions-runner-cedsbe:v1.0.0@sha256:2993eba02adcb90d368af949fbe423e3df86c898afaeffaa2488025947465e6c"
         command: ["/home/runner/run.sh"]
