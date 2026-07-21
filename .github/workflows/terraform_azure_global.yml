@@ -97,21 +97,17 @@ jobs:
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
             <details><summary>Validation Output</summary>
-
-            \`\`\`\n
+            \`\`\`
             ${{ steps.validate.outputs.stdout }}
             \`\`\`
-
             </details>
 
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
             <details><summary>Show Plan</summary>
-
-            \`\`\`terraform\n
+            \`\`\`terraform
             ${process.env.PLAN}
             \`\`\`
-
             </details>
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
@@ -132,3 +128,8 @@ jobs:
                 body: output
               })
             }
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve
+        working-directory: terraform/azure/global
