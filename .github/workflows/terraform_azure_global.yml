@@ -1,4 +1,4 @@
-name: "Terraform Kubernetes Workflow"
+name: "Terraform Azure Global Workflow"
 
 on:
   - workflow_dispatch
@@ -14,12 +14,24 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v2.4.0
         with:
           fetch-depth: 0
 
+      - name: Unlock git-crypt
+        env:
+          GIT_CRYPT_KEY_BASE64: ${{ secrets.GIT_CRYPT_KEY_BASE64 }}
+        run: |
+          echo "🔍 Unlocking git-crypt"
+          umask 077
+          KEY_FILE=$(mktemp)
+          trap 'rm -f "$KEY_FILE"' EXIT
+          echo "$GIT_CRYPT_KEY_BASE64" | base64 --decode > "$KEY_FILE"
+          git-crypt unlock "$KEY_FILE"
       - name: Configure Terraform
         uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.15.8"
 
       - name: Terraform Init
         run: terraform init -backend-config="backend.config"
@@ -28,7 +40,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
+          ARM_USE_OIDC: "true"
       - name: Terraform Validate
         run: terraform validate
         working-directory: terraform/azure/global
@@ -36,6 +48,7 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_USE_OIDC: "true"
 
       - name: Terraform Plan
         run: terraform plan -input=false
@@ -44,3 +57,4 @@ jobs:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_USE_OIDC: "true"
