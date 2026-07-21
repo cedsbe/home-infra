@@ -97,7 +97,8 @@ jobs:
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
             <details><summary>Validation Output</summary>
-            \`\`\`
+
+            \`\`\`\n
             ${{ steps.validate.outputs.stdout }}
             \`\`\`
             </details>
@@ -105,9 +106,11 @@ jobs:
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
             <details><summary>Show Plan</summary>
-            \`\`\`terraform
+
+            \`\`\`terraform\n
             ${process.env.PLAN}
             \`\`\`
+
             </details>
 
             *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
