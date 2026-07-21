@@ -1,0 +1,46 @@
+name: "Terraform Kubernetes Workflow"
+
+on:
+  - workflow_dispatch
+
+jobs:
+  terraform-validation:
+    runs-on: arc-runners-home-infra
+    timeout-minutes: 15
+    name: "Terraform Validation"
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+
+      - name: Configure Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Terraform Init
+        run: terraform init -backend-config="backend.config"
+        working-directory: terraform/azure/global
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform/azure/global
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+      - name: Terraform Plan
+        run: terraform plan -input=false
+        working-directory: terraform/azure/global
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_HOME_INFRA }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_HOME_INFRA }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
