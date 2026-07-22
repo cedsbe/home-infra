@@ -1,7 +1,7 @@
 # renovate: datasource=github-releases depName=cilium/cilium
 cilium_version = "v1.19.6"
 # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
-gateway_api_version = "v1.3.0"
+gateway_api_version = "v1.6.1"
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
 kubernetes_version = "v1.36.2"
 talos_version      = "v1.13.4"
