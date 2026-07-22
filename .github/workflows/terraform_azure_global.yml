@@ -37,7 +37,7 @@ jobs:
 
       - name: Configure Terraform
         id: terraform-setup
-        uses: hashicorp/setup-terraform@v4
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
         with:
           terraform_version: "1.15.8" # renovate: datasource=github-releases depName=hashicorp/terraform packageName=hashicorp/terraform versioning=semver-coerced  extractVersion=^v(?<version>.*)$ registryUrl=https://github.com
 
@@ -74,7 +74,7 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: "true"
 
-      - uses: actions/github-script@v9
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         name: "Comment on Pull Request"
         id: comment
         if: github.event_name == 'pull_request'
