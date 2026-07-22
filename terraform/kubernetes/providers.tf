@@ -39,7 +39,7 @@ terraform {
 
     utils = { # tflint-ignore: terraform_unused_required_providers # Transitive dependency used by module
       source  = "netascode/utils"
-      version = "1.1.0-beta6"
+      version = "2.0.2"
     }
   }
 }
