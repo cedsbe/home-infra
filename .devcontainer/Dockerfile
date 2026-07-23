@@ -25,7 +25,7 @@ ARG KUBECONFORM_VERSION=v0.8.0
 # renovate: datasource=github-releases depName=ahmetb/kubectx
 ARG KUBECTX_VERSION=v0.11.0
 # renovate: datasource=github-releases depName=int128/kubelogin
-ARG KUBELOGIN_VERSION=v1.36.2
+ARG KUBELOGIN_VERSION=v1.36.3
 # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
 ARG KUBESEAL_VERSION=v0.38.4
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
@@ -39,7 +39,7 @@ ARG STARSHIP_VERSION=v1.26.0
 # renovate: datasource=github-releases depName=stern/stern
 ARG STERN_VERSION=v1.34.0
 # renovate: datasource=github-releases depName=siderolabs/talos
-ARG TALOS_VERSION=v1.13.6
+ARG TALOS_VERSION=v1.13.7
 # renovate: datasource=github-releases depName=go-task/task
 ARG TASK_VERSION=v3.52.0
 # renovate: datasource=github-releases depName=terraform-linters/tflint
@@ -49,7 +49,7 @@ ARG TRIVY_VERSION=v0.72.0
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=v4.53.3
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_CODE_VERSION=2.1.210
+ARG CLAUDE_CODE_VERSION=2.1.216
 # renovate: datasource=npm depName=cspell
 ARG CSPELL_VERSION=10.0.1
 
