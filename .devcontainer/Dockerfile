@@ -11,27 +11,27 @@ ENV TZ=$TZ
 
 # Tool versions - automatically updated by Renovate
 # renovate: datasource=github-releases depName=argoproj/argo-cd
-ARG ARGOCD_VERSION=v3.4.5
+ARG ARGOCD_VERSION=v3.5.2
 # renovate: datasource=github-releases depName=eza-community/eza
 ARG EZA_VERSION=v0.23.5
 # renovate: datasource=github-releases depName=hadolint/hadolint
-ARG HADOLINT_VERSION=v2.14.0
+ARG HADOLINT_VERSION=v2.15.1
 # renovate: datasource=github-releases depName=derailed/k9s
 ARG K9S_VERSION=v0.51.0
 # renovate: datasource=github-releases depName=kubecolor/kubecolor
-ARG KUBECOLOR_VERSION=v0.6.0
+ARG KUBECOLOR_VERSION=v0.7.1
 # renovate: datasource=github-releases depName=yannh/kubeconform
 ARG KUBECONFORM_VERSION=v0.8.0
 # renovate: datasource=github-releases depName=ahmetb/kubectx
 ARG KUBECTX_VERSION=v0.11.0
 # renovate: datasource=github-releases depName=int128/kubelogin
-ARG KUBELOGIN_VERSION=v1.36.2
+ARG KUBELOGIN_VERSION=v1.36.3
 # renovate: datasource=github-releases depName=bitnami-labs/sealed-secrets
-ARG KUBESEAL_VERSION=v0.38.4
+ARG KUBESEAL_VERSION=v0.39.1
 # renovate: datasource=github-releases depName=kubernetes-sigs/kustomize
 ARG KUSTOMIZE_VERSION=v5.8.0
 # renovate: datasource=github-releases depName=jesseduffield/lazygit
-ARG LAZYGIT_VERSION=v0.63.1
+ARG LAZYGIT_VERSION=v0.65.0
 # renovate: datasource=github-releases depName=gitleaks/gitleaks
 ARG GITLEAKS_VERSION=v8.30.1
 # renovate: datasource=github-releases depName=starship/starship
@@ -39,19 +39,19 @@ ARG STARSHIP_VERSION=v1.26.0
 # renovate: datasource=github-releases depName=stern/stern
 ARG STERN_VERSION=v1.34.0
 # renovate: datasource=github-releases depName=siderolabs/talos
-ARG TALOS_VERSION=v1.13.6
+ARG TALOS_VERSION=v1.14.0
 # renovate: datasource=github-releases depName=go-task/task
-ARG TASK_VERSION=v3.52.0
+ARG TASK_VERSION=v3.53.1
 # renovate: datasource=github-releases depName=terraform-linters/tflint
 ARG TFLINT_VERSION=v0.64.0
 # renovate: datasource=github-releases depName=aquasecurity/trivy
-ARG TRIVY_VERSION=v0.72.0
+ARG TRIVY_VERSION=v0.74.0
 # renovate: datasource=github-releases depName=mikefarah/yq
-ARG YQ_VERSION=v4.53.3
+ARG YQ_VERSION=v4.53.6
 # renovate: datasource=npm depName=@anthropic-ai/claude-code
-ARG CLAUDE_CODE_VERSION=2.1.210
+ARG CLAUDE_CODE_VERSION=2.1.258
 # renovate: datasource=npm depName=cspell
-ARG CSPELL_VERSION=10.0.1
+ARG CSPELL_VERSION=10.2.0
 
 # Install system dependencies grouped by purpose
 RUN <<EOF
